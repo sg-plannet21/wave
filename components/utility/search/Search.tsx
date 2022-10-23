@@ -3,7 +3,7 @@ import { useState } from 'react';
 export interface ISearch {}
 
 const Search: React.FC<ISearch> = () => {
-  const [searchTerm, setSearchTerm] = useState<string>();
+  const [searchTerm, setSearchTerm] = useState<string>('');
   return (
     <form
       className="flex flex-col items-center gap-y-5"
