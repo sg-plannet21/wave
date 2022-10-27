@@ -1,7 +1,7 @@
 import { IAuthLayout } from './AuthLayout';
 
 const base: IAuthLayout = {
-  title: 'Hello world!',
+  title: 'Title',
   children: '{{children}}',
 };
 
