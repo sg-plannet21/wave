@@ -1,9 +1,9 @@
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import PrimaryLayout, { IPrimaryLayout } from './PrimaryLayout';
+import PrimaryLayout, { IPrimaryLayoutProps } from './PrimaryLayout';
 import { mockPrimaryLayoutProps } from './PrimaryLayout.mocks';
 
 export default {
-  title: 'layout/PrimaryLayout',
+  title: 'layouts/PrimaryLayout',
   component: PrimaryLayout,
   // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
   argTypes: {},
@@ -19,4 +19,4 @@ export const Base = Template.bind({});
 
 Base.args = {
   ...mockPrimaryLayoutProps.base,
-} as IPrimaryLayout;
+} as IPrimaryLayoutProps;

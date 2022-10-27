@@ -1,6 +1,6 @@
-import { IPrimaryLayout } from './PrimaryLayout';
+import { IPrimaryLayoutProps } from './PrimaryLayout';
 
-const base: IPrimaryLayout = {
+const base: IPrimaryLayoutProps = {
   children: '{{component}}',
 };
 

@@ -1,3 +1,4 @@
+import { RouterContext } from 'next/dist/shared/lib/router-context';
 import * as NextImage from 'next/image';
 import '../pages/globals.css';
 import { AuthProvider } from '../state/auth/AuthContext';
@@ -49,6 +50,9 @@ export const parameters = {
       color: /(background|color)$/i,
       date: /Date$/,
     },
+  },
+  nextRouter: {
+    Provider: RouterContext.Provider,
   },
   viewport: { viewports: customViewports },
 };

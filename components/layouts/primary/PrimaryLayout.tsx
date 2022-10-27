@@ -14,7 +14,13 @@ import {
 const Logo = () => {
   return (
     <NavLink className="flex items-center text-white" href=".">
-      <Image className="h-8 w-auto" src={logo} alt="Workflow" />
+      <Image
+        height="32px"
+        width="32px"
+        className="h-8 w-auto"
+        src={logo}
+        alt="Workflow"
+      />
       <span className="text-xl text-white font-semibold">Wave</span>
     </NavLink>
   );
@@ -217,7 +223,7 @@ const UserNavigation: React.FC = () => {
   );
 };
 
-type IPrimaryLayoutProps = {
+export type IPrimaryLayoutProps = {
   children: React.ReactNode;
 };
 
