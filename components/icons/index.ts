@@ -33,5 +33,6 @@ export { default as Star } from './Star';
 export { default as Sun } from './Sun';
 export { default as Trash } from './Trash';
 export { default as UnassignedEntity } from './UnassignedEntity';
+export { default as User } from './User';
 export { default as Users } from './Users';
 export { default as Vercel } from './Vercel';
