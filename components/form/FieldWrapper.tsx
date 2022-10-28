@@ -1,4 +1,4 @@
-import cn from 'classnames';
+import classNames from 'classnames';
 import * as React from 'react';
 import { FieldError } from 'react-hook-form';
 
@@ -19,7 +19,7 @@ export const FieldWrapper = (props: FieldWrapperProps) => {
   return (
     <div>
       <label
-        className={cn(
+        className={classNames(
           'block mb-2 text-sm font-medium',
           { 'text-red-700 dark:text-red-500': !!error },
           className

@@ -1,4 +1,4 @@
-import cn from 'classnames';
+import classNames from 'classnames';
 import { UseFormRegisterReturn } from 'react-hook-form';
 import { FieldWrapper, FieldWrapperPassThroughProps } from './FieldWrapper';
 
@@ -21,7 +21,7 @@ export const InputField: React.FC<InputFieldProps> = ({
     <FieldWrapper label={label} error={error}>
       <input
         type={type}
-        className={cn(
+        className={classNames(
           'appearance-none block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none sm:text-sm dark:shadow-sm-light text-gray-900 dark:bg-gray-700',
           {
             'border-gray-300 placeholder-gray-400 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 focus:border-blue-500':
