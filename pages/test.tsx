@@ -1,4 +1,3 @@
-import React from 'react';
 import Button from '../components/buttons/Button';
 import Drawer from '../components/feedback/drawer/Drawer';
 
@@ -9,7 +8,6 @@ import { NextPageWithLayout } from './page';
 
 const Test: NextPageWithLayout = () => {
   const { close, open, isOpen } = useDisclosure();
-  const cancelButtonRef = React.useRef(null);
 
   return (
     <>
