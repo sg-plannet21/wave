@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from '../components/buttons/Button';
-import Dialog, { DialogTitle } from '../components/feedback/dialog/Dialog';
+import Drawer from '../components/feedback/drawer/Drawer';
 
 import PrimaryLayout from '../components/layouts/primary/PrimaryLayout';
 import { useDisclosure } from '../state/hooks/useDisclosure';
@@ -14,13 +14,12 @@ const Test: NextPageWithLayout = () => {
   return (
     <>
       <Button onClick={open}>Open Modal</Button>
-      <Dialog isOpen={isOpen} onClose={close} initialFocus={cancelButtonRef}>
-        <DialogTitle
-          as="h3"
-          className="text-lg font-medium leading-6 text-gray-900"
-        >
-          Payment successful
-        </DialogTitle>
+      <Drawer
+        isOpen={isOpen}
+        onClose={close}
+        title="Drawer Test"
+        renderFooter={() => <span>Footer</span>}
+      >
         <div className="mt-2">
           <p className="text-sm text-gray-500">
             Your payment has been successfully submitted. We’ve sent you an
@@ -37,7 +36,7 @@ const Test: NextPageWithLayout = () => {
             Got it, thanks!
           </button>
         </div>
-      </Dialog>
+      </Drawer>
     </>
   );
 };

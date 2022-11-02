@@ -223,11 +223,11 @@ const UserNavigation: React.FC = () => {
   );
 };
 
-export type IPrimaryLayoutProps = {
+export type PrimaryLayoutProps = {
   children: React.ReactNode;
 };
 
-const PrimaryLayout: React.FC<IPrimaryLayoutProps> = ({ children }) => {
+const PrimaryLayout: React.FC<PrimaryLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   return (
