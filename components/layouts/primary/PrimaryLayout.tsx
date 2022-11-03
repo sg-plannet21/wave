@@ -1,8 +1,8 @@
 import { Dialog, Menu, Transition } from '@headlessui/react';
+import NavLink from 'components/buttons/NavLink/NavLink';
 import Image from 'next/image';
+import logo from 'public/logo.svg';
 import React from 'react';
-import logo from '../../../public/logo.svg';
-import NavLink from '../../buttons/NavLink/NavLink';
 import {
   Cross,
   Menu as MenuIcon,

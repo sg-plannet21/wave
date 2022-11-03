@@ -1,11 +1,10 @@
+import Button from 'components/buttons/Button';
+import { Form } from 'components/form/Form';
+import { InputField } from 'components/form/InputField';
+import TimeRangePicker from 'components/form/TimeRangeField';
+import PrimaryLayout from 'components/layouts/primary/PrimaryLayout';
 import { FieldError } from 'react-hook-form';
 import { z } from 'zod';
-import Button from '../components/buttons/Button';
-import { Form } from '../components/form/Form';
-import { InputField } from '../components/form/InputField';
-import TimeRangePicker from '../components/form/TimeRangeField';
-import PrimaryLayout from '../components/layouts/primary/PrimaryLayout';
-import { generateTimeRange } from '../lib/client/date-utilities';
 
 import { NextPageWithLayout } from './page';
 
@@ -37,9 +36,6 @@ const LoginSchema = z.object({
 // const momentStartTime = moment.utc().hour()
 
 type LoginCredentials = z.infer<typeof LoginSchema>;
-
-const times = generateTimeRange('4:00', '23:59');
-console.log('times', times);
 
 const Test: NextPageWithLayout = () => {
   return (

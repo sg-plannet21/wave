@@ -1,12 +1,11 @@
 import { TimePicker } from 'antd';
+import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
+import { generateTimeRange, timeFormat } from 'lib/client/date-utilities';
 import {
   FieldValues,
   useController,
   UseControllerProps,
 } from 'react-hook-form';
-
-import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
-import { generateTimeRange, timeFormat } from '../../lib/client/date-utilities';
 import { FieldWrapper, FieldWrapperPassThroughProps } from './FieldWrapper';
 
 // https://dev.to/texmeijin/component-design-idea-using-react-hook-form-v7-ie0

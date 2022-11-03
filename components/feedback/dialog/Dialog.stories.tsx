@@ -1,7 +1,7 @@
 import { ComponentStory, Meta, Story } from '@storybook/react';
+import Button from 'components/buttons/Button';
 import React from 'react';
-import { useDisclosure } from '../../../state/hooks/useDisclosure';
-import Button from '../../buttons/Button';
+import { useDisclosure } from 'state/hooks/useDisclosure';
 import Dialog, { DialogTitle } from './Dialog';
 
 import { mockDialogProps } from './Dialog.mocks';

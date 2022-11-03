@@ -1,6 +1,6 @@
 import { ComponentStory, Meta, Story } from '@storybook/react';
-import { useDisclosure } from '../../../state/hooks/useDisclosure';
-import Button from '../../buttons/Button';
+import Button from 'components/buttons/Button';
+import { useDisclosure } from 'state/hooks/useDisclosure';
 import Drawer, { DrawerProps } from './Drawer';
 import { mockDrawerProps } from './Drawer.mocks';
 

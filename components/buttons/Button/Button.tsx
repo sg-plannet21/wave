@@ -1,6 +1,6 @@
 import classNames from 'classnames';
+import Spinner from 'components/feedback/spinner/Spinner';
 import React from 'react';
-import Spinner from '../../feedback/spinner/Spinner';
 
 const variants = {
   primary: 'bg-blue-600 text-white',
@@ -28,7 +28,7 @@ type IconProps =
       endIcon?: undefined;
     };
 
-export type ButtonProps = React.ComponentProps<'button'> & {
+export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: keyof typeof variants;
   size?: keyof typeof sizes;
   isLoading?: boolean;
