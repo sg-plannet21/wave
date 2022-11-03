@@ -3,10 +3,10 @@ import * as React from 'react';
 import { FieldError } from 'react-hook-form';
 
 type FieldWrapperProps = {
-  label?: string;
   className?: string;
-  children: React.ReactNode;
   error?: FieldError | undefined;
+  label?: string;
+  children: React.ReactNode;
 };
 
 export type FieldWrapperPassThroughProps = Omit<

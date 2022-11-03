@@ -28,7 +28,7 @@ type IconProps =
       endIcon?: undefined;
     };
 
-export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+export type ButtonProps = React.ComponentProps<'button'> & {
   variant?: keyof typeof variants;
   size?: keyof typeof sizes;
   isLoading?: boolean;
@@ -60,9 +60,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         {...props}
       >
-        {isLoading && <Spinner size="sm" className="text-current" />}
         {!isLoading && startIcon}
         <span className="mx-2">{props.children}</span> {!isLoading && endIcon}
+        {isLoading && (
+          <Spinner size="sm" className="text-current dark:text-current" />
+        )}
       </button>
     );
   }

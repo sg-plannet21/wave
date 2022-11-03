@@ -28,7 +28,7 @@ export const InputField: React.FC<InputFieldProps> = ({
               !error,
           },
           {
-            'bg-red-50 border-red-500 placeholder-red-700 focus:ring-red-500 focus:border-red-500 dark:border-red-400':
+            'bg-red-50 border-red-500 placeholder-red-700 focus:ring-red-500 focus:border-red-500 dark:border-red-400 dark:bg-red-200':
               !!error,
           },
           className
