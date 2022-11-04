@@ -1,3 +1,4 @@
+export { default as Archive } from './Archive';
 export { default as ArrowLeft } from './ArrowLeft';
 export { default as ArrowRight } from './ArrowRight';
 export { default as Bag } from './Bag';
