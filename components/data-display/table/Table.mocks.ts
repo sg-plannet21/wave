@@ -55,6 +55,14 @@ const columns: TableColumn<Dessert>[] = [
 const base: TableProps<Dessert> = {
   data: desserts,
   columns: columns,
+  sortColumn: {
+    field: 'name',
+    order: 'asc',
+  },
+  onSort: undefined,
+  // onSort(sortColumn) {
+  //   console.log('Sorting', sortColumn);
+  // },
 };
 
 export const mockTableProps = {

@@ -14,16 +14,26 @@ import { FieldWrapper, FieldWrapperPassThroughProps } from './FieldWrapper';
 type TimeRangePickerProps<T extends FieldValues> =
   FieldWrapperPassThroughProps & UseControllerProps<T> & { name: string };
 
-const defaultRange = generateTimeRange('9:00', '17:00');
+const defaultStartTime = '09:00';
+const defaultEndTime = '17:00';
 
 const TimeRangePicker = <T extends FieldValues>({
   label,
   error,
+  defaultValue,
   ...props
 }: TimeRangePickerProps<T>) => {
   const { field } = useController<T>({
-    defaultValue: defaultRange as any,
     ...props,
+    defaultValue: defaultValue?.length
+      ? generateTimeRange({
+          startTime: defaultValue[0],
+          endTime: defaultValue[1],
+        })
+      : (generateTimeRange({
+          startTime: defaultStartTime,
+          endTime: defaultEndTime,
+        }) as any),
   });
   return (
     <FieldWrapper label={label} error={error}>

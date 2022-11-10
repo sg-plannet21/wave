@@ -1,4 +1,4 @@
-import { SvgElement } from "./types";
+import { SvgElement } from './types';
 
 const DoubleChevron: SvgElement = ({ ...props }) => {
   return (

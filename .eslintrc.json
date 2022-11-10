@@ -1,9 +1,10 @@
 {
   "extends": [
-    "plugin:storybook/recommended", // New
-    "next",
     "next/core-web-vitals",
-    "eslint:recommended"
+    "plugin:storybook/recommended", // New
+    "prettier",
+    "eslint:recommended",
+    "next"
   ],
   "globals": {
     "React": "readonly"
