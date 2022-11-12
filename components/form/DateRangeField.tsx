@@ -3,9 +3,9 @@ import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 import { createUtcDateRange, dateFormat } from 'lib/client/date-utilities';
 import moment from 'moment';
 import {
-    FieldValues,
-    useController,
-    UseControllerProps
+  FieldValues,
+  useController,
+  UseControllerProps,
 } from 'react-hook-form';
 import { FieldWrapper, FieldWrapperPassThroughProps } from './FieldWrapper';
 

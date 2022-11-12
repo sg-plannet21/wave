@@ -3,7 +3,7 @@ import NavLink, { INavLink } from './NavLink';
 import { mockNavLinkProps } from './NavLink.mocks';
 
 export default {
-  title: 'buttons/NavLink',
+  title: 'navigation/NavLink',
   component: NavLink,
   // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
   argTypes: {},

@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import cn from 'classnames';
 import * as React from 'react';
 import { UseFormRegisterReturn } from 'react-hook-form';
 
@@ -9,18 +9,33 @@ type Option = {
   value: string | number | string[];
 };
 
-type SelectFieldProps = FieldWrapperPassThroughProps & {
-  options: Option[];
-  className?: string;
-  defaultValue?: string;
-  placeholder?: string;
-  registration: Partial<UseFormRegisterReturn>;
-};
+type GroupOption = { optgroup?: string; options: Option[] };
+
+type OptionType =
+  | { options: Option[]; groupedOptions?: never }
+  | { options?: never; groupedOptions: GroupOption[] };
+
+type SelectFieldProps = FieldWrapperPassThroughProps &
+  OptionType & {
+    className?: string;
+    defaultValue?: string;
+    placeholder?: string;
+    registration: Partial<UseFormRegisterReturn>;
+  };
+
+function renderOption({ label, value }: Option) {
+  return (
+    <option key={label?.toString()} value={value}>
+      {label}
+    </option>
+  );
+}
 
 export const SelectField = (props: SelectFieldProps) => {
   const {
     label,
     options,
+    groupedOptions,
     error,
     className,
     defaultValue,
@@ -32,7 +47,7 @@ export const SelectField = (props: SelectFieldProps) => {
       <select
         placeholder={placeholder}
         name="location"
-        className={classNames(
+        className={cn(
           'mt-1 block w-full pl-3 pr-10 py-2 text-base rounded-md border text-gray-900 focus:outline-none sm:text-sm dark:text-white dark:bg-gray-700',
           {
             'bg-gray-50 border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500':
@@ -47,11 +62,20 @@ export const SelectField = (props: SelectFieldProps) => {
         defaultValue={defaultValue}
         {...registration}
       >
-        {options.map(({ label, value }) => (
-          <option key={label?.toString()} value={value}>
-            {label}
-          </option>
-        ))}
+        {options
+          ? options.map((option) => renderOption(option))
+          : groupedOptions.map((groupedOption) =>
+              groupedOption.optgroup ? (
+                <optgroup
+                  key={groupedOption.optgroup}
+                  label={groupedOption.optgroup}
+                >
+                  {groupedOption.options.map((option) => renderOption(option))}
+                </optgroup>
+              ) : (
+                groupedOption.options.map((option) => renderOption(option))
+              )
+            )}
       </select>
     </FieldWrapper>
   );
