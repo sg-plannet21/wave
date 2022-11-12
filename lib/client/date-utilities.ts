@@ -39,13 +39,30 @@ export function createUtcTimeRange({
   return times.map((time) => moment.utc(time, timeFormat));
 }
 
-function displayLocalTime(time: Moment) {
+function createLocalTimeString(time: Moment) {
   return moment(time).local().format(timeFormat);
+}
+
+function createTimeRangeString(startTime: Moment, endTime: Moment) {
+  return `${createLocalTimeString(startTime)} - ${createLocalTimeString(
+    endTime
+  )}`;
+}
+
+function createLocalDateString(date: Moment) {
+  return moment(date).local().format(dateFormat);
+}
+
+function createDateRangeString(startDate: Moment, endDate: Moment) {
+  return `${createLocalDateString(startDate)} - ${createLocalDateString(
+    endDate
+  )}`;
 }
 
 export function validateRange(
   timeRange: [Moment, Moment],
   comparator: { range: [Moment, Moment]; label?: string }[],
+  type: 'date' | 'time' = 'date',
   abortEarly = true
 ): { result: true } | { result: false; message: string } {
   const [startTime, endTime] = timeRange;
@@ -69,11 +86,11 @@ export function validateRange(
       endTime.isSameOrAfter(existingEndTime)
     ) {
       messages.push(
-        `Range encloses existing range: ${
-          label ? `${label} -` : ''
-        } ${displayLocalTime(existingStartTime)} - ${displayLocalTime(
-          existingEndTime
-        )}`
+        `Range encloses existing range: ${label ? `${label}, ` : ''} ${
+          type === 'date'
+            ? createDateRangeString(existingStartTime, existingEndTime)
+            : createTimeRangeString(existingStartTime, existingEndTime)
+        }`
       );
       isValidRange = false;
       if (abortEarly) break;
@@ -85,11 +102,11 @@ export function validateRange(
       endTime.isBetween(existingStartTime, existingEndTime)
     ) {
       messages.push(
-        `Conflict with existing time range: ${
-          label ? `${label} -` : ''
-        } ${displayLocalTime(existingStartTime)} - ${displayLocalTime(
-          existingEndTime
-        )}`
+        `Conflict with existing range: ${label ? `${label}, ` : ''} ${
+          type === 'date'
+            ? createDateRangeString(existingStartTime, existingEndTime)
+            : createTimeRangeString(existingStartTime, existingEndTime)
+        }`
       );
       isValidRange = false;
       if (abortEarly) break;

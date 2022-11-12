@@ -3,8 +3,8 @@ import DateRangePicker from 'components/form/DateRangeField';
 import { Form } from 'components/form/Form';
 import { InputField } from 'components/form/InputField';
 import PrimaryLayout from 'components/layouts/primary/PrimaryLayout';
-import { TimeRange } from 'lib/client/date-utilities';
-import moment from 'moment';
+import { createUtcDateRange, validateRange } from 'lib/client/date-utilities';
+import moment, { Moment } from 'moment';
 import { FieldError } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -15,52 +15,64 @@ import { NextPageWithLayout } from './page';
 //   password:string;
 // }
 
-const schedules = [
-  { id: 1, startTime: '15:00', endTime: '17:00', day: 1 },
-  { id: 2, startTime: '18:00', endTime: '19:00', day: 1 },
-  { id: 3, startTime: '7:00', endTime: '19:00', day: 2 },
-  { id: 4, startTime: '7:00', endTime: '19:00', day: 2 },
-];
+const startDate = moment.utc().subtract(1, 'day').hours(9);
+const endDate = moment(startDate).add(2, 'days').hours(18);
 
-const testTimes: TimeRange[] = schedules
-  .filter((schedule) => schedule.day === 1)
-  .map(({ startTime, endTime }) => ({ startTime, endTime }));
+const startDate2 = moment(startDate).add(5);
+const endDate2 = moment(startDate2).add(1);
+
+const schedules = [
+  {
+    id: 1,
+    startDate: startDate.toJSON(),
+    endDate: endDate.toJSON(),
+    label: 'Holiday 1',
+  },
+  {
+    id: 4,
+    startDate: startDate2.toJSON(),
+    endDate: endDate2.toJSON(),
+    label: 'Holiday 2',
+  },
+];
 
 const LoginSchema = z.object({
   username: z.string().min(1, 'Required'),
   password: z.string().min(1, 'Required'),
-  duration: z.array(z.any()).length(2),
-  // duration: z.array(z.any()).transform((val, ctx) => {
-  //   const [startTime, endTime] = val.map((momentInstance: Moment) =>
-  //     momentInstance.isUTC()
-  //       ? momentInstance.format(timeFormat)
-  //       : moment.utc(momentInstance).format(timeFormat)
-  //   );
+  duration: z.array(z.any()).transform((val, ctx) => {
+    const [startTime, endTime] = val as [Moment, Moment];
 
-  //   const outcome = validateTimeRange({ startTime, endTime }, testTimes);
+    // testing
+    if (!startTime.isUTC() || !endTime.isUTC())
+      throw new Error('Start / End Time is not in UTC format');
 
-  //   if (!outcome.result) {
-  //     ctx.addIssue({
-  //       code: z.ZodIssueCode.custom,
-  //       message: outcome.message,
-  //     });
-  //     // This is a special symbol you can use to
-  //     // return early from the transform function.
-  //     // It has type `never` so it does not affect the
-  //     // inferred return type.
-  //     return z.NEVER;
-  //   }
+    const comparisionTimes = schedules.map((schedule) => ({
+      range: createUtcDateRange({
+        startDate: schedule.startDate,
+        endDate: schedule.endDate,
+      }) as [Moment, Moment],
+      label: schedule.label,
+    }));
 
-  //   return [startTime, endTime];
-  // }),
+    const outcome = validateRange([startTime, endTime], comparisionTimes);
+
+    if (!outcome.result) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: outcome.message,
+      });
+      // This is a special symbol you can use to
+      // return early from the transform function.
+      // It has type `never` so it does not affect the
+      // inferred return type.
+      return z.NEVER;
+    }
+
+    return [startTime, endTime].map((time) => time.toJSON());
+  }),
 });
 
 type LoginCredentials = z.infer<typeof LoginSchema>;
-
-const startDate = moment().subtract(1, 'day').toJSON();
-const endDate = moment().subtract(2, 'day').toJSON();
-console.log('startDate', startDate);
-console.log('endDate', endDate);
 
 const Test: NextPageWithLayout = () => {
   return (
@@ -89,7 +101,7 @@ const Test: NextPageWithLayout = () => {
               name="duration"
               // error={formState.errors['duration']}
               error={formState.errors['duration'] as FieldError | undefined}
-              defaultValue={[startDate, endDate]}
+              // defaultValue={['1:11', '5:55']}
               label="Date Range"
               control={control}
             />

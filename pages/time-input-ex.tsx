@@ -37,13 +37,15 @@ const LoginSchema = z.object({
     if (!startTime.isUTC() || !endTime.isUTC())
       throw new Error('Start / End Time is not in UTC format');
 
-    const comparisionTimes = schedules.map((schedule) => ({
-      range: createUtcTimeRange({
-        startTime: schedule.startTime,
-        endTime: schedule.endTime,
-      }) as [Moment, Moment],
-      label: formatDay(schedule.day),
-    }));
+    const comparisionTimes = schedules
+      .filter((schedule) => schedule.day === 1)
+      .map((schedule) => ({
+        range: createUtcTimeRange({
+          startTime: schedule.startTime,
+          endTime: schedule.endTime,
+        }) as [Moment, Moment],
+        label: formatDay(schedule.day),
+      }));
 
     const outcome = validateRange([startTime, endTime], comparisionTimes);
 
@@ -65,7 +67,7 @@ const LoginSchema = z.object({
 
 type LoginCredentials = z.infer<typeof LoginSchema>;
 
-const Test: NextPageWithLayout = () => {
+const TimeInputExample: NextPageWithLayout = () => {
   return (
     <div className="p-4">
       <h1 className="text-2xl text-purple-700 leading-5 text-center">
@@ -106,8 +108,8 @@ const Test: NextPageWithLayout = () => {
   );
 };
 
-export default Test;
+export default TimeInputExample;
 
-Test.getLayout = (page) => {
+TimeInputExample.getLayout = (page) => {
   return <PrimaryLayout>{page}</PrimaryLayout>;
 };
