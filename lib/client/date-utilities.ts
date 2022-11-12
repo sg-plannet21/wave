@@ -39,38 +39,36 @@ export function createUtcTimeRange({
   return times.map((time) => moment.utc(time, timeFormat));
 }
 
-function createLocalTimeString(time: Moment) {
+function formatLocalTime(time: Moment) {
   return moment(time).local().format(timeFormat);
 }
 
-function createTimeRangeString(startTime: Moment, endTime: Moment) {
-  return `${createLocalTimeString(startTime)} - ${createLocalTimeString(
-    endTime
-  )}`;
+function formatLocalTimeRange(startTime: Moment, endTime: Moment) {
+  return `${formatLocalTime(startTime)} - ${formatLocalTime(endTime)}`;
 }
 
-function createLocalDateString(date: Moment) {
+function formatLocalDate(date: Moment) {
   return moment(date).local().format(dateFormat);
 }
 
-function createDateRangeString(startDate: Moment, endDate: Moment) {
-  return `${createLocalDateString(startDate)} - ${createLocalDateString(
-    endDate
-  )}`;
+function formatLocalDateRange(startDate: Moment, endDate: Moment) {
+  return `${formatLocalDate(startDate)} - ${formatLocalDate(endDate)}`;
 }
 
 export function validateRange(
   timeRange: [Moment, Moment],
   comparator: { range: [Moment, Moment]; label?: string }[],
-  type: 'date' | 'time' = 'date',
-  abortEarly = true
+  options: { type?: 'date' | 'time'; abortEarly?: boolean } = {
+    abortEarly: true,
+    type: 'date',
+  }
 ): { result: true } | { result: false; message: string } {
   const [startTime, endTime] = timeRange;
 
   if (endTime.isSameOrBefore(startTime)) {
     return { result: false, message: 'Start time must come before end time' };
   }
-
+  const { abortEarly, type } = options;
   let messages: string[] = [];
   let isValidRange = true;
 
@@ -88,8 +86,8 @@ export function validateRange(
       messages.push(
         `Range encloses existing range: ${label ? `${label}, ` : ''} ${
           type === 'date'
-            ? createDateRangeString(existingStartTime, existingEndTime)
-            : createTimeRangeString(existingStartTime, existingEndTime)
+            ? formatLocalDateRange(existingStartTime, existingEndTime)
+            : formatLocalTimeRange(existingStartTime, existingEndTime)
         }`
       );
       isValidRange = false;
@@ -104,8 +102,8 @@ export function validateRange(
       messages.push(
         `Conflict with existing range: ${label ? `${label}, ` : ''} ${
           type === 'date'
-            ? createDateRangeString(existingStartTime, existingEndTime)
-            : createTimeRangeString(existingStartTime, existingEndTime)
+            ? formatLocalDateRange(existingStartTime, existingEndTime)
+            : formatLocalTimeRange(existingStartTime, existingEndTime)
         }`
       );
       isValidRange = false;

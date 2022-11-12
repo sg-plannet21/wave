@@ -47,7 +47,9 @@ const LoginSchema = z.object({
         label: formatDay(schedule.day),
       }));
 
-    const outcome = validateRange([startTime, endTime], comparisionTimes);
+    const outcome = validateRange([startTime, endTime], comparisionTimes, {
+      type: 'time',
+    });
 
     if (!outcome.result) {
       ctx.addIssue({
