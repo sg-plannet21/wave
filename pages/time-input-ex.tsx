@@ -1,10 +1,15 @@
 import Button from 'components/buttons/Button';
-import DateRangePicker from 'components/form/DateRangeField';
 import { Form } from 'components/form/Form';
 import { InputField } from 'components/form/InputField';
+import TimeRangePicker from 'components/form/TimeRangeField';
 import PrimaryLayout from 'components/layouts/primary/PrimaryLayout';
-import { TimeRange } from 'lib/client/date-utilities';
-import moment from 'moment';
+import {
+  createUtcTimeRange,
+  formatDay,
+  timeFormat,
+  validateRange,
+} from 'lib/client/date-utilities';
+import { Moment } from 'moment';
 import { FieldError } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -22,45 +27,43 @@ const schedules = [
   { id: 4, startTime: '7:00', endTime: '19:00', day: 2 },
 ];
 
-const testTimes: TimeRange[] = schedules
-  .filter((schedule) => schedule.day === 1)
-  .map(({ startTime, endTime }) => ({ startTime, endTime }));
-
 const LoginSchema = z.object({
   username: z.string().min(1, 'Required'),
   password: z.string().min(1, 'Required'),
-  duration: z.array(z.any()).length(2),
-  // duration: z.array(z.any()).transform((val, ctx) => {
-  //   const [startTime, endTime] = val.map((momentInstance: Moment) =>
-  //     momentInstance.isUTC()
-  //       ? momentInstance.format(timeFormat)
-  //       : moment.utc(momentInstance).format(timeFormat)
-  //   );
+  duration: z.array(z.any()).transform((val, ctx) => {
+    const [startTime, endTime] = val as [Moment, Moment];
 
-  //   const outcome = validateTimeRange({ startTime, endTime }, testTimes);
+    // testing
+    if (!startTime.isUTC() || !endTime.isUTC())
+      throw new Error('Start / End Time is not in UTC format');
 
-  //   if (!outcome.result) {
-  //     ctx.addIssue({
-  //       code: z.ZodIssueCode.custom,
-  //       message: outcome.message,
-  //     });
-  //     // This is a special symbol you can use to
-  //     // return early from the transform function.
-  //     // It has type `never` so it does not affect the
-  //     // inferred return type.
-  //     return z.NEVER;
-  //   }
+    const comparisionTimes = schedules.map((schedule) => ({
+      range: createUtcTimeRange({
+        startTime: schedule.startTime,
+        endTime: schedule.endTime,
+      }) as [Moment, Moment],
+      label: formatDay(schedule.day),
+    }));
 
-  //   return [startTime, endTime];
-  // }),
+    const outcome = validateRange([startTime, endTime], comparisionTimes);
+
+    if (!outcome.result) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: outcome.message,
+      });
+      // This is a special symbol you can use to
+      // return early from the transform function.
+      // It has type `never` so it does not affect the
+      // inferred return type.
+      return z.NEVER;
+    }
+
+    return [startTime, endTime].map((time) => time.format(timeFormat));
+  }),
 });
 
 type LoginCredentials = z.infer<typeof LoginSchema>;
-
-const startDate = moment().subtract(1, 'day').toJSON();
-const endDate = moment().subtract(2, 'day').toJSON();
-console.log('startDate', startDate);
-console.log('endDate', endDate);
 
 const Test: NextPageWithLayout = () => {
   return (
@@ -85,12 +88,12 @@ const Test: NextPageWithLayout = () => {
               error={formState.errors['password']}
               type="password"
             />
-            <DateRangePicker
+            <TimeRangePicker
               name="duration"
               // error={formState.errors['duration']}
               error={formState.errors['duration'] as FieldError | undefined}
-              defaultValue={[startDate, endDate]}
-              label="Date Range"
+              // defaultValue={['1:11', '5:55']}
+              label="Time Range"
               control={control}
             />
             <Button variant="primary" type="submit" className="w-full">

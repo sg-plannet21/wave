@@ -1,6 +1,7 @@
 import { TimePicker } from 'antd';
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
-import { generateTimeRange, timeFormat } from 'lib/client/date-utilities';
+import { createUtcTimeRange, timeFormat } from 'lib/client/date-utilities';
+import moment from 'moment';
 import {
   FieldValues,
   useController,
@@ -8,14 +9,12 @@ import {
 } from 'react-hook-form';
 import { FieldWrapper, FieldWrapperPassThroughProps } from './FieldWrapper';
 
-// https://dev.to/texmeijin/component-design-idea-using-react-hook-form-v7-ie0
-// type DefaultValue = [EventValue<Moment>, EventValue<Moment>];
-
 type TimeRangePickerProps<T extends FieldValues> =
   FieldWrapperPassThroughProps & UseControllerProps<T> & { name: string };
 
-const defaultStartTime = '09:00';
-const defaultEndTime = '17:00';
+const [defaultStartTime, defaultEndTime] = ['09:00', '17:00'].map((time) =>
+  moment.utc(moment(time, timeFormat))
+);
 
 const TimeRangePicker = <T extends FieldValues>({
   label,
@@ -26,14 +25,11 @@ const TimeRangePicker = <T extends FieldValues>({
   const { field } = useController<T>({
     ...props,
     defaultValue: defaultValue?.length
-      ? generateTimeRange({
+      ? createUtcTimeRange({
           startTime: defaultValue[0],
           endTime: defaultValue[1],
         })
-      : (generateTimeRange({
-          startTime: defaultStartTime,
-          endTime: defaultEndTime,
-        }) as any),
+      : ([defaultStartTime, defaultEndTime] as any),
   });
   return (
     <FieldWrapper label={label} error={error}>
@@ -41,6 +37,7 @@ const TimeRangePicker = <T extends FieldValues>({
         {...field}
         format={timeFormat}
         allowClear={false}
+        minuteStep={15}
         className="w-full"
       />
     </FieldWrapper>
