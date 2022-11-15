@@ -2,6 +2,7 @@ import { Meta, Story } from '@storybook/react';
 import Button from 'components/buttons/Button';
 import { FieldError } from 'react-hook-form';
 import { Form } from './Form';
+import { FormDrawer } from './FormDrawer';
 import { InputField } from './InputField';
 import { SelectField } from './SelectField';
 import TimeRangePicker from './TimeRangeField';
@@ -89,3 +90,21 @@ const Template: Story = () => <MyForm />;
 
 export const Default = Template.bind({});
 Default.args = {};
+
+export const AsFormDrawer = () => {
+  return (
+    <FormDrawer
+      triggerButton={<Button>Open Form</Button>}
+      isDone={true}
+      size="lg"
+      title="Form Drawer Example"
+      submitButton={
+        <Button form="my-form" type="submit">
+          Submit
+        </Button>
+      }
+    >
+      <MyForm hideSubmit />
+    </FormDrawer>
+  );
+};
