@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/react';
-import Button from 'components/buttons/Button';
+import Button from 'components/inputs/Button';
 import { FieldError } from 'react-hook-form';
 import { Form } from './Form';
 import { FormDrawer } from './FormDrawer';

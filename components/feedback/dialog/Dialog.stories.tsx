@@ -1,5 +1,5 @@
 import { ComponentStory, Meta, Story } from '@storybook/react';
-import Button from 'components/buttons/Button';
+import Button from 'components/inputs/Button';
 import React from 'react';
 import { useDisclosure } from 'state/hooks/useDisclosure';
 import Dialog, { DialogTitle } from './Dialog';
