@@ -2,11 +2,14 @@ import { Dialog, Menu, Transition } from '@headlessui/react';
 import BusinessUnitSelect from 'components/navigation/BusinessUnitSelect/BusinessUnitSelect';
 import NavLink from 'components/navigation/NavLink/NavLink';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import logo from 'public/logo.svg';
 import React from 'react';
 import {
   Cross,
   Menu as MenuIcon,
+  Route,
+  Schedule,
   UnassignedEntity,
   User,
   Users,
@@ -124,17 +127,29 @@ type SideNavigationItem = {
 };
 
 const SideNavigation: React.FC = () => {
+  const router = useRouter();
+  const { businessUnitId } = router.query;
   // TODO: check access & filter admin routes
   const sideNavigation = [
     {
       name: 'Unassigned Entities',
-      href: '/unassigned-entities',
+      href: `/${businessUnitId}/unassigned-entities`,
       icon: UnassignedEntity,
     },
     {
       name: 'Users',
-      href: '/about',
+      href: `/${businessUnitId}/users`,
       icon: Users,
+    },
+    {
+      name: 'Routes',
+      href: `/${businessUnitId}/routes`,
+      icon: Route,
+    },
+    {
+      name: 'Schedules',
+      href: `/${businessUnitId}/schedules`,
+      icon: Schedule,
     },
   ].filter(Boolean) as SideNavigationItem[];
 

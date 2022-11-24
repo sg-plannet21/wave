@@ -2,7 +2,8 @@ import { Listbox, Transition } from '@headlessui/react';
 import { BusinessUnit, Check, DoubleChevron } from 'components/icons';
 
 import storage from 'lib/client/storage';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { User } from 'state/auth/types';
 
 type BusinessUnitSelectProps = {
@@ -17,33 +18,59 @@ export type SelectOption = {
 const BusinessUnitSelect: React.FC<BusinessUnitSelectProps> = ({
   businessUnits,
 }) => {
-  const [selectedItem, setSelectedItem] = useState<SelectOption | null>(null);
+  const router = useRouter();
+  const [selectedBusinessUnit, setSelectedBusinessUnit] = useState<
+    SelectOption | undefined
+  >(undefined);
+
+  const getUserBusinessUnit = useCallback(
+    (businessUnit: string): SelectOption | undefined => {
+      const bu = businessUnits.find((bu) => bu.business_unit === businessUnit);
+      if (!bu) return undefined;
+      return { label: bu.business_unit_name, value: bu.business_unit };
+    },
+    [businessUnits]
+  );
+
+  function handleChange(businessUnit: SelectOption) {
+    storage.setBusinessUnit(businessUnit.value.toString());
+    setSelectedBusinessUnit(businessUnit);
+
+    // filter the businessUnitId dynamic route and path up to proceeding '/'
+    // const regex = /\/\[businessUnitId\]\/.*\//;
+    const regex = /\/\[businessUnitId\]\/[A-Za-z0-9]*/;
+    const resultsArray = regex.exec(router.pathname);
+    const pathname = resultsArray?.length
+      ? resultsArray[0]
+      : `/[businessUnitId]`;
+
+    router.push({
+      pathname,
+      query: { businessUnitId: businessUnit.value },
+    });
+  }
 
   useEffect(() => {
-    if (selectedItem !== null || !businessUnits.length) return;
+    if (!selectedBusinessUnit && router.query.businessUnitId) {
+      console.log(
+        'useEffect. setBusinessUnit to:',
+        router.query.businessUnitId?.toString()
+      );
 
-    const persistedBusinessUnit = storage.getBusinessUnit();
-    if (persistedBusinessUnit) {
-      // ensure the BU list (still) includes the stored business unit id
-      const businessUnit = businessUnits.find(
-        (businessUnit) => businessUnit.business_unit === persistedBusinessUnit
+      const businessUnit = getUserBusinessUnit(
+        router.query.businessUnitId.toString()
       );
 
       if (businessUnit) {
-        setSelectedItem({
-          value: businessUnit.business_unit,
-          label: businessUnit.business_unit_name,
-        });
+        storage.setBusinessUnit(businessUnit.value.toString());
+        setSelectedBusinessUnit(businessUnit);
+      } else {
+        // router.replace('/')
+        // todo: invalid bu
+        console.log('invalid BU');
       }
-    } else {
-      const defaultBusinessUnit = {
-        value: businessUnits[0].business_unit,
-        label: businessUnits[0].business_unit_name,
-      };
-      storage.setBusinessUnit(defaultBusinessUnit.value);
-      setSelectedItem(defaultBusinessUnit);
     }
-  }, [selectedItem, businessUnits]);
+  }, [selectedBusinessUnit, router.query.businessUnitId, getUserBusinessUnit]);
 
   const options = useMemo(() => {
     return businessUnits.map((bu) => ({
@@ -52,19 +79,14 @@ const BusinessUnitSelect: React.FC<BusinessUnitSelectProps> = ({
     }));
   }, [businessUnits]);
 
-  function handleItemChange(item: SelectOption) {
-    storage.setBusinessUnit(item.value.toString());
-    setSelectedItem(item);
-  }
-
-  if (!businessUnits?.length || !selectedItem) return null;
+  if (!businessUnits?.length || !selectedBusinessUnit) return null;
 
   return (
-    <Listbox value={selectedItem} onChange={handleItemChange}>
+    <Listbox value={selectedBusinessUnit} onChange={handleChange}>
       <div className="relative">
         <Listbox.Button className="group relative w-full flex items-center cursor-default rounded-lg bg-orange-200 dark:bg-orange-600 dark:text-gray-300 p-2 pr-10 text-base font-medium shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
           <BusinessUnit className="text-gray-400 group-hover:text-gray-300 mr-4 flex-shrink-0 h-6 w-6" />
-          <span className="block truncate">{selectedItem.label}</span>
+          <span className="block truncate">{selectedBusinessUnit.label}</span>
           <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
             <DoubleChevron
               className="h-5 w-5 text-gray-400 dark:text-gray-200"
@@ -94,14 +116,14 @@ const BusinessUnitSelect: React.FC<BusinessUnitSelectProps> = ({
                 <>
                   <span
                     className={`block truncate ${
-                      option.value === selectedItem.value
+                      option.value === selectedBusinessUnit.value
                         ? 'font-medium'
                         : 'font-normal'
                     }`}
                   >
                     {option.label}
                   </span>
-                  {option.value === selectedItem.value ? (
+                  {option.value === selectedBusinessUnit.value ? (
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
                       <Check className="h-5 w-5" aria-hidden="true" />
                     </span>
