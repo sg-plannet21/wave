@@ -1,5 +1,3 @@
-import { BusinessUnitSelectProps } from './BusinessUnitSelect';
-
 const businessUnitList = [
   { path: 'bu1', label: 'Business Unit 1' },
   { path: 'bu2', label: 'Business Unit 2' },
@@ -7,7 +5,7 @@ const businessUnitList = [
   { path: 'bu4', label: 'Business Unit 4' },
 ];
 
-const base: BusinessUnitSelectProps = {
+const base = {
   businessUnits: businessUnitList,
 };
 
