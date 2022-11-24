@@ -11,7 +11,9 @@ const options = [
 const base: SelectProps = {
   options,
   selectedOption: options[2],
-  onChange: () => {},
+  onChange: () => {
+    console.log('onChange');
+  },
 };
 
 export const mockSelectProps = {

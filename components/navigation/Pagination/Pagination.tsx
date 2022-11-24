@@ -6,7 +6,6 @@ export type PaginationProps = {
   currentPage: number;
   pageSize: number;
   itemCount: number;
-  // eslint-disable-next-line no-unused-vars
   onPageChange: (currentPage: number) => void;
 };
 

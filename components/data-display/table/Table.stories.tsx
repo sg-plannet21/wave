@@ -19,4 +19,5 @@ export const Base = Template.bind({});
 
 Base.args = {
   ...mockTableProps.base,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as TableProps<any>;

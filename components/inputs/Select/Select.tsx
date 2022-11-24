@@ -10,7 +10,6 @@ export type SelectOption = {
 export type SelectProps = {
   options: SelectOption[];
   selectedOption: SelectOption;
-  // eslint-disable-next-line no-unused-vars
   onChange: (option: SelectOption) => void;
 };
 

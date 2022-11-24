@@ -29,7 +29,8 @@ const TimeRangePicker = <T extends FieldValues>({
           startTime: defaultValue[0],
           endTime: defaultValue[1],
         })
-      : ([defaultStartTime, defaultEndTime] as any),
+      : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ([defaultStartTime, defaultEndTime] as any),
   });
   return (
     <FieldWrapper label={label} error={error}>

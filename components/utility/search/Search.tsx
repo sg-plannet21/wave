@@ -1,9 +1,7 @@
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-export interface ISearch {}
-
-const Search: React.FC<ISearch> = () => {
+const Search: React.FC = () => {
   // 1
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState<string>('');

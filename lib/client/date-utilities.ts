@@ -69,7 +69,7 @@ export function validateRange(
     return { result: false, message: 'Start time must come before end time' };
   }
   const { abortEarly, type } = options;
-  let messages: string[] = [];
+  const messages: string[] = [];
   let isValidRange = true;
 
   for (let i = 0; i < comparator.length; i++) {

@@ -1,11 +1,9 @@
 import classNames from 'classnames';
 import MagnifyingGlass from 'components/icons/MagnifyingGlass';
 
-type WithRequiredProperty<Type, Key extends keyof Type> = Type & {
-  [Property in Key]-?: Type[Property];
-};
+type WithRequired<T, K extends keyof T> = T & Required<Pick<T, K>>;
 
-export type SearchProps = WithRequiredProperty<
+export type SearchProps = WithRequired<
   React.InputHTMLAttributes<HTMLInputElement>,
   'onChange' | 'value'
 >;

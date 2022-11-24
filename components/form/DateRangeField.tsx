@@ -33,7 +33,8 @@ const DateRangePicker = <T extends FieldValues>({
           startDate: defaultValue[0],
           endDate: defaultValue[1],
         })
-      : ([defaultStartDate, defaultEndDate] as any),
+      : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ([defaultStartDate, defaultEndDate] as any),
   });
   return (
     <FieldWrapper label={label} error={error}>

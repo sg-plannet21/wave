@@ -4,6 +4,7 @@
     "plugin:storybook/recommended", // New
     "prettier",
     "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
     "next"
   ],
   "globals": {
@@ -20,6 +21,11 @@
     }
   ],
   "rules": {
-    "no-unused-vars": [1, { "args": "after-used", "argsIgnorePattern": "^_" }]
-  }
+    // "no-unused-vars": [1, { "args": "after-used", "argsIgnorePattern": "^_" }]
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "error"
+  },
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "root": true
 }

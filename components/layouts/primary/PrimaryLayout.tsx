@@ -1,4 +1,5 @@
 import { Dialog, Menu, Transition } from '@headlessui/react';
+import BusinessUnitSelect from 'components/navigation/BusinessUnitSelect/BusinessUnitSelect';
 import NavLink from 'components/navigation/NavLink/NavLink';
 import Image from 'next/image';
 import logo from 'public/logo.svg';
@@ -10,6 +11,21 @@ import {
   User,
   Users,
 } from '../../icons/';
+
+const businessUnits = [
+  {
+    business_unit: '1',
+    business_unit_name: 'Business Unit 1',
+    default_region: 1,
+    roles: [],
+  },
+  {
+    business_unit: '2',
+    business_unit_name: 'Business Unit 2',
+    default_region: 2,
+    roles: [],
+  },
+];
 
 const Logo = () => {
   return (
@@ -89,6 +105,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({
             </div>
             <div className="mt-5 flex-1 h-0 overflow-y-auto">
               <nav className="px-2 py-1 space-y-1">
+                <BusinessUnitSelect businessUnits={businessUnits} />
                 <SideNavigation />
               </nav>
             </div>
@@ -123,6 +140,8 @@ const SideNavigation: React.FC = () => {
 
   return (
     <>
+      <BusinessUnitSelect businessUnits={businessUnits} />
+
       {sideNavigation.map((item) => (
         <NavLink
           key={item.name}

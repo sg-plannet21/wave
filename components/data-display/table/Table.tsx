@@ -10,7 +10,6 @@ export type TableColumn<Entry> = {
   title: string;
   field: keyof Entry;
   ignoreFiltering?: boolean;
-  // eslint-disable-next-line no-unused-vars
   Cell?({ entry }: { entry: Entry }): React.ReactElement;
 };
 
@@ -18,7 +17,6 @@ export type TableProps<Entry> = {
   data: Entry[];
   columns: TableColumn<Entry>[];
   sortColumn?: SortColumn<Entry>;
-  // eslint-disable-next-line no-unused-vars
   onSort?: (sortColumn: SortColumn<Entry>) => void;
 };
 
@@ -34,7 +32,7 @@ const Table = <Entry extends { id: string }>({
   function raiseSort(field: keyof Entry) {
     console.log('changing order of', field);
     if (!onSort) return;
-    let updatedSortColumn = { ...sortColumn };
+    const updatedSortColumn = { ...sortColumn };
     if (updatedSortColumn?.field === field) {
       updatedSortColumn.order =
         updatedSortColumn.order === 'asc' ? 'desc' : 'asc';
