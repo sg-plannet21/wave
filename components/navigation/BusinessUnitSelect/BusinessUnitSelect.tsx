@@ -16,7 +16,7 @@ export type SelectOption = {
 };
 
 const BusinessUnitSelect: React.FC<BusinessUnitSelectProps> = ({
-  businessUnits,
+  businessUnits = [],
 }) => {
   const router = useRouter();
   const [selectedBusinessUnit, setSelectedBusinessUnit] = useState<
@@ -79,7 +79,7 @@ const BusinessUnitSelect: React.FC<BusinessUnitSelectProps> = ({
     }));
   }, [businessUnits]);
 
-  if (!businessUnits?.length || !selectedBusinessUnit) return null;
+  if (!options.length || !selectedBusinessUnit) return null;
 
   return (
     <Listbox value={selectedBusinessUnit} onChange={handleChange}>
