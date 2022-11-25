@@ -10,7 +10,7 @@ const sizes = {
   full: 'max-w-full',
 };
 
-type DialogProps = {
+export type DialogProps = {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;

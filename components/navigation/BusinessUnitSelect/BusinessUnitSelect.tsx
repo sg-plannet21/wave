@@ -32,23 +32,26 @@ const BusinessUnitSelect: React.FC<BusinessUnitSelectProps> = ({
     [businessUnits]
   );
 
-  function handleChange(businessUnit: SelectOption) {
-    storage.setBusinessUnit(businessUnit.value.toString());
-    setSelectedBusinessUnit(businessUnit);
+  const handleChange = useCallback(
+    (businessUnit: SelectOption) => {
+      storage.setBusinessUnit(businessUnit.value.toString());
+      setSelectedBusinessUnit(businessUnit);
 
-    // filter the businessUnitId dynamic route and path up to proceeding '/'
-    // const regex = /\/\[businessUnitId\]\/.*\//;
-    const regex = /\/\[businessUnitId\]\/[A-Za-z0-9]*/;
-    const resultsArray = regex.exec(router.pathname);
-    const pathname = resultsArray?.length
-      ? resultsArray[0]
-      : `/[businessUnitId]`;
+      // filter the businessUnitId dynamic route and path up to proceeding '/'
+      // const regex = /\/\[businessUnitId\]\/.*\//;
+      const regex = /\/\[businessUnitId\]\/\w*/;
+      const resultsArray = regex.exec(router.pathname);
+      const pathname = resultsArray?.length
+        ? resultsArray[0]
+        : `/[businessUnitId]`;
 
-    router.push({
-      pathname,
-      query: { businessUnitId: businessUnit.value },
-    });
-  }
+      router.push({
+        pathname,
+        query: { businessUnitId: businessUnit.value },
+      });
+    },
+    [router]
+  );
 
   useEffect(() => {
     if (!selectedBusinessUnit && router.query.businessUnitId) {

@@ -6,10 +6,17 @@ import { useRouter } from 'next/router';
 import logo from 'public/logo.svg';
 import React from 'react';
 import {
+  BusinessUnit,
   Cross,
+  Dialpad,
+  EntryPoint,
+  Exception,
   Menu as MenuIcon,
+  Prompt,
+  Queue,
   Route,
   Schedule,
+  Section,
   UnassignedEntity,
   User,
   Users,
@@ -137,9 +144,9 @@ const SideNavigation: React.FC = () => {
       icon: UnassignedEntity,
     },
     {
-      name: 'Users',
-      href: `/${businessUnitId}/users`,
-      icon: Users,
+      name: 'Business Units',
+      href: `/${businessUnitId}/business-units`,
+      icon: BusinessUnit,
     },
     {
       name: 'Routes',
@@ -147,9 +154,44 @@ const SideNavigation: React.FC = () => {
       icon: Route,
     },
     {
+      name: 'Users',
+      href: `/${businessUnitId}/users`,
+      icon: Users,
+    },
+    {
+      name: 'Entry Points',
+      href: `/${businessUnitId}/entry-points`,
+      icon: EntryPoint,
+    },
+    {
+      name: 'Menus',
+      href: `/${businessUnitId}/menus`,
+      icon: Dialpad,
+    },
+    {
+      name: 'Queues',
+      href: `/${businessUnitId}/queues`,
+      icon: Queue,
+    },
+    {
+      name: 'Messages',
+      href: `/${businessUnitId}/messages`,
+      icon: Prompt,
+    },
+    {
+      name: 'Sections',
+      href: `/${businessUnitId}/sections`,
+      icon: Section,
+    },
+    {
       name: 'Schedules',
       href: `/${businessUnitId}/schedules`,
       icon: Schedule,
+    },
+    {
+      name: 'Schedule Exceptions',
+      href: `/${businessUnitId}/schedule-exceptions`,
+      icon: Exception,
     },
   ].filter(Boolean) as SideNavigationItem[];
 
