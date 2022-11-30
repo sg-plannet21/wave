@@ -19,26 +19,27 @@ import {
 } from 'components/icons';
 import BusinessUnitSelect from 'components/navigation/BusinessUnitSelect/BusinessUnitSelect';
 import NavLink from 'components/navigation/NavLink/NavLink';
+import { useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import logo from 'public/logo.svg';
 import React from 'react';
 
-const businessUnits = [
-  {
-    business_unit: '1',
-    business_unit_name: 'Business Unit 1',
-    default_region: 1,
-    roles: [],
-  },
-  {
-    business_unit: '2',
-    business_unit_name: 'Business Unit 2',
-    default_region: 2,
-    roles: [],
-  },
-];
+// const businessUnits = [
+//   {
+//     business_unit: '1',
+//     business_unit_name: 'Business Unit 1',
+//     default_region: 1,
+//     roles: [],
+//   },
+//   {
+//     business_unit: '2',
+//     business_unit_name: 'Business Unit 2',
+//     default_region: 2,
+//     roles: [],
+//   },
+// ];
 
 const Logo = () => {
   return (
@@ -64,6 +65,8 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({
   sidebarOpen,
   setSidebarOpen,
 }) => {
+  const { data } = useSession();
+  const businessUnits = data?.user.business_unit_roles ?? [];
   return (
     <Transition.Root show={sidebarOpen} as={React.Fragment}>
       <Dialog
@@ -139,6 +142,8 @@ type SideNavigationItem = {
 const SideNavigation: React.FC = () => {
   const router = useRouter();
   const { businessUnitId } = router.query;
+  const { data } = useSession();
+  const businessUnits = data?.user.business_unit_roles ?? [];
   // TODO: check access & filter admin routes
   const sideNavigation = [
     {
@@ -323,13 +328,11 @@ const PrimaryLayout: React.FC<PrimaryLayoutProps> = ({ children }) => {
       <button
         id="theme-toggle"
         type="button"
-        className="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5"
+        className="text-cyan-400 dark:text-yellow-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5"
         onClick={() => setTheme(isDarkTheme ? 'light' : 'dark')}
       >
         <Moon className={`${isDarkTheme ? 'hidden' : ''} w-6 h-6`} />
-        <Sun
-          className={`${isDarkTheme ? '' : 'hidden'} w-6 h-6 text-yellow-600`}
-        />
+        <Sun className={`${isDarkTheme ? '' : 'hidden'} w-6 h-6`} />
       </button>
     );
   }
