@@ -1,17 +1,33 @@
+import AuthRoute from 'components/utility/AuthRoute';
+import { Session } from 'next-auth';
+import { SessionProvider } from 'next-auth/react';
+import { ThemeProvider } from 'next-themes';
 import type { AppProps } from 'next/app';
-import { AuthProvider } from '../state/auth/AuthContext';
 import './globals.css';
 import { NextPageWithLayout } from './page';
 
-interface AppPropsWithLayout extends AppProps {
+interface AppPropsWithLayout extends AppProps<{ session: Session }> {
   Component: NextPageWithLayout;
 }
 
-function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+function MyApp({
+  Component,
+  pageProps: { session, ...pageProps },
+}: AppPropsWithLayout) {
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout || ((page) => page);
 
-  return <AuthProvider>{getLayout(<Component {...pageProps} />)}</AuthProvider>;
+  return (
+    <ThemeProvider enableSystem={true} attribute="class">
+      <SessionProvider session={session}>
+        {Component.publicRoute ? (
+          getLayout(<Component {...pageProps} />)
+        ) : (
+          <AuthRoute>{getLayout(<Component {...pageProps} />)}</AuthRoute>
+        )}
+      </SessionProvider>
+    </ThemeProvider>
+  );
 }
 
 export default MyApp;

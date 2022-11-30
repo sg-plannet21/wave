@@ -1,10 +1,4 @@
 import { Dialog, Menu, Transition } from '@headlessui/react';
-import BusinessUnitSelect from 'components/navigation/BusinessUnitSelect/BusinessUnitSelect';
-import NavLink from 'components/navigation/NavLink/NavLink';
-import Image from 'next/image';
-import { useRouter } from 'next/router';
-import logo from 'public/logo.svg';
-import React from 'react';
 import {
   BusinessUnit,
   Cross,
@@ -12,15 +6,24 @@ import {
   EntryPoint,
   Exception,
   Menu as MenuIcon,
+  Moon,
   Prompt,
   Queue,
   Route,
   Schedule,
   Section,
+  Sun,
   UnassignedEntity,
   User,
   Users,
-} from '../../icons/';
+} from 'components/icons';
+import BusinessUnitSelect from 'components/navigation/BusinessUnitSelect/BusinessUnitSelect';
+import NavLink from 'components/navigation/NavLink/NavLink';
+import { useTheme } from 'next-themes';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import logo from 'public/logo.svg';
+import React from 'react';
 
 const businessUnits = [
   {
@@ -305,6 +308,31 @@ export type PrimaryLayoutProps = {
 
 const PrimaryLayout: React.FC<PrimaryLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
+  const { systemTheme, theme, setTheme } = useTheme();
+
+  // When mounted on client, now we can show the UI
+  React.useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
+  function renderThemeChanger() {
+    const currentTheme = theme === 'system' ? systemTheme : theme;
+    const isDarkTheme = currentTheme === 'dark';
+    return (
+      <button
+        id="theme-toggle"
+        type="button"
+        className="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5"
+        onClick={() => setTheme(isDarkTheme ? 'light' : 'dark')}
+      >
+        <Moon className={`${isDarkTheme ? 'hidden' : ''} w-6 h-6`} />
+        <Sun
+          className={`${isDarkTheme ? '' : 'hidden'} w-6 h-6 text-yellow-600`}
+        />
+      </button>
+    );
+  }
 
   return (
     <>
@@ -325,6 +353,7 @@ const PrimaryLayout: React.FC<PrimaryLayoutProps> = ({ children }) => {
             </button>
             <div className="flex-1 px-4 flex justify-end">
               <div className="ml-4 flex items-center md:ml-6">
+                {renderThemeChanger()}
                 <UserNavigation />
               </div>
             </div>
