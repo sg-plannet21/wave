@@ -7,3 +7,107 @@
     @apply border-0 p-2 px-6 bg-slate-100 rounded-md;
   }
 }
+
+/* Date Picker Styles Start */
+.dark .ant-picker {
+  background-color: rgb(51 65 85);
+}
+
+.dark .ant-picker input,
+.dark .ant-picker-suffix,
+.dark .anticon {
+  color: whitesmoke;
+}
+
+.dark .ant-picker-dropdown {
+  background-color: rgb(67, 100, 146);
+}
+
+.dark .ant-picker-panel-container {
+  background-color: rgb(67, 100, 146);
+  color: aliceblue;
+}
+
+.dark .ant-picker-header,
+.dark .ant-picker-header button,
+.dark .ant-picker-content th {
+  color: red;
+}
+
+.dark .ant-picker-cell-disabled {
+  background-color: yellow;
+}
+
+.dark .ant-picker-cell-in-view {
+  color: rgb(217, 176, 255);
+}
+.dark
+  .ant-picker-cell-in-view.ant-picker-cell-today
+  .ant-picker-cell-inner::before {
+  border: 1px solid #20ff18;
+}
+
+.dark .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
+  background-color: azure;
+  color: black;
+}
+
+.dark
+  .ant-picker-time-panel-column
+  > li.ant-picker-time-panel-cell
+  .ant-picker-time-panel-cell-inner {
+  color: #20ff18;
+}
+
+.dark .ant-picker-datetime-panel .ant-picker-time-panel {
+  border-left: 1px solid orange;
+}
+
+.dark .ant-picker-header {
+  border-bottom: 1px solid orange;
+}
+
+.dark .ant-picker-time-panel-column:not(:first-child) {
+  border-left: 1px solid orange;
+}
+
+.dark .ant-picker-panel {
+  border: 1px solid pink;
+}
+/* Date Picker Styles Start */
+
+/* React H5 Audio Player - Custom Styles Start */
+.rhap_container {
+  background-color: transparent !important;
+  color: rgb(52, 55, 253) !important;
+  box-shadow: none !important;
+  /* @apply bg-violet-600 !important; */
+}
+
+.rhap_container svg,
+.rhap_time {
+  color: aqua !important;
+}
+
+.rhap_progress-filled {
+  background-color: rgb(255, 125, 147) !important;
+}
+
+.rhap_progress-bar-show-download {
+  background-color: rgb(32, 128, 218) !important;
+}
+.rhap_progress-indicator,
+.rhap_volume-indicator {
+  background-color: cornflowerblue !important;
+}
+
+.rhap_volume-bar {
+  background-color: #8f0094 !important;
+}
+
+.rhap_play-status--paused .rhap_progress-filled {
+  background-color: orange !important;
+}
+/* React H5 Audio Player - Custom Styles End */

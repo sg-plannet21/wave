@@ -24,6 +24,7 @@ export { default as MapPin } from './MapPin';
 export { default as Menu } from './Menu';
 export { default as Minus } from './Minus';
 export { default as Moon } from './Moon';
+export { default as Play } from './Play';
 export { default as Plus } from './Plus';
 export { default as Prompt } from './Prompt';
 export { default as Queue } from './Queue';
