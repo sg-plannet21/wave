@@ -1,6 +1,6 @@
 import AudioPlayerDialog from 'components/feedback/audio-player-dialog';
 import PrimaryLayout from 'components/layouts/primary/PrimaryLayout';
-import RouteTable from 'features/pages/routes/components/RouteTable';
+import RouteTable from 'features/pages/routes/components/RoutesTable';
 import { NextPageWithLayout } from 'pages/page';
 
 const SchedulesHome: NextPageWithLayout = () => {

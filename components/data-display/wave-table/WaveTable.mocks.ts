@@ -1,4 +1,4 @@
-import { TableColumn, TableProps } from './Table';
+import { TableColumn, TableProps } from '../table';
 
 type Dessert = {
   id: string;
@@ -65,6 +65,6 @@ const base: TableProps<Dessert> = {
   // },
 };
 
-export const mockTableProps = {
+export const mockWaveTableProps = {
   base,
 };

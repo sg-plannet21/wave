@@ -7,10 +7,10 @@ export type SortColumn<Entry> = {
 };
 
 export type TableColumn<Entry> = {
-  title: string;
   field: keyof Entry;
+  label: string;
+  Cell?: ({ entry }: { entry: Entry }) => JSX.Element;
   ignoreFiltering?: boolean;
-  Cell?({ entry }: { entry: Entry }): React.ReactElement;
 };
 
 export type TableProps<Entry> = {
@@ -20,7 +20,7 @@ export type TableProps<Entry> = {
   onSort?: (sortColumn: SortColumn<Entry>) => void;
 };
 
-const Table = <Entry extends { id: string }>({
+const Table = <Entry extends { [P in keyof Entry]: Entry[P] }>({
   data,
   columns,
   sortColumn = {
@@ -30,8 +30,8 @@ const Table = <Entry extends { id: string }>({
   onSort,
 }: TableProps<Entry>) => {
   function raiseSort(field: keyof Entry) {
-    console.log('changing order of', field);
     if (!onSort) return;
+
     const updatedSortColumn = { ...sortColumn };
     if (updatedSortColumn?.field === field) {
       updatedSortColumn.order =
@@ -40,6 +40,7 @@ const Table = <Entry extends { id: string }>({
       updatedSortColumn.field = field;
       updatedSortColumn.order = 'asc';
     }
+
     onSort(updatedSortColumn);
   }
 
@@ -62,63 +63,60 @@ const Table = <Entry extends { id: string }>({
       </div>
     );
   }
+
   return (
-    <div className="flex flex-col">
-      <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <div className="overflow-hidden border-b border-gray-200 shadow sm:rounded-lg">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  {columns.map((column, index) => {
-                    const isFilterable = !!onSort && !column.ignoreFiltering;
-                    return (
-                      <th
-                        key={column.title + index}
-                        scope="col"
-                        {...(isFilterable && {
-                          onClick: () => raiseSort(column.field),
-                        })}
-                        className={classNames(
-                          'px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase',
-                          {
-                            'cursor-pointer': isFilterable,
-                          }
-                        )}
-                      >
-                        <div className="flex items-center space-x-1">
-                          {column.title}
-                          {isFilterable && renderSortIcon(column.field)}
-                        </div>
-                      </th>
-                    );
-                  })}
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((entry, entryIndex) => (
-                  <tr
-                    key={entry?.id || entryIndex}
-                    className="odd:bg-white even:bg-gray-100"
+    <div className="flex flex-col w-full">
+      <div className="inline-block min-w-full align-middle overflow-x-auto py-2 sm:px-4 lg:px-6">
+        <table className="min-w-full divide-y-2 divide-emerald-600 text-gray-500 dark:text-gray-400">
+          <thead className="bg-slate-700">
+            <tr>
+              {columns.map((column, index) => {
+                const isFilterable = !!onSort && !column.ignoreFiltering;
+                return (
+                  <th
+                    key={column.label + index}
+                    scope="col"
+                    {...(isFilterable && {
+                      onClick: () => raiseSort(column.field),
+                    })}
+                    className={classNames(
+                      'px-6 py-3 text-xs font-medium tracking-wider text-left uppercase',
+                      {
+                        'cursor-pointer': isFilterable,
+                      }
+                    )}
                   >
-                    {columns.map(({ Cell, field, title }, columnIndex) => (
-                      <td
-                        key={title + columnIndex}
-                        className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"
-                      >
-                        {Cell ? (
-                          <Cell entry={entry} />
-                        ) : (
-                          (entry[field] as string | number)
-                        )}
-                      </td>
-                    ))}
-                  </tr>
+                    <div className="flex items-center space-x-1">
+                      {column.label}
+                      {isFilterable && renderSortIcon(column.field)}
+                    </div>
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((record, entryIndex) => (
+              <tr
+                key={entryIndex}
+                className="odd:bg-slate-800 even:bg-gray-700"
+              >
+                {columns.map(({ field, label, Cell }) => (
+                  <td
+                    key={label + entryIndex}
+                    className="px-6 py-4 text-sm font-medium whitespace-nowrap"
+                  >
+                    {Cell ? (
+                      <Cell entry={record} />
+                    ) : (
+                      (record[field] as string | number)
+                    )}
+                  </td>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -158,7 +156,7 @@ function ChevronUp({ ...props }) {
       {...props}
     >
       <path
-        d="M16 8.90482L12 4L8 8.90482M8"
+        d="M16 8.90482L12 4L8 8.90482M8 15.0952"
         stroke="currentColor"
         strokeWidth="1.5"
         strokeLinecap="round"
