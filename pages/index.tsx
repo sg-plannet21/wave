@@ -1,11 +1,13 @@
+import Spinner from 'components/feedback/spinner/Spinner';
 import storage from 'lib/client/storage';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PrimaryLayout from '../components/layouts/primary/PrimaryLayout';
 import { NextPageWithLayout } from './page';
 
 const Home: NextPageWithLayout = () => {
+  const [calledPush, setCalledPush] = useState(false);
   const router = useRouter();
   const { data } = useSession();
 
@@ -16,20 +18,21 @@ const Home: NextPageWithLayout = () => {
 
   useEffect(() => {
     console.log('useEffect - query');
-    if (!Object.keys(router.query).length) {
+    if (!calledPush && !Object.keys(router.query).length) {
       const redirectTo =
         storage.getBusinessUnit() ??
         businessUnitRoles[0].business_unit ??
         '/404';
       console.log('redirecting to :>> ', redirectTo);
+      setCalledPush(true);
       router.replace(redirectTo);
     }
-  }, [router, businessUnitRoles]);
+  }, [router, businessUnitRoles, calledPush]);
 
   return (
-    <section className="flex flex-col items-center gap-y-5 mt-12 sm:mt-36">
-      <h1>Home</h1>
-    </section>
+    <div className="flex items-center justify-center w-screen h-screen">
+      <Spinner size="xl" />
+    </div>
   );
 };
 

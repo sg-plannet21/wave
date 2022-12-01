@@ -26,21 +26,6 @@ import { useRouter } from 'next/router';
 import logo from 'public/logo.svg';
 import React from 'react';
 
-// const businessUnits = [
-//   {
-//     business_unit: '1',
-//     business_unit_name: 'Business Unit 1',
-//     default_region: 1,
-//     roles: [],
-//   },
-//   {
-//     business_unit: '2',
-//     business_unit_name: 'Business Unit 2',
-//     default_region: 2,
-//     roles: [],
-//   },
-// ];
-
 const Logo = () => {
   return (
     <NavLink className="flex items-center text-white" href=".">
@@ -264,7 +249,7 @@ const UserNavigation: React.FC = () => {
       {({ open }) => (
         <>
           <div>
-            <Menu.Button className="max-w-xs bg-gray-200 p-2 flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <Menu.Button className="max-w-xs bg-gray-200 p-2 flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-slate-600 dark:text-gray-300">
               <span className="sr-only">Open user menu</span>
               <User className="h-8 w-8 rounded-full" />
             </Menu.Button>
@@ -281,7 +266,7 @@ const UserNavigation: React.FC = () => {
           >
             <Menu.Items
               static
-              className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+              className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-slate-600 ring-1 ring-black ring-opacity-5 focus:outline-none"
             >
               {userNavigation.map((item) => (
                 <Menu.Item key={item.name}>
@@ -289,10 +274,10 @@ const UserNavigation: React.FC = () => {
                     <NavLink
                       onClick={item.onClick}
                       href={item.href}
-                      className={`block px-4 py-2 text-sm text-gray-700 ${
-                        active && 'bg-gray-100'
+                      className={`block px-4 py-2 text-sm text-gray-700 dark:text-white ${
+                        active && 'bg-gray-100 dark:bg-cyan-600'
                       }`}
-                      activeClassName="bg-indigo-100"
+                      activeClassName="bg-indigo-100 dark:bg-cyan-500"
                     >
                       {item.name}
                     </NavLink>
@@ -339,7 +324,7 @@ const PrimaryLayout: React.FC<PrimaryLayoutProps> = ({ children }) => {
 
   return (
     <>
-      <div className="h-screen flex overflow-hidden bg-gray-100">
+      <div className="h-screen flex overflow-hidden bg-gray-100 dark:bg-slate-700 dark:text-white">
         <MobileSidebar
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
@@ -354,7 +339,7 @@ const PrimaryLayout: React.FC<PrimaryLayoutProps> = ({ children }) => {
               <span className="sr-only">Open sidebar</span>
               <MenuIcon className="h-6 w-6" aria-hidden="true" />
             </button>
-            <div className="flex-1 px-4 flex justify-end">
+            <div className="flex-1 px-4 flex justify-end dark:bg-slate-800">
               <div className="ml-4 flex items-center md:ml-6">
                 {renderThemeChanger()}
                 <UserNavigation />

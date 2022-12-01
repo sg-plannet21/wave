@@ -1,5 +1,5 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { axios } from 'lib/client/axios';
+import { createWaveFetcherKey, waveFetcher } from 'lib/client/axios';
 import _, { Dictionary } from 'lodash';
 
 type EntityMap = {
@@ -66,20 +66,21 @@ export interface InfiniteConfig<Data = unknown, Error = unknown>
   fallbackData?: Data[];
 }
 
-function getRequest<Data>(
+function getKey<Data>(
   queryKey: string,
   index: number,
   previousPageData: AxiosResponse<ApiCollectionResponse<Data>> | null
-): GetRequest {
+): string | null {
   if (previousPageData && !previousPageData.data.next) {
     return null;
   }
+
   // first page
   if (index === 0) {
-    return { url: queryKey };
+    return createWaveFetcherKey({ url: queryKey });
   }
   // remaining..
-  return { url: `${queryKey}?page=${index}` };
+  return createWaveFetcherKey({ url: `${queryKey}?page=${index}` });
 }
 
 // getRequest: (
@@ -110,14 +111,9 @@ export default function useWaveCollectionRequest<
     AxiosError<Error>
   >(
     (index, previousPageData) => {
-      const key = getRequest(
-        entities[entityType].path,
-        index,
-        previousPageData
-      );
-      return key ? JSON.stringify(key) : null;
+      return getKey(entities[entityType].path, index, previousPageData);
     },
-    (request) => axios(JSON.parse(request)),
+    (request) => waveFetcher(request),
     {
       ...config,
       fallbackData:
