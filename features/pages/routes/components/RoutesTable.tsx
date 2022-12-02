@@ -1,6 +1,6 @@
 import { TableColumn } from 'components/data-display/table';
 import WaveTable from 'components/data-display/wave-table';
-import { useRouteTableData } from '../hooks/useRoutesTable';
+import { useRouteTableData } from '../hooks/useRoutesTableData';
 import { RouteTableEntity } from '../types';
 
 function generateColumns(): TableColumn<RouteTableEntity>[] {
@@ -23,12 +23,9 @@ const RoutesTable: React.FC = () => {
   if (error) return <div>An error has occurred..</div>;
 
   return (
-    <div>
-      <WaveTable<RouteTableEntity>
-        columns={generateColumns()}
-        data={data}
-        pageSize={2}
-      />
+    <div className="flex">
+      <div className="hidden md:flex col w-1/4">Filters</div>
+      <WaveTable<RouteTableEntity> columns={generateColumns()} data={data} />
     </div>
   );
 };
