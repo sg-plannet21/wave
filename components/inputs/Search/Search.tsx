@@ -10,7 +10,7 @@ export type SearchProps = WithRequired<
 // px-2 py-1 text-gray-600 dark:text-slate-400 justify-between border-b border-gray-300
 const Search: React.FC<SearchProps> = ({ className, ...rest }) => {
   return (
-    <div className="group flex justify-between items-end border-b border-gray-300 px-2 text-gray-500 dark:text-gray-300 dark:border-gray-300">
+    <div className="group flex justify-between items-end border-b border-gray-500 px-2 text-gray-500 dark:text-gray-300 dark:border-gray-300">
       <label htmlFor="table-search" className="sr-only">
         Search
       </label>

@@ -1,5 +1,6 @@
 import { TableColumn } from 'components/data-display/table';
 import WaveTable from 'components/data-display/wave-table';
+import Card from 'components/surfaces/card';
 import { useRouteTableData } from '../hooks/useRoutesTableData';
 import { RouteTableEntity } from '../types';
 
@@ -24,8 +25,14 @@ const RoutesTable: React.FC = () => {
 
   return (
     <div className="flex">
-      <div className="hidden md:flex col w-1/4">Filters</div>
-      <WaveTable<RouteTableEntity> columns={generateColumns()} data={data} />
+      <div className="hidden md:flex md:flex-col md:w-1/4">
+        <Card title="System Filter" description="Enable system routes">
+          filters go here
+        </Card>
+      </div>
+      <div className="w-full">
+        <WaveTable<RouteTableEntity> columns={generateColumns()} data={data} />
+      </div>
     </div>
   );
 };

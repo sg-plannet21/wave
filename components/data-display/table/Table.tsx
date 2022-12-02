@@ -47,9 +47,9 @@ const Table = <Entry extends { [P in keyof Entry]: Entry[P] }>({
   function renderSortIcon(field: keyof Entry) {
     if (sortColumn?.field === field) {
       return sortColumn.order === 'asc' ? (
-        <ChevronUp className="shrink-0 w-6 h-6" />
+        <ChevronUp className="shrink-0 w-6 h-6 text-indigo-500 dark:text-orange-400" />
       ) : (
-        <ChevronDown className="shrink-0 w-6 h-6" />
+        <ChevronDown className="shrink-0 w-6 h-6 text-indigo-500 dark:text-orange-400" />
       );
     }
     return <DoubleChevron className="shrink-0 w-6 h-6" />;
@@ -57,7 +57,7 @@ const Table = <Entry extends { [P in keyof Entry]: Entry[P] }>({
 
   if (!data?.length) {
     return (
-      <div className="flex flex-col items-center justify-center text-gray-500 bg-white h-80">
+      <div className="flex flex-col items-center justify-center text-gray-500 dark:text-white h-80">
         <Archive className="w-16 h-16" />
         <h4>No Entries Found</h4>
       </div>
@@ -66,9 +66,9 @@ const Table = <Entry extends { [P in keyof Entry]: Entry[P] }>({
 
   return (
     <div className="flex flex-col w-full">
-      <div className="inline-block min-w-full align-middle overflow-x-auto py-2 sm:px-4 lg:px-6">
-        <table className="min-w-full divide-y-2 divide-emerald-600 text-gray-500 dark:text-gray-400">
-          <thead className="bg-slate-700">
+      <div className="rounded-lg inline-block min-w-full align-middle overflow-x-auto py-2 sm:px-4 lg:px-6">
+        <table className="min-w-full divide-y-2 divide-indigo-500 dark:divide-orange-400 text-gray-500 dark:text-gray-400">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
               {columns.map((column, index) => {
                 const isFilterable = !!onSort && !column.ignoreFiltering;
@@ -80,7 +80,7 @@ const Table = <Entry extends { [P in keyof Entry]: Entry[P] }>({
                       onClick: () => raiseSort(column.field),
                     })}
                     className={classNames(
-                      'px-6 py-3 text-xs font-medium tracking-wider text-left uppercase',
+                      'px-6 py-3 font-medium tracking-wider text-left',
                       {
                         'cursor-pointer': isFilterable,
                       }
@@ -99,7 +99,7 @@ const Table = <Entry extends { [P in keyof Entry]: Entry[P] }>({
             {data.map((record, entryIndex) => (
               <tr
                 key={entryIndex}
-                className="odd:bg-slate-800 even:bg-gray-700"
+                className="odd:bg-white odd:dark:bg-slate-800 even:bg-gray-200 even:dark:bg-gray-700"
               >
                 {columns.map(({ field, label, Cell }) => (
                   <td

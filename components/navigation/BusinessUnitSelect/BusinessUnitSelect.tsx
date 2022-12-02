@@ -87,7 +87,7 @@ const BusinessUnitSelect: React.FC<BusinessUnitSelectProps> = ({
   return (
     <Listbox value={selectedBusinessUnit} onChange={handleChange}>
       <div className="relative">
-        <Listbox.Button className="group relative w-full flex items-center cursor-default rounded-lg bg-orange-200 dark:bg-orange-600 dark:text-gray-300 p-2 pr-10 text-base font-medium shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+        <Listbox.Button className="group relative w-full flex items-center cursor-default rounded-lg bg-indigo-600 dark:bg-orange-600 text-gray-200 dark:text-gray-300 p-2 pr-10 text-base font-medium shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
           <BusinessUnit className="text-gray-400 group-hover:text-gray-300 mr-4 flex-shrink-0 h-6 w-6" />
           <span className="block truncate">{selectedBusinessUnit.label}</span>
           <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">

@@ -324,7 +324,7 @@ const PrimaryLayout: React.FC<PrimaryLayoutProps> = ({ children }) => {
 
   return (
     <>
-      <div className="h-screen flex overflow-hidden bg-gray-100 dark:bg-slate-700 dark:text-white">
+      <div className="h-screen flex overflow-hidden">
         <MobileSidebar
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
@@ -346,7 +346,7 @@ const PrimaryLayout: React.FC<PrimaryLayoutProps> = ({ children }) => {
               </div>
             </div>
           </div>
-          <main className="flex-1 relative overflow-y-auto focus:outline-none">
+          <main className="flex-1 relative overflow-y-auto focus:outline-none text-gray-900 bg-gray-100 dark:bg-gray-900 dark:text-white">
             {children}
           </main>
         </div>

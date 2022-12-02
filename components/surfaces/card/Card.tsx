@@ -16,14 +16,18 @@ export type CardProps = TitleProps & {
 
 const Card: React.FC<CardProps> = ({ title, description, children }) => {
   return (
-    <div className="p-3 max-w-sm bg-white rounded-lg border text-gray-900 dark:text-white border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700">
-      <h5 className="mb-1 font-semibold tracking-tight">{title}</h5>
-      {description && (
-        <p className="text-sm font-normal text-gray-500 dark:text-gray-400">
-          {description}
-        </p>
-      )}
-      <div className="mt-1 flex flex-col space-y-2">{children}</div>
+    <div className="flex justify-center">
+      <div className="block max-w-sm p-6 rounded-lg shadow-md border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700 ">
+        <h5 className="text-gray-900 dark:text-gray-200 text-lg leading-tight font-medium mb-2">
+          {title}
+        </h5>
+        {description && (
+          <p className="text-gray-700 text-base dark:text-gray-400">
+            {description}
+          </p>
+        )}
+        <div className="mt-2 flex flex-col space-y-2">{children}</div>
+      </div>
     </div>
   );
 };
