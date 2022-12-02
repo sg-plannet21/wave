@@ -180,13 +180,13 @@ const tableData: LeagueEntry[] = [
 const leagueTableColumns: TableColumn<LeagueEntry>[] = [
   {
     field: 'name',
-    title: 'Name',
+    label: 'Name',
     Cell: ({ entry }) => <span className="text-indigo-500">{entry.name}</span>,
   },
-  { field: 'wins', title: 'Wins' },
-  { field: 'played', title: 'Played' },
-  { field: 'draws', title: 'Draws' },
-  { field: 'losses', title: 'Losses' },
+  { field: 'wins', label: 'Wins' },
+  { field: 'played', label: 'Played' },
+  { field: 'draws', label: 'Draws' },
+  { field: 'losses', label: 'Losses' },
 ];
 
 const TableExample: React.FC = () => {

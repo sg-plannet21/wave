@@ -24,7 +24,11 @@ const RoutesTable: React.FC = () => {
 
   return (
     <div>
-      <WaveTable<RouteTableEntity> columns={generateColumns()} data={data} />
+      <WaveTable<RouteTableEntity>
+        columns={generateColumns()}
+        data={data}
+        pageSize={2}
+      />
     </div>
   );
 };

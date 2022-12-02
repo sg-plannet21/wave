@@ -45,15 +45,15 @@ const desserts: Dessert[] = [
 const columns: TableColumn<Dessert>[] = [
   {
     field: 'name',
-    title: 'Dessert (100g serving)',
+    label: 'Dessert (100g serving)',
   },
   {
     field: 'calories',
-    title: 'Calories',
+    label: 'Calories',
   },
-  { field: 'fat', title: 'Fat (g)' },
-  { field: 'carbs', title: 'Carbs (g)' },
-  { field: 'protein', title: 'Protein (g)', ignoreFiltering: true },
+  { field: 'fat', label: 'Fat (g)' },
+  { field: 'carbs', label: 'Carbs (g)' },
+  { field: 'protein', label: 'Protein (g)', ignoreFiltering: true },
 ];
 
 const TableTest: NextPageWithLayout = () => {

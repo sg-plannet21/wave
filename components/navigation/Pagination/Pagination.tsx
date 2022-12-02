@@ -75,85 +75,107 @@ const Pagination: React.FC<PaginationProps> = ({
 
   function renderPageNavigation() {
     return (
-      <nav aria-label="Page navigation">
-        <ul className="inline-flex items-center -space-x-px">
-          <li>
-            <a
-              href="#"
-              {...(currentPage > 1 && {
-                onClick: () => onPageChange(currentPage - 1),
-              })}
-              className={classNames(
-                'block py-2 px-3 ml-0 leading-tight text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white',
-                { 'cursor-not-allowed': currentPage === 1 }
-              )}
-            >
-              <span className="sr-only">Previous</span>
-              <svg
-                aria-hidden="true"
-                className="w-5 h-5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-            </a>
-          </li>
-          {pages.map((page) => (
-            <li key={page}>
-              <a
-                onClick={() => onPageChange(page)}
-                href="#"
-                {...(currentPage && { 'aria-current': 'page' })}
+      <nav
+        className="isolate inline-flex -space-x-px rounded-md shadow-sm"
+        aria-label="Pagination"
+      >
+        <a
+          href="#"
+          {...(currentPage > 1 && {
+            onClick: () => onPageChange(currentPage - 1),
+          })}
+          className={classNames(
+            'relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 focus:z-20',
+            'dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400',
+            {
+              'cursor-default': currentPage === 1,
+            },
+            {
+              'hover:bg-gray-50 dark:hover:bg-gray-700 dark:hover:text-white':
+                currentPage !== 1,
+            }
+          )}
+        >
+          <span className="sr-only">Previous</span>
+          <svg
+            className="h-5 w-5"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </a>
+        {pages.map((page, index, arr) => (
+          <React.Fragment key={page}>
+            {index > 0 && arr[index] - 1 > arr[index - 1] && (
+              <span
                 className={classNames(
-                  'py-2 px-3 leading-tight border',
-                  {
-                    'text-blue-600 bg-blue-50 border-blue-300 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white':
-                      currentPage === page,
-                  },
-                  {
-                    'text-gray-500 bg-white border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white':
-                      currentPage !== page,
-                  }
+                  'relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700',
+                  'dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400'
                 )}
               >
-                {page}
-              </a>
-            </li>
-          ))}
-          <li>
+                ...
+              </span>
+            )}
             <a
+              onClick={() => onPageChange(page)}
               href="#"
-              {...(currentPage < pageCount && {
-                onClick: () => onPageChange(currentPage + 1),
-              })}
+              {...(currentPage && { 'aria-current': 'page' })}
               className={classNames(
-                'block py-2 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white',
-                { 'cursor-not-allowed': currentPage === pageCount }
+                'relative inline-flex items-center border px-4 py-2 text-sm font-medium focus:z-20 bg-white',
+                'dark:bg-gray-800 dark:border-gray-600',
+                {
+                  'z-10 border-indigo-500 bg-indigo-50 text-indigo-600 dark:bg-gray-600 dark:text-white':
+                    currentPage === page,
+                },
+                {
+                  'border-gray-300 bg-white text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-600 dark:hover:text-white dark:text-gray-400':
+                    currentPage !== page,
+                }
               )}
             >
-              <span className="sr-only">Next</span>
-              <svg
-                aria-hidden="true"
-                className="w-5 h-5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
+              {page}
             </a>
-          </li>
-        </ul>
+          </React.Fragment>
+        ))}
+        <a
+          href="#"
+          {...(currentPage < pageCount && {
+            onClick: () => onPageChange(currentPage + 1),
+          })}
+          className={classNames(
+            'relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500  focus:z-20',
+            'dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400',
+            {
+              'cursor-default': currentPage === pageCount,
+            },
+            {
+              'hover:bg-gray-50 dark:hover:bg-gray-700 dark:hover:text-white':
+                currentPage !== pageCount,
+            }
+          )}
+        >
+          <span className="sr-only">Next</span>
+          <svg
+            className="h-5 w-5"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </a>
       </nav>
     );
   }
