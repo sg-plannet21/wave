@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import { Play } from 'components/icons';
-import Button from 'components/inputs/Button';
+import Button from 'components/inputs/button';
 import React, { useRef, useState } from 'react';
 import ReactAudioPlayer from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';

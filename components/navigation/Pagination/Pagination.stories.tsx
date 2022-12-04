@@ -1,6 +1,6 @@
 import { Meta, Story } from '@storybook/react';
 import Table, { TableColumn } from 'components/data-display/table';
-import Button from 'components/inputs/Button';
+import Button from 'components/inputs/button';
 import { paginate } from 'lib/client/paginate';
 import { useState } from 'react';
 import Pagination from './Pagination';

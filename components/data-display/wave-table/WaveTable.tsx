@@ -1,4 +1,4 @@
-import Search from 'components/inputs/Search';
+import Search from 'components/inputs/search';
 import Pagination from 'components/navigation/Pagination';
 import { paginate } from 'lib/client/paginate';
 import _ from 'lodash';

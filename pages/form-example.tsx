@@ -1,7 +1,7 @@
 import DateRangePicker from 'components/form/DateRangeField';
 import { Form } from 'components/form/Form';
 import { InputField } from 'components/form/InputField';
-import Button from 'components/inputs/Button';
+import Button from 'components/inputs/button';
 import PrimaryLayout from 'components/layouts/primary/PrimaryLayout';
 import { createUtcDateRange, validateRange } from 'lib/client/date-utilities';
 import moment, { Moment } from 'moment';

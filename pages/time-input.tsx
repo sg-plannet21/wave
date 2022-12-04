@@ -1,7 +1,7 @@
 import { Form } from 'components/form/Form';
 import { InputField } from 'components/form/InputField';
 import TimeRangePicker from 'components/form/TimeRangeField';
-import Button from 'components/inputs/Button';
+import Button from 'components/inputs/button';
 import PrimaryLayout from 'components/layouts/primary/PrimaryLayout';
 import {
   createUtcTimeRange,

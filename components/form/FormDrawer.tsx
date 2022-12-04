@@ -1,5 +1,5 @@
 import Drawer, { DrawerProps } from 'components/feedback/drawer/';
-import Button from 'components/inputs/Button';
+import Button from 'components/inputs/button';
 import * as React from 'react';
 import { useDisclosure } from 'state/hooks/useDisclosure';
 

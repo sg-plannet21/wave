@@ -1,6 +1,6 @@
 import { Form } from 'components/form/Form';
 import { InputField } from 'components/form/InputField';
-import Button from 'components/inputs/Button';
+import Button from 'components/inputs/button';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { z } from 'zod';

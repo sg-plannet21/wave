@@ -1,4 +1,4 @@
-import Search from 'components/inputs/Search/';
+import Search from 'components/inputs/search';
 import PrimaryLayout from 'components/layouts/primary/PrimaryLayout';
 import { useState } from 'react';
 import { NextPageWithLayout } from './page';
