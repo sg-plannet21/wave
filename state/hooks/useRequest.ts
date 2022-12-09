@@ -2,8 +2,6 @@ import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { axios } from 'lib/client/axios';
 import useSWR, { SWRConfiguration, SWRResponse } from 'swr';
 
-// https://github.com/vercel/swr/blob/main/examples/axios-typescript/libs/useRequest.ts
-
 export type GetRequest = AxiosRequestConfig | null;
 
 interface Return<Data, Error>
@@ -38,13 +36,15 @@ export default function useRequest<Data = unknown, Error = unknown>(
      * NOTE: Typescript thinks `request` can be `null` here, but the fetcher
      * function is actually only called by `useSWR` when it isn't.
      */
-    request && (() => axios.request<Data>(request)),
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    () => axios.request<Data>(request!),
     {
       ...config,
       fallbackData: fallbackData && {
         status: 200,
         statusText: 'InitialData',
-        config: request ?? {},
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        config: request!,
         headers: {},
         data: fallbackData,
       },

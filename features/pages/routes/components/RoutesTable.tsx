@@ -6,25 +6,46 @@ import { mapNumberToColour } from 'components/inputs/switch/Switch';
 import Card from 'components/surfaces/card';
 import _ from 'lodash';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import {
   RouteTableRecord,
   useRouteTableData,
 } from '../hooks/useRoutesTableData';
 
-const columns: TableColumn<RouteTableRecord>[] = [
-  { field: 'name', label: 'Name' },
-  { field: 'destinationTypeLabel', label: 'Destination Type' },
-  {
-    field: 'systemCreatedLabel',
-    label: 'System',
-  },
-];
-
 const RoutesTable: React.FC = () => {
+  const {
+    query: { businessUnitId },
+  } = useRouter();
   const { data, filters, isLoading, error } = useRouteTableData();
 
+  const columns: TableColumn<RouteTableRecord>[] = [
+    {
+      field: 'name',
+      label: 'Name',
+      Cell({ entry }) {
+        return (
+          <Link
+            href={{
+              pathname: 'routes/[routeId]',
+              query: { businessUnitId, routeId: entry.id },
+            }}
+          >
+            <a className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+              {entry.name}
+            </a>
+          </Link>
+        );
+      },
+    },
+    { field: 'destinationTypeLabel', label: 'Destination Type' },
+    {
+      field: 'systemCreatedLabel',
+      label: 'Type',
+    },
+  ];
+
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>We have encountered and error..</div>;
+  if (error) return <div>We have encountered an error..</div>;
 
   function handleSystemFilterToggle() {
     filters.setSystemRoutes((prevState: boolean) => !prevState);
@@ -58,22 +79,24 @@ const RoutesTable: React.FC = () => {
             />
           </Card>
 
-          <Card
-            title="Destination Types"
-            description="Filter by Destination Type"
-          >
-            {filters.destinationList.map((destination, index) => (
-              <Switch
-                key={destination}
-                isChecked={
-                  !filters.destinationExceptionList.includes(destination)
-                }
-                label={destination}
-                onChange={() => handleDestinationFilterChange(destination)}
-                colour={mapNumberToColour(index)}
-              />
-            ))}
-          </Card>
+          {filters.destinationList.length > 1 && (
+            <Card
+              title="Destination Types"
+              description="Filter by Destination Type"
+            >
+              {filters.destinationList.map((destination, index) => (
+                <Switch
+                  key={destination}
+                  isChecked={
+                    !filters.destinationExceptionList.includes(destination)
+                  }
+                  label={destination}
+                  onChange={() => handleDestinationFilterChange(destination)}
+                  colour={mapNumberToColour(index)}
+                />
+              ))}
+            </Card>
+          )}
         </div>
         <div className="w-full">
           <WaveTable columns={columns} data={data} />

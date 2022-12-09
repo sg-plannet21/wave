@@ -10,11 +10,12 @@ export type INavLink = React.ComponentPropsWithoutRef<'a'> & {
 const NavLink = forwardRef<HTMLAnchorElement, INavLink>((props, ref) => {
   const { asPath } = useRouter();
   const { children, href, className, activeClassName, ...rest } = props;
+
   return (
     <Link href={href}>
       <a
         ref={ref}
-        className={`${className} ${asPath === href && activeClassName}`}
+        className={`${className} ${asPath.includes(href) && activeClassName}`}
         {...rest}
       >
         {children}

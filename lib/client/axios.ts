@@ -6,12 +6,12 @@ console.log('API_URL :>> ', API_URL);
 
 // import { useNotificationStore } from "@/stores/notifications";
 
-// function businessUnitRequestInterceptor(config: AxiosRequestConfig) {
-//   const businessUnit = storage.getBusinessUnit();
-//   if (!config.headers) config.headers = { Accept: 'application/json' };
-//   if (businessUnit) config.headers['businessunit'] = businessUnit;
-//   return config;
-// }
+function businessUnitRequestInterceptor(config: AxiosRequestConfig) {
+  const businessUnit = storage.getBusinessUnit();
+  if (!config.headers) config.headers = { Accept: 'application/json' };
+  if (businessUnit) config.headers['businessunit'] = businessUnit;
+  return config;
+}
 
 export const axios = Axios.create({
   baseURL: API_URL,
@@ -31,19 +31,28 @@ export function setAuthHeader(authToken: string) {
 //   return JSON.stringify(config);
 // }
 
-export function waveFetcher(request: string) {
-  return axios(JSON.parse(request));
-}
+// export function waveFetcher(request: string) {
+//   return axios(JSON.parse(request));
+// }
 
-export function createWaveFetcherKey(
-  request: AxiosRequestConfig | null
-): string | null {
-  const defaultHeaders: AxiosRequestConfig = {
+// export function createWaveFetcherKey(
+//   request: AxiosRequestConfig | null
+// ): string | null {
+//   const defaultHeaders: AxiosRequestConfig = {
+//     headers: {
+//       businessunit: storage.getBusinessUnit(),
+//     },
+//   };
+//   return request ? JSON.stringify({ ...defaultHeaders, ...request }) : null;
+// }
+
+export function fetcher(request: AxiosRequestConfig | null) {
+  return axios.request({
     headers: {
       businessunit: storage.getBusinessUnit(),
     },
-  };
-  return request ? JSON.stringify({ ...defaultHeaders, ...request }) : null;
+    ...request,
+  });
 }
 
 // export function fetcher(key: [url: string, businessUnitId?: string]) {
@@ -56,7 +65,7 @@ export function createWaveFetcherKey(
 //   });
 // }
 
-// axios.interceptors.request.use(businessUnitRequestInterceptor);
+axios.interceptors.request.use(businessUnitRequestInterceptor);
 
 // axios.interceptors.response.use(
 //   (response) => {

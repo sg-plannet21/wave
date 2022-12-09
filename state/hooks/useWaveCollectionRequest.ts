@@ -1,5 +1,6 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { createWaveFetcherKey, waveFetcher } from 'lib/client/axios';
+import { axios } from 'lib/client/axios';
+import storage from 'lib/client/storage';
 import _, { Dictionary } from 'lodash';
 
 type EntityMap = {
@@ -66,6 +67,17 @@ export interface InfiniteConfig<Data = unknown, Error = unknown>
   fallbackData?: Data[];
 }
 
+function createWaveFetcherKey(
+  request: AxiosRequestConfig | null
+): string | null {
+  const defaultHeaders: AxiosRequestConfig = {
+    headers: {
+      businessunit: storage.getBusinessUnit(),
+    },
+  };
+  return request ? JSON.stringify({ ...defaultHeaders, ...request }) : null;
+}
+
 function getKey<Data>(
   queryKey: string,
   index: number,
@@ -113,7 +125,7 @@ export default function useWaveCollectionRequest<
     (index, previousPageData) => {
       return getKey(entities[entityType].path, index, previousPageData);
     },
-    (request) => waveFetcher(request),
+    (request) => axios(JSON.parse(request)),
     {
       ...config,
       fallbackData:

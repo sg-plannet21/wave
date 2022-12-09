@@ -4,18 +4,18 @@ import { UseFormRegisterReturn } from 'react-hook-form';
 
 import { FieldWrapper, FieldWrapperPassThroughProps } from './FieldWrapper';
 
-type Option = {
+export type Option = {
   label: React.ReactNode;
   value: string | number | string[];
 };
 
-type GroupOption = { optgroup?: string; options: Option[] };
+export type GroupOption = { optgroup?: string; options: Option[] };
 
 type OptionType =
   | { options: Option[]; groupedOptions?: never }
   | { options?: never; groupedOptions: GroupOption[] };
 
-type SelectFieldProps = FieldWrapperPassThroughProps &
+export type SelectFieldProps = FieldWrapperPassThroughProps &
   OptionType & {
     className?: string;
     defaultValue?: string;
