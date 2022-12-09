@@ -1,14 +1,11 @@
+import DestinationTypeField from 'components/form/DestinationTypeField';
 import { Form } from 'components/form/Form';
 import { InputField } from 'components/form/InputField';
-import { Option, SelectField } from 'components/form/SelectField';
 import Button from 'components/inputs/button';
-import { useMemo } from 'react';
-import useWaveCollectionRequest from 'state/hooks/useWaveCollectionRequest';
 import { z } from 'zod';
 import { createRoute } from '../api/createRoute';
 import { editRoute } from '../api/editRoute';
 import { useRoute } from '../hooks/useRoute';
-import { RouteDestinationType } from '../types';
 
 type RoutesFormProps = {
   onSuccess: () => void;
@@ -32,31 +29,10 @@ const RoutesForm: React.FC<RoutesFormProps> = ({ id, onSuccess }) => {
   const { data: route, error: routeError } = useRoute(
     newRecord ? undefined : id
   );
-  const { data: destinationTypes, error: destinationTypesErrors } =
-    useWaveCollectionRequest<RouteDestinationType>('routeDestinationTypes');
 
-  const options: Option[] = useMemo(() => {
-    if (!destinationTypes) return [];
+  if (!newRecord && !route) return <div>Loading..</div>;
 
-    const defaultValue: Option = {
-      label: 'Select Destination Type',
-      value: '',
-    };
-
-    const options = Object.values(destinationTypes).map(
-      ({ destination_type, destination_type_id }) => ({
-        label: destination_type,
-        value: destination_type_id,
-      })
-    );
-
-    return [defaultValue, ...options];
-  }, [destinationTypes]);
-
-  if (!options.length || (!newRecord && !route)) return <div>Loading..</div>;
-
-  if (routeError || destinationTypesErrors)
-    return <div>An error has occurred</div>;
+  if (routeError) return <div>An error has occurred</div>;
 
   return (
     <Form<RouteFormValues, typeof schema>
@@ -94,8 +70,7 @@ const RoutesForm: React.FC<RoutesFormProps> = ({ id, onSuccess }) => {
             label="Destination"
             error={formState.errors['destination']}
           />
-          <SelectField
-            options={options}
+          <DestinationTypeField
             label="Destination Type"
             registration={register('destinationType')}
             error={formState.errors['destinationType']}

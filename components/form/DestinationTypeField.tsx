@@ -29,10 +29,12 @@ const DestinationTypeField: React.FC<
     return [defaultValue, ...options];
   }, [data]);
 
-  if (!data)
-    <div className="flex w-full justify-center items-center">
-      <Spinner size="sm" />
-    </div>;
+  if (!options.length)
+    return (
+      <div className="flex w-full justify-center items-center">
+        <Spinner size="sm" />
+      </div>
+    );
 
   if (error) return <div>An Error has occurred</div>;
 
