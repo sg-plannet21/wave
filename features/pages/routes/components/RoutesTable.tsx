@@ -37,6 +37,7 @@ const RoutesTable: React.FC = () => {
         );
       },
     },
+    { field: 'destination', label: 'Destination' },
     { field: 'destinationTypeLabel', label: 'Destination Type' },
     {
       field: 'systemCreatedLabel',
@@ -62,7 +63,7 @@ const RoutesTable: React.FC = () => {
     <div className="w-full flex flex-col justify-center items-center">
       <div className="flex w-full">
         <div className="w-1/4 flex flex-col p-2 space-y-3">
-          <Link href="/new">
+          <Link href={`/${businessUnitId}/routes/new`}>
             <a className="flex justify-center items-center space-x-1 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
               <Plus />
               <span>New Route</span>

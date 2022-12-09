@@ -1,10 +1,9 @@
-import { axios } from 'lib/client/axios';
 import useRequest, { Config } from 'state/hooks/useRequest';
 import { Route } from '../types';
 
-export const getRoute = ({ routeId }: { routeId: string }): Promise<Route> => {
-  return axios.get(`/routes/${routeId}`);
-};
+// export const getRoute = ({ routeId }: { routeId: string }): Promise<Route> => {
+//   return axios.get(`/routes/${routeId}`);
+// };
 
 // type UseRouteOptions = {
 //   routeId?: string;

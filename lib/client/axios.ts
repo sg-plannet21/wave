@@ -10,6 +10,10 @@ function businessUnitRequestInterceptor(config: AxiosRequestConfig) {
   const businessUnit = storage.getBusinessUnit();
   if (!config.headers) config.headers = { Accept: 'application/json' };
   if (businessUnit) config.headers['businessunit'] = businessUnit;
+
+  if (config.method === 'post' || config.method === 'patch')
+    config.data.business_unit = businessUnit;
+
   return config;
 }
 

@@ -11,7 +11,7 @@ import { NextPageWithLayout } from 'pages/page';
 
 const RouteDetails: NextPageWithLayout = () => {
   const router = useRouter();
-  const { routeId } = router.query;
+  const { routeId, businessUnitId } = router.query;
   // const newRecord = routeId === 'new';
   // const { data, error } = useRoute(newRecord ? undefined : routeId?.toString());
 
@@ -23,6 +23,7 @@ const RouteDetails: NextPageWithLayout = () => {
 
   function onSuccess() {
     console.log('SUCCESS');
+    router.push(`/${businessUnitId}/routes`);
   }
 
   return (

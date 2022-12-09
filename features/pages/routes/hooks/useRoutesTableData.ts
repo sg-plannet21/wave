@@ -7,6 +7,7 @@ export type RouteTableRecord = {
   id: string;
   name: string;
   destinationTypeLabel: string;
+  destination: string;
   system: boolean;
   systemCreatedLabel: string;
 };
@@ -29,6 +30,7 @@ export function useRouteTableData() {
       id: route.route_id,
       name: route.route_name,
       system: route.system_created,
+      destination: route.destination,
       systemCreatedLabel: route.system_created ? 'System' : 'Custom',
       destinationTypeLabel: _.get(
         destinationTypes[route.destination_type],
