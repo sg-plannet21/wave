@@ -2,21 +2,18 @@ const Info = ({ ...props }) => {
   return (
     <svg
       viewBox="0 0 24 24"
-      width="24"
-      height="24"
       stroke="currentColor"
       strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
       fill="none"
-      shapeRendering="geometricPrecision"
       {...props}
     >
-      <circle cx="12" cy="12" r="10" fill="transparent" />
-      <path d="M12 8v4" stroke="currentColor" />
-      <path d="M12 16h.01" stroke="currentColor" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+      />
     </svg>
-  )
-}
+  );
+};
 
-export default Info
+export default Info;

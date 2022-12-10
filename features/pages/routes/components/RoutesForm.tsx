@@ -18,11 +18,13 @@ const schema = z.object({
   destinationType: z.string().min(1, ' Destination is required'),
 });
 
-type RouteFormValues = {
-  name: string;
-  destination: string;
-  destinationType: string;
-};
+type RouteFormValues = z.infer<typeof schema>;
+
+// type RouteFormValues = {
+//   name: string;
+//   destination: string;
+//   destinationType: string;
+// };
 
 const RoutesForm: React.FC<RoutesFormProps> = ({ id, onSuccess }) => {
   const newRecord = id === 'new';
