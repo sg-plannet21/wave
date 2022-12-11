@@ -2,7 +2,7 @@ import ConfirmationDialog from 'components/feedback/confirmation-dialog';
 import { Trash } from 'components/icons';
 import Button from 'components/inputs/button';
 import React from 'react';
-import useWaveCollectionRequest from 'state/hooks/useWaveCollectionRequest';
+import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import deleteRoute from '../api/deleteRoute';
 import { Route } from '../types';
 
@@ -16,16 +16,18 @@ const DeleteRoute: React.FC<DeleteRouteProps> = ({ id, name }) => {
   const [status, setStatus] = React.useState<'idle' | 'loading' | 'complete'>(
     'idle'
   );
-  const { mutate } = useWaveCollectionRequest<Route>('routes');
+  const { mutate } = useCollectionRequest<Route>('routes');
 
   async function handleDelete() {
     try {
       setStatus('loading');
       mutate(
         async (routes) => {
+          if (!routes) return;
           await deleteRoute(id);
-          console.log('routes', routes);
-          return routes;
+          const clonedRoutes = Object.assign({}, routes);
+          if (clonedRoutes[id]) delete clonedRoutes[id];
+          return clonedRoutes;
         },
         { revalidate: false }
       );

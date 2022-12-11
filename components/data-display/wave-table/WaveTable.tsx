@@ -23,6 +23,10 @@ const WaveTable = <Entry extends { [P in keyof Entry]: Entry[P] }>({
     if (searchTerm.trim().length) setCurrentPage(1);
   }, [searchTerm]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [data.length]);
+
   const filterableFields = useMemo(
     () => columns.filter((column) => !column.ignoreFiltering),
     [columns]

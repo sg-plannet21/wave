@@ -39,6 +39,9 @@ const entities: EntityMap = {
 export default function useCollectionRequest<Entity>(
   entityType: keyof typeof entities
 ) {
+  if (!entities[entityType]) {
+    throw new Error('Unknown entity for useCollectionRequest: ' + entityType);
+  }
   return useSWR<Dictionary<Entity>, AxiosError<WaveError>>(
     [entities[entityType].path, storage.getBusinessUnit()],
     entityFetcher(

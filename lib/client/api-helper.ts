@@ -107,6 +107,7 @@ export function fetcher<JSON>(request: GetRequest): Promise<JSON> | null {
   console.log('making req');
   return axios.request(request).then((response) => response.data);
 }
+
 export async function continousFetcher<DATA = unknown>(request: GetRequest) {
   // if (!request?.url) return null;
   const results: DATA[] = [];
@@ -122,72 +123,6 @@ export async function continousFetcher<DATA = unknown>(request: GetRequest) {
   }
   return results;
 }
-
-// export function fetcher<JSON = any>(
-//   input: RequestInfo,
-//   init?: RequestInit
-// ): Promise<JSON> {
-//   const requestInfo =
-//     typeof input === "string"
-//       ? addBaseUrl(input)
-//       : new Request({ ...input, url: addBaseUrl(input.url) });
-//   return fetch(requestInfo, { ...defaultFetchOptions, ...init }).then((res) =>
-//     res.json()
-//   );
-// }
-
-// export const testFetcher = (url: string, token: string, businessUnit: string) =>
-//   fetch(url, {
-//     headers: { Authorization: 'Bearer ' + token, businessunit: businessUnit },
-//   }).then((res) => res.json());
-
-// @todo
-// async function continousFetch<JSON = any>(
-//   input: RequestInfo,
-//   init?: RequestInit
-// ) {
-//   const results: JSON[] = [];
-//   let keepGoing = true;
-//   while (keepGoing) {
-//     const response = await fetcher(input, init);
-//     if (!response.ok) {
-//       throw new Error("Error retrieving data!");
-//     }
-//     const json = await response.json();
-//   }
-// }
-
-// export function entityFetcher<T>(
-//   entityId: keyof T,
-//   orderBy: keyof T
-// ): BareFetcher {
-//   return async <Data>(
-//     ...args: [url: string, businessUnit: string]
-//   ): Promise<Dictionary<Data> | null> => {
-//     const [url] = args;
-
-//     if (!url) return null;
-
-//     const results: Data[] = [];
-//     let hasNext = true;
-//     let page = 1;
-//     let reqUrl = `${url}?page=${page}`;
-//     do {
-//       const { data } = await axios.get<ApiCollectionResponse<Data>>(reqUrl);
-//       results.push(...data.results);
-//       if (data.next) {
-//         reqUrl =
-//           process.env.NODE_ENV === 'development'
-//             ? `${url}?page=${++page}`
-//             : data.next;
-//       } else {
-//         hasNext = false;
-//       }
-//     } while (hasNext);
-
-//     return _.chain(results).sortBy(orderBy).keyBy(entityId).value();
-//   };
-// }
 
 export function entityFetcher<Data>(
   entityId: keyof Data,
