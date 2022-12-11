@@ -7,22 +7,22 @@ export type RefreshTokenResponse = {
   access: string;
 };
 
-enum EntityRoles {
-  prompts = 'Prompts',
-  entryPoints = 'EntryPoints',
-  menus = 'Menus',
-  queues = 'Queues',
-  schedules = 'Schedules',
-  // administrator = "Administrator",
+export enum EntityRoles {
+  Prompts = 'Prompts',
+  EntryPoints = 'EntryPoints',
+  Menus = 'Menus',
+  Queues = 'Queues',
+  Schedules = 'Schedules',
+  Administrator = 'Administrator',
 }
 
-type AdministratorRole = ['Administrator'];
+// export type AdministratorRole = ['Administrator'];
 
 export interface BusinessUnitRole {
   business_unit: string;
   business_unit_name: string;
   default_region: number;
-  roles: EntityRoles[] | AdministratorRole;
+  roles: EntityRoles[];
 }
 
 export interface User {

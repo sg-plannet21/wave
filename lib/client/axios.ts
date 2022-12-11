@@ -50,14 +50,69 @@ export function setAuthHeader(authToken: string) {
 //   return request ? JSON.stringify({ ...defaultHeaders, ...request }) : null;
 // }
 
-export function fetcher(request: AxiosRequestConfig | null) {
-  return axios.request({
-    headers: {
-      businessunit: storage.getBusinessUnit(),
-    },
-    ...request,
-  });
-}
+// export function fetcher(request: AxiosRequestConfig | null) {
+//   return axios.request({
+//     headers: {
+//       businessunit: storage.getBusinessUnit(),
+//     },
+//     ...request,
+//   });
+// }
+
+// export async function continousFetcher<DATA = unknown>(request: GetRequest) {
+//   console.log('request :>> ', request);
+//   if (!request?.url) return null;
+//   const results: DATA[] = [];
+//   let page = 1;
+//   let hasNext = true;
+//   while (hasNext) {
+//     console.log('hasNext :>> ', hasNext);
+//     const { data } = await axios.request<ApiCollectionResponse<DATA>>({
+//       ...request,
+//       url: `${request?.url}?page=${page++}`,
+//     });
+//     console.log('continousFetcher data :>> ', data);
+//     results.push(...data.results);
+//     if (!data.next) hasNext = false;
+//   }
+//   console.log('results :>> ', results);
+//   return results;
+// }
+
+// export const continousFetcher: BareFetcher = async <Data>(
+//   ...args: [
+//     url: string,
+//     entityId: string,
+//     orderBy: string,
+//     businessUnit: string
+//   ]
+// ): Promise<Data[] | null> => {
+//   const [url, entityId, orderBy] = args;
+
+//   if (!url) return null;
+
+//   const results: Data[] = [];
+//   let hasNext = true;
+//   let page = 1;
+//   let reqUrl = `${url}?page=${page}`;
+//   do {
+//     const { data } = await axios.get<ApiCollectionResponse<Data>>(reqUrl);
+//     results.push(...data.results);
+//     console.log('data', data);
+//     if (data.next) {
+//       reqUrl =
+//         process.env.NODE_ENV === 'development'
+//           ? `${url}?page=${++page}`
+//           : data.next;
+//     } else {
+//       hasNext = false;
+//     }
+//   } while (hasNext);
+
+//   const test = _.chain(results).sortBy(orderBy).keyBy(entityId).value();
+//   console.log('test', test);
+//   return results;
+// };
 
 // export function fetcher(key: [url: string, businessUnitId?: string]) {
 //   const [url, businessUnitId] = key;

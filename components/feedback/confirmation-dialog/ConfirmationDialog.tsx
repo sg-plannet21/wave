@@ -69,6 +69,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             )}
           </div>
         </div>
+
         <div className="mt-4 flex space-x-2 justify-end">
           <Button
             type="button"

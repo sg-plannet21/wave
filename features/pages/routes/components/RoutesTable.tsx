@@ -7,16 +7,19 @@ import Card from 'components/surfaces/card';
 import _ from 'lodash';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useIsAuthorised } from 'state/hooks/useAuthorisation';
 import {
   RouteTableRecord,
   useRouteTableData,
 } from '../hooks/useRoutesTableData';
+import DeleteRoute from './DeleteRoute';
 
 const RoutesTable: React.FC = () => {
   const {
     query: { businessUnitId },
   } = useRouter();
   const { data, filters, isLoading, error } = useRouteTableData();
+  const { isSuperUser } = useIsAuthorised();
 
   const columns: TableColumn<RouteTableRecord>[] = [
     {
@@ -44,6 +47,18 @@ const RoutesTable: React.FC = () => {
       label: 'Type',
     },
   ];
+
+  if (isSuperUser) {
+    columns.push({
+      field: 'id',
+      label: '',
+      ignoreFiltering: true,
+      Cell({ entry }) {
+        if (entry.system) return <></>;
+        return <DeleteRoute id={entry.id} name={entry.name} />;
+      },
+    });
+  }
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>We have encountered an error..</div>;

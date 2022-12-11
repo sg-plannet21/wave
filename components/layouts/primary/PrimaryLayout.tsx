@@ -50,8 +50,6 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({
   sidebarOpen,
   setSidebarOpen,
 }) => {
-  const { data } = useSession();
-  const businessUnits = data?.user.business_unit_roles ?? [];
   return (
     <Transition.Root show={sidebarOpen} as={React.Fragment}>
       <Dialog
@@ -106,7 +104,6 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({
             </div>
             <div className="mt-5 flex-1 h-0 overflow-y-auto">
               <nav className="px-2 py-1 space-y-1">
-                <BusinessUnitSelect businessUnits={businessUnits} />
                 <SideNavigation />
               </nav>
             </div>

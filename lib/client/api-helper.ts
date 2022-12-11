@@ -1,10 +1,13 @@
-import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosRequestConfig } from 'axios';
 import jwt_decode from 'jwt-decode';
+import _, { Dictionary } from 'lodash';
 import { User as LoginResponse } from 'next-auth';
 import { JWT } from 'next-auth/jwt';
 import { User } from 'state/auth/types';
+import { BareFetcher } from 'swr';
 import { axios } from './axios';
 import storage from './storage';
+import { ApiCollectionResponse } from './types';
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -96,13 +99,6 @@ export function fetcherInit(accessToken: string) {
   };
 }
 
-type ApiCollectionResponse<T> = {
-  count: number;
-  next: null | string;
-  previous: null | string;
-  results: T[];
-};
-
 type GetRequest = AxiosRequestConfig | null;
 
 export function fetcher<JSON>(request: GetRequest): Promise<JSON> | null {
@@ -117,11 +113,10 @@ export async function continousFetcher<DATA = unknown>(request: GetRequest) {
   let page = 1;
   let hasNext = true;
   while (hasNext) {
-    const { data }: AxiosResponse<ApiCollectionResponse<DATA>> =
-      await axios.request({
-        ...request,
-        url: `${request?.url}?page=${page++}`,
-      });
+    const { data } = await axios.request<ApiCollectionResponse<DATA>>({
+      ...request,
+      url: `${request?.url}?page=${page++}`,
+    });
     results.push(...data.results);
     if (!data.next) hasNext = false;
   }
@@ -161,3 +156,35 @@ export const testFetcher = (url: string, token: string, businessUnit: string) =>
 //     const json = await response.json();
 //   }
 // }
+
+export function entityFetcher<Data>(
+  entityId: keyof Data,
+  orderBy: keyof Data
+): BareFetcher {
+  return async <Data>(
+    ...args: [url: string, businessUnit: string]
+  ): Promise<Dictionary<Data> | null> => {
+    const [url] = args;
+
+    if (!url) return null;
+
+    const results: Data[] = [];
+    let hasNext = true;
+    let page = 1;
+    let reqUrl = `${url}?page=${page}`;
+    do {
+      const { data } = await axios.get<ApiCollectionResponse<Data>>(reqUrl);
+      results.push(...data.results);
+      if (data.next) {
+        reqUrl =
+          process.env.NODE_ENV === 'development'
+            ? `${url}?page=${++page}`
+            : data.next;
+      } else {
+        hasNext = false;
+      }
+    } while (hasNext);
+
+    return _.chain(results).sortBy(orderBy).keyBy(entityId).value();
+  };
+}

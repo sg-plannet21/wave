@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { useMemo, useState } from 'react';
-import useWaveCollectionRequest from 'state/hooks/useWaveCollectionRequest';
+import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { Route, RouteDestinationType } from '../types';
 
 export type RouteTableRecord = {
@@ -19,9 +19,9 @@ export function useRouteTableData() {
   >([]);
 
   const { data: routes, error: routesError } =
-    useWaveCollectionRequest<Route>('routes');
+    useCollectionRequest<Route>('routes');
   const { data: destinationTypes, error: destinationTypesError } =
-    useWaveCollectionRequest<RouteDestinationType>('routeDestinationTypes');
+    useCollectionRequest<RouteDestinationType>('routeDestinationTypes');
 
   const data: RouteTableRecord[] = useMemo(() => {
     if (!routes || !destinationTypes) return [];
