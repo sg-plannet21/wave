@@ -136,10 +136,10 @@ export async function continousFetcher<DATA = unknown>(request: GetRequest) {
 //   );
 // }
 
-export const testFetcher = (url: string, token: string, businessUnit: string) =>
-  fetch(url, {
-    headers: { Authorization: 'Bearer ' + token, businessunit: businessUnit },
-  }).then((res) => res.json());
+// export const testFetcher = (url: string, token: string, businessUnit: string) =>
+//   fetch(url, {
+//     headers: { Authorization: 'Bearer ' + token, businessunit: businessUnit },
+//   }).then((res) => res.json());
 
 // @todo
 // async function continousFetch<JSON = any>(
@@ -157,16 +157,46 @@ export const testFetcher = (url: string, token: string, businessUnit: string) =>
 //   }
 // }
 
+// export function entityFetcher<T>(
+//   entityId: keyof T,
+//   orderBy: keyof T
+// ): BareFetcher {
+//   return async <Data>(
+//     ...args: [url: string, businessUnit: string]
+//   ): Promise<Dictionary<Data> | null> => {
+//     const [url] = args;
+
+//     if (!url) return null;
+
+//     const results: Data[] = [];
+//     let hasNext = true;
+//     let page = 1;
+//     let reqUrl = `${url}?page=${page}`;
+//     do {
+//       const { data } = await axios.get<ApiCollectionResponse<Data>>(reqUrl);
+//       results.push(...data.results);
+//       if (data.next) {
+//         reqUrl =
+//           process.env.NODE_ENV === 'development'
+//             ? `${url}?page=${++page}`
+//             : data.next;
+//       } else {
+//         hasNext = false;
+//       }
+//     } while (hasNext);
+
+//     return _.chain(results).sortBy(orderBy).keyBy(entityId).value();
+//   };
+// }
+
 export function entityFetcher<Data>(
   entityId: keyof Data,
   orderBy: keyof Data
-): BareFetcher {
-  return async <Data>(
+): BareFetcher<Dictionary<Data>> {
+  return async (
     ...args: [url: string, businessUnit: string]
-  ): Promise<Dictionary<Data> | null> => {
+  ): Promise<Dictionary<Data>> => {
     const [url] = args;
-
-    if (!url) return null;
 
     const results: Data[] = [];
     let hasNext = true;

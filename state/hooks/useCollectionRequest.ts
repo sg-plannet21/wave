@@ -1,8 +1,6 @@
-import { AxiosError } from 'axios';
 import { entityFetcher } from 'lib/client/api-helper';
 
 import storage from 'lib/client/storage';
-import { WaveError } from 'lib/client/types';
 import { Dictionary } from 'lodash';
 import useSWR from 'swr';
 
@@ -39,8 +37,11 @@ const entities: EntityMap = {
 export default function useCollectionRequest<Entity>(
   entityType: keyof typeof entities
 ) {
-  return useSWR<Dictionary<Entity>, AxiosError<WaveError>>(
+  return useSWR<Dictionary<Entity>>(
     [entities[entityType].path, storage.getBusinessUnit()],
-    entityFetcher(entities[entityType].id, entities[entityType].orderBy)
+    entityFetcher(
+      entities[entityType].id as keyof Entity,
+      entities[entityType].orderBy as keyof Entity
+    )
   );
 }

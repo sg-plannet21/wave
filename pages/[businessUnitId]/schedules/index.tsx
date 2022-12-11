@@ -7,12 +7,12 @@ import useCollectionRequest from 'state/hooks/useCollectionRequest';
 const SchedulesHome: NextPageWithLayout = () => {
   const { data } = useCollectionRequest<Route>('routes');
 
-  console.log('data', data);
-
   if (data) {
-    const name = Object.values(data)[0].route_name;
-    console.log('name :>> ', name);
+    const route_id = Object.values(data)[0].route_id;
+    console.log('route_id :>> ', route_id);
   }
+
+  console.log('data :>> ', data);
 
   return (
     <section className="flex flex-col items-center gap-y-5 mt-12">
