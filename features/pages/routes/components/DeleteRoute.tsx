@@ -24,10 +24,14 @@ const DeleteRoute: React.FC<DeleteRouteProps> = ({ id, name }) => {
       mutate(
         async (routes) => {
           if (!routes) return;
-          await deleteRoute(id);
-          const clonedRoutes = Object.assign({}, routes);
-          if (clonedRoutes[id]) delete clonedRoutes[id];
-          return clonedRoutes;
+          try {
+            await deleteRoute(id);
+
+            if (routes[id]) delete routes[id];
+          } catch (error) {
+            console.log('error', error);
+          }
+          return { ...routes };
         },
         { revalidate: false }
       );

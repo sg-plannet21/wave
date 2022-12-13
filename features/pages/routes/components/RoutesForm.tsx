@@ -2,6 +2,8 @@ import DestinationTypeField from 'components/form/DestinationTypeField';
 import { Form } from 'components/form/Form';
 import { InputField } from 'components/form/InputField';
 import Button from 'components/inputs/button';
+import _ from 'lodash';
+import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { z } from 'zod';
 import { createRoute } from '../api/createRoute';
 import { editRoute } from '../api/editRoute';
@@ -32,6 +34,8 @@ const RoutesForm: React.FC<RoutesFormProps> = ({ id, onSuccess }) => {
     newRecord ? undefined : id
   );
 
+  const { mutate } = useCollectionRequest('routes');
+
   if (!newRecord && !route) return <div>Loading..</div>;
 
   if (routeError) return <div>An error has occurred</div>;
@@ -41,15 +45,23 @@ const RoutesForm: React.FC<RoutesFormProps> = ({ id, onSuccess }) => {
       schema={schema}
       onSubmit={async (values) => {
         console.log('values', values);
+        mutate(
+          async (routes) => {
+            try {
+              const { data } = newRecord
+                ? await createRoute(values)
+                : await editRoute({ ...values, id });
 
-        try {
-          newRecord
-            ? await createRoute(values)
-            : await editRoute({ ...values, id });
-          onSuccess();
-        } catch (error) {
-          console.log('error', error);
-        }
+              const route = _.keyBy(data, data.route_id);
+              onSuccess();
+              return { ...routes, route };
+            } catch (error) {
+              console.log('error', error);
+              return routes;
+            }
+          },
+          { revalidate: false }
+        );
       }}
       options={{
         defaultValues: {

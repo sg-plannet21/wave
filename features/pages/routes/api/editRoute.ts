@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios';
 import { axios } from 'lib/client/axios';
 import { Route } from '../types';
 
@@ -8,7 +9,7 @@ type EditRouteDTO = {
   destinationType: Route['destination_type'];
 };
 
-export function editRoute(data: EditRouteDTO): Promise<Route> {
+export function editRoute(data: EditRouteDTO): Promise<AxiosResponse<Route>> {
   return axios.patch(`/routes/${data.id}/`, {
     route_id: data.id,
     route_name: data.name,

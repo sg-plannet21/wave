@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios';
 import { axios } from 'lib/client/axios';
 import { Route } from '../types';
 
@@ -7,7 +8,9 @@ type CreateRouteDTO = {
   destinationType: Route['destination_type'];
 };
 
-export function createRoute(data: CreateRouteDTO): Promise<Route> {
+export function createRoute(
+  data: CreateRouteDTO
+): Promise<AxiosResponse<Route>> {
   return axios.post('/routes/', {
     route_name: data.name,
     destination: data.destination,
