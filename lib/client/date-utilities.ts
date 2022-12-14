@@ -8,19 +8,19 @@ export type TimeRange = {
 export const timeFormat = 'HH:mm';
 export const dateFormat = 'DD-MM-YYYY HH:mm';
 
-export function formatDay(dayIndex: number): string {
-  if (dayIndex < 1 || dayIndex > 7)
-    throw new Error(`Day index out of range: ${dayIndex}`);
-  return [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
-  ][dayIndex];
-}
+// export function formatDay(dayIndex: number): string {
+//   if (dayIndex < 1 || dayIndex > 7)
+//     throw new Error(`Day index out of range: ${dayIndex}`);
+//   return [
+//     'Monday',
+//     'Tuesday',
+//     'Wednesday',
+//     'Thursday',
+//     'Friday',
+//     'Saturday',
+//     'Sunday',
+//   ][dayIndex];
+// }
 
 function isValidTimeString(time: string): boolean {
   const validTimeExp = new RegExp('([0-1]?[0-9]|2[0-3]):[0-5][0-9]$');
@@ -37,6 +37,17 @@ export function createUtcTimeRange({
       throw new Error(`Invalid time format: ${time}.`);
   });
   return times.map((time) => moment.utc(time, timeFormat));
+}
+
+export function formatTimeString(time: string): string {
+  const validTimeFormat = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/;
+  if (!validTimeFormat.test(time))
+    throw new Error('Incorrect time format: ' + time);
+
+  const utcTime = moment.utc(time, timeFormat);
+  const localTime = moment(utcTime).local();
+
+  return localTime.format(timeFormat);
 }
 
 function formatLocalTime(time: Moment) {
