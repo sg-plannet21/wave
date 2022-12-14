@@ -3,9 +3,9 @@ import { InputField } from 'components/form/InputField';
 import TimeRangePicker from 'components/form/TimeRangeField';
 import Button from 'components/inputs/button';
 import PrimaryLayout from 'components/layouts/primary/PrimaryLayout';
+import { Weekdays } from 'features/pages/schedules/types';
 import {
   createUtcTimeRange,
-  formatDay,
   timeFormat,
   validateRange,
 } from 'lib/client/date-utilities';
@@ -44,7 +44,7 @@ const LoginSchema = z.object({
           startTime: schedule.startTime,
           endTime: schedule.endTime,
         }) as [Moment, Moment],
-        label: formatDay(schedule.day),
+        label: Weekdays[schedule.day],
       }));
 
     const outcome = validateRange([startTime, endTime], comparisionTimes, {
