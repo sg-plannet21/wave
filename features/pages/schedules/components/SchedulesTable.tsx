@@ -1,14 +1,12 @@
 import Table, { TableColumn } from 'components/data-display/table';
-import { Plus, Section } from 'components/icons';
-import Select from 'components/inputs/select';
+import { Plus } from 'components/icons';
 import Switch from 'components/inputs/switch';
 import { mapNumberToColour } from 'components/inputs/switch/Switch';
-import { SelectOption } from 'components/navigation/BusinessUnitSelect/BusinessUnitSelect';
+import SectionsSelect from 'components/navigation/SectionsSelect';
 import Card from 'components/surfaces/card';
 import _ from 'lodash';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
 import { useIsAuthorised } from 'state/hooks/useAuthorisation';
 import {
   ScheduleTableRecord,
@@ -17,20 +15,13 @@ import {
 import { Weekdays } from '../types';
 import DeleteSchedule from './DeleteSchedule';
 
-const options: SelectOption[] = [
-  { label: 'Section 1', value: '1' },
-  { label: 'Section 2', value: '2' },
-  { label: 'Section 3', value: '3' },
-];
-
 const SchedulesTable: React.FC = () => {
-  const [selectedOption, setSelectedOption] = useState<SelectOption>(
-    options[0]
-  );
   const {
-    query: { businessUnitId },
+    query: { businessUnitId, sectionId },
   } = useRouter();
-  const { data, filters, isLoading, error } = useSchedulesTableData();
+  const { data, filters, isLoading, error } = useSchedulesTableData(
+    sectionId?.toString()
+  );
   const { isSuperUser, hasWriteAccess } = useIsAuthorised();
 
   const columns: TableColumn<ScheduleTableRecord>[] = [
@@ -41,8 +32,8 @@ const SchedulesTable: React.FC = () => {
         return (
           <Link
             href={{
-              pathname: 'schedules/[scheduleId]',
-              query: { businessUnitId, scheduleId: entry.id },
+              pathname: '/[businessUnitId]/schedules/[sectionId]/[scheduleId]',
+              query: { businessUnitId, sectionId, scheduleId: entry.id },
             }}
           >
             <a className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
@@ -69,7 +60,7 @@ const SchedulesTable: React.FC = () => {
         if (entry.isDefault) return <></>;
         return (
           <div className="text-right">
-            <DeleteSchedule id={entry.id} name={entry.weekDay.toString()} />;
+            <DeleteSchedule id={entry.id} name={entry.weekDay.toString()} />
           </div>
         );
       },
@@ -125,15 +116,7 @@ const SchedulesTable: React.FC = () => {
         <div className="w-full">
           <div className="py-2 px-4 flex justify-end">
             <div className="w-72">
-              <Select
-                options={options}
-                selectedOption={selectedOption}
-                onChange={setSelectedOption}
-                className="bg-slate-200 dark:bg-slate-600"
-                icon={
-                  <Section className="text-gray-400 group-hover:text-gray-300 mr-4 flex-shrink-0 h-6 w-6" />
-                }
-              />
+              <SectionsSelect />
             </div>
           </div>
           <Table<ScheduleTableRecord> columns={columns} data={data} />

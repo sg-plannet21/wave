@@ -5,20 +5,12 @@ import { NextPageWithLayout } from 'pages/page';
 
 const ScheduleDetails: NextPageWithLayout = () => {
   const router = useRouter();
-  const { businessUnitId, scheduleId } = router.query;
-
-  function onSuccess() {
-    console.log('SUCCESS');
-    router.push(`/${businessUnitId}/sections`);
-  }
+  const { businessUnitId, sectionId, scheduleId } = router.query;
 
   return (
     <ContentLayout title="Schedule Details">
       <section className="flex flex-col items-center gap-y-5 mt-12">
-        <ScheduleDetails
-          onSuccess={onSuccess}
-          id={scheduleId?.toString() ?? 'new'}
-        />
+        <p>Schedule Details - {scheduleId}</p>
       </section>
     </ContentLayout>
   );

@@ -12,9 +12,10 @@ export type ScheduleTableRecord = {
   startTime: string | null;
   endTime: string | null;
   route: string;
+  sectionId: string;
 };
 
-export function useSchedulesTableData() {
+export function useSchedulesTableData(sectionId?: string) {
   const [showDefaultSchedules, setShowDefaultSchedules] =
     useState<boolean>(true);
   const [dayExceptions, setDayExceptions] = useState<number[]>([]);
@@ -23,8 +24,6 @@ export function useSchedulesTableData() {
     useCollectionRequest<Schedule>('schedules');
   const { data: routes, error: routesError } =
     useCollectionRequest<Route>('routes');
-
-  console.log('schedules :>> ', schedules);
 
   const data: ScheduleTableRecord[] = useMemo(() => {
     if (!schedules || !routes) return [];
@@ -35,19 +34,25 @@ export function useSchedulesTableData() {
       isDefault: schedule.is_default,
       startTime: schedule.start_time
         ? formatTimeString(schedule.start_time)
-        : 'default',
+        : 'Default',
       endTime: schedule.end_time
         ? formatTimeString(schedule.end_time)
-        : 'default',
+        : 'Default',
       route: _.get(routes[schedule.route], 'route_name'),
+      sectionId: schedule.section,
     }));
   }, [schedules, routes]);
 
+  const filterBySection: ScheduleTableRecord[] = useMemo(() => {
+    if (!sectionId) return data;
+    return data.filter((schedule) => schedule.sectionId === sectionId);
+  }, [data, sectionId]);
+
   const filteredBySystem: ScheduleTableRecord[] = useMemo(() => {
     return showDefaultSchedules
-      ? data
-      : data.filter((schedule) => !schedule.isDefault);
-  }, [data, showDefaultSchedules]);
+      ? filterBySection
+      : filterBySection.filter((schedule) => !schedule.isDefault);
+  }, [filterBySection, showDefaultSchedules]);
 
   const filterByDays = useMemo(() => {
     return filteredBySystem.filter(
@@ -55,10 +60,14 @@ export function useSchedulesTableData() {
     );
   }, [filteredBySystem, dayExceptions]);
 
+  const ordered = useMemo(() => {
+    return _.orderBy(filterByDays, ['weekDay', 'isDefault'], ['asc']);
+  }, [filterByDays]);
+
   return {
     isLoading: !schedules && !routes && !schedulesError && !routesError,
     error: schedulesError || routesError,
-    data: filterByDays,
+    data: ordered,
     filters: {
       isSystemRoutes: showDefaultSchedules,
       setSystemRoutes: setShowDefaultSchedules,

@@ -48,7 +48,7 @@ const DeleteSection: React.FC<DeleteSectionProps> = ({ id, name }) => {
       body={`Delete ${name}?`}
       isDone={status === 'complete'}
       triggerButton={
-        <button className="text-red-600 dark:text-red-400 transition-transform hover:scale-110">
+        <button className="p-1 text-red-600 dark:text-red-400 transition-transform hover:scale-110 outline-none focus:outline-none">
           <Trash className="h-4 w-4" />
         </button>
       }
@@ -56,7 +56,7 @@ const DeleteSection: React.FC<DeleteSectionProps> = ({ id, name }) => {
         <Button
           type="button"
           isLoading={status === 'loading'}
-          className="bg-red-600"
+          variant="danger"
           onClick={handleDelete}
         >
           Delete

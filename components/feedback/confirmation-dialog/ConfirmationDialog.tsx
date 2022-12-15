@@ -41,30 +41,35 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       <Dialog isOpen={isOpen} onClose={close} initialFocus={cancelButtonRef}>
         <div className="sm:flex sm:items-start">
           {icon === 'danger' && (
-            <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+            <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-700 sm:mx-0 sm:h-10 sm:w-10">
               <Exclamation
-                className="h-6 w-6 text-red-600"
+                className="h-6 w-6 text-red-600 dark:text-white"
                 aria-hidden="true"
               />
             </div>
           )}
 
           {icon === 'info' && (
-            <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-              <Info className="h-6 w-6 text-blue-600" aria-hidden="true" />
+            <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-700 sm:mx-0 sm:h-10 sm:w-10">
+              <Info
+                className="h-6 w-6 text-blue-600 dark:text-white"
+                aria-hidden="true"
+              />
             </div>
           )}
 
           <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
             <DialogTitle
               as="h3"
-              className="text-lg leading-6 font-medium text-gray-900"
+              className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100"
             >
               {title}
             </DialogTitle>
             {body && (
               <div className="mt-2">
-                <p className="text-sm text-gray-500">{body}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-300">
+                  {body}
+                </p>
               </div>
             )}
           </div>

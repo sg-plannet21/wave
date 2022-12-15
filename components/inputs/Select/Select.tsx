@@ -35,7 +35,7 @@ const Select: React.FC<SelectProps> = ({
       <div className="relative mt-1">
         <Listbox.Button
           className={classNames(
-            'group relative w-full flex items-center cursor-default rounded-lg bg-indigo-600 dark:bg-orange-600 text-gray-200 dark:text-gray-300 p-2 pr-10 text-base font-medium shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm',
+            'group relative w-full flex items-center cursor-default bg-indigo-600 dark:bg-orange-600 text-gray-200 dark:text-gray-300 rounded-lg p-2 pr-10 text-base font-medium shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm',
             className
           )}
         >
@@ -61,7 +61,7 @@ const Select: React.FC<SelectProps> = ({
                 className={({ active }) =>
                   `relative cursor-default select-none py-2 pl-10 pr-4 ${
                     active
-                      ? 'bg-amber-100 text-amber-900'
+                      ? 'bg-amber-100 text-amber-900 dark:bg-slate-800 dark:text-orange-400'
                       : 'text-gray-900 dark:text-white'
                   }`
                 }
@@ -78,7 +78,7 @@ const Select: React.FC<SelectProps> = ({
                     {option.label}
                   </span>
                   {option.value === selectedOption.value ? (
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600 dark:text-orange-600">
                       <Check className="h-5 w-5" aria-hidden="true" />
                     </span>
                   ) : null}

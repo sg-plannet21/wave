@@ -62,7 +62,7 @@ const Dialog: React.FC<DialogProps> = ({
             >
               <UIDialog.Panel
                 className={classNames(
-                  'w-full transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all',
+                  'w-full transform overflow-hidden rounded-2xl bg-white dark:bg-slate-700 dark:text-white p-6 text-left align-middle shadow-xl transition-all',
                   sizes[size]
                 )}
               >

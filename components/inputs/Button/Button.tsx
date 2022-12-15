@@ -4,8 +4,10 @@ import React from 'react';
 
 const variants = {
   primary: 'bg-blue-600 text-white',
-  inverse: 'bg-white text-blue-600',
-  danger: 'bg-red-600 text-white',
+  inverse:
+    'bg-white text-blue-600 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white',
+  danger:
+    'bg-red-600 text-white focus:ring-1 focus:ring-offset-1 focus:ring-red-500',
 };
 
 const sizes = {
@@ -53,7 +55,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         type={type}
         className={classNames(
-          'flex justify-center items-center border border-gray-300 disabled:opacity-70 disabled:cursor-not-allowed rounded-md shadow-sm font-medium focus:outline-none hover:opacity-80',
+          'flex justify-center items-center border border-gray-300 dark:border-gray-600 disabled:opacity-70 disabled:cursor-not-allowed rounded-md shadow-sm font-medium focus:outline-none hover:opacity-80',
           variants[variant],
           sizes[size],
           className
