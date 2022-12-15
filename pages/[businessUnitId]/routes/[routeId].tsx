@@ -1,3 +1,4 @@
+import ContentLayout from 'components/layouts/content/Content';
 import PrimaryLayout from 'components/layouts/primary/PrimaryLayout';
 import RoutesForm from 'features/pages/routes/components/RoutesForm';
 import { useRouter } from 'next/router';
@@ -27,10 +28,11 @@ const RouteDetails: NextPageWithLayout = () => {
   }
 
   return (
-    <section className="flex flex-col items-center gap-y-5 mt-12 sm:mt-36">
-      <h1>Route Details - {routeId}</h1>
-      <RoutesForm onSuccess={onSuccess} id={routeId?.toString() ?? 'new'} />
-    </section>
+    <ContentLayout title="Route Details">
+      <section className="flex flex-col items-center gap-y-5 mt-12">
+        <RoutesForm onSuccess={onSuccess} id={routeId?.toString() ?? 'new'} />
+      </section>
+    </ContentLayout>
   );
 };
 

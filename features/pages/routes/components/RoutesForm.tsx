@@ -3,6 +3,7 @@ import { Form } from 'components/form/Form';
 import { InputField } from 'components/form/InputField';
 import Button from 'components/inputs/button';
 import _ from 'lodash';
+import { useState } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { z } from 'zod';
 import { createRoute } from '../api/createRoute';
@@ -30,6 +31,7 @@ type RouteFormValues = z.infer<typeof schema>;
 
 const RoutesForm: React.FC<RoutesFormProps> = ({ id, onSuccess }) => {
   const newRecord = id === 'new';
+  const [isLoading, setIsLoading] = useState(false);
   const { data: route, error: routeError } = useRoute(
     newRecord ? undefined : id
   );
@@ -45,6 +47,7 @@ const RoutesForm: React.FC<RoutesFormProps> = ({ id, onSuccess }) => {
       schema={schema}
       onSubmit={async (values) => {
         console.log('values', values);
+        setIsLoading(true);
         mutate(
           async (routes) => {
             try {
@@ -58,6 +61,8 @@ const RoutesForm: React.FC<RoutesFormProps> = ({ id, onSuccess }) => {
             } catch (error) {
               console.log('error', error);
               return routes;
+            } finally {
+              setIsLoading(false);
             }
           },
           { revalidate: false }
@@ -91,8 +96,8 @@ const RoutesForm: React.FC<RoutesFormProps> = ({ id, onSuccess }) => {
           />
           <div>
             <Button
-              disabled={!formState.isDirty || formState.isSubmitting}
-              isLoading={formState.isSubmitting}
+              disabled={!formState.isDirty || isLoading}
+              isLoading={isLoading}
               type="submit"
               className="w-full"
             >

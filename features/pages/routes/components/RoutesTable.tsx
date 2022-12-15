@@ -55,7 +55,11 @@ const RoutesTable: React.FC = () => {
       ignoreFiltering: true,
       Cell({ entry }) {
         if (entry.system) return <></>;
-        return <DeleteRoute id={entry.id} name={entry.name} />;
+        return (
+          <div className="text-right">
+            <DeleteRoute id={entry.id} name={entry.name} />;
+          </div>
+        );
       },
     });
   }

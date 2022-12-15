@@ -15,7 +15,8 @@ export type ScheduleTableRecord = {
 };
 
 export function useSchedulesTableData() {
-  const [showSystemRoutes, setShowSystemRoutes] = useState<boolean>(true);
+  const [showDefaultSchedules, setShowDefaultSchedules] =
+    useState<boolean>(true);
   const [dayExceptions, setDayExceptions] = useState<number[]>([]);
 
   const { data: schedules, error: schedulesError } =
@@ -43,10 +44,10 @@ export function useSchedulesTableData() {
   }, [schedules, routes]);
 
   const filteredBySystem: ScheduleTableRecord[] = useMemo(() => {
-    return showSystemRoutes
+    return showDefaultSchedules
       ? data
       : data.filter((schedule) => !schedule.isDefault);
-  }, [data, showSystemRoutes]);
+  }, [data, showDefaultSchedules]);
 
   const filterByDays = useMemo(() => {
     return filteredBySystem.filter(
@@ -59,8 +60,8 @@ export function useSchedulesTableData() {
     error: schedulesError || routesError,
     data: filterByDays,
     filters: {
-      isSystemRoutes: showSystemRoutes,
-      setSystemRoutes: setShowSystemRoutes,
+      isSystemRoutes: showDefaultSchedules,
+      setSystemRoutes: setShowDefaultSchedules,
       dayExceptions,
       setDayExceptions,
     },

@@ -118,7 +118,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({
 type SideNavigationItem = {
   name: string;
   href: string;
-  icon: (_props: React.SVGProps<SVGSVGElement>) => React.ReactElement;
+  icon: (props: React.SVGProps<SVGSVGElement>) => React.ReactElement;
 };
 
 const SideNavigation: React.FC = () => {

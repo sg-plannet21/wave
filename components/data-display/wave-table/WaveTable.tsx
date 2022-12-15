@@ -19,9 +19,9 @@ const WaveTable = <Entry extends { [P in keyof Entry]: Entry[P] }>({
   const [searchTerm, setSearchTerm] = useState('');
   const [sortCol, setSortCol] = useState<SortColumn<Entry>>(sortColumn);
 
-  useEffect(() => {
-    if (searchTerm.trim().length) setCurrentPage(1);
-  }, [searchTerm]);
+  // useEffect(() => {
+  //   if (searchTerm.trim().length) setCurrentPage(1);
+  // }, [searchTerm]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -32,7 +32,7 @@ const WaveTable = <Entry extends { [P in keyof Entry]: Entry[P] }>({
     [columns]
   );
 
-  const filteredData = useMemo(() => {
+  const filteredData: Entry[] = useMemo(() => {
     if (!searchTerm.trim().length) return data;
 
     const regEx = new RegExp(searchTerm.trim(), 'i');
@@ -46,12 +46,12 @@ const WaveTable = <Entry extends { [P in keyof Entry]: Entry[P] }>({
     return filtered;
   }, [data, searchTerm, filterableFields]);
 
-  const orderedData = useMemo(
+  const orderedData: Entry[] = useMemo(
     () => _.orderBy(filteredData, [sortCol.field], [sortCol.order]),
     [filteredData, sortCol]
   );
 
-  const pagedData = useMemo(
+  const pagedData: Entry[] = useMemo(
     () => paginate(orderedData ?? [], currentPage, pageSize),
     [orderedData, currentPage, pageSize]
   );
