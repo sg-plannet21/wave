@@ -9,7 +9,7 @@ type CreateScheduleDTO = {
   endTime: Schedule['end_time'];
 };
 
-export function createRoute(
+export function editSchedule(
   data: CreateScheduleDTO
 ): Promise<AxiosResponse<Schedule>> {
   return axios.patch(`schedules/${data.id}`, {

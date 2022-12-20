@@ -7,6 +7,7 @@ import Card from 'components/surfaces/card';
 import _ from 'lodash';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { useIsAuthorised } from 'state/hooks/useAuthorisation';
 import {
   ScheduleTableRecord,
@@ -16,6 +17,11 @@ import { Weekdays } from '../types';
 import DeleteSchedule from './DeleteSchedule';
 
 const SchedulesTable: React.FC = () => {
+  const [selectedSchedules, setSelectedSchedules] = useState<{
+    isDefault: boolean;
+    schedules: string[];
+  }>({ isDefault: false, schedules: [] });
+
   const {
     query: { businessUnitId, sectionId },
   } = useRouter();
@@ -24,7 +30,45 @@ const SchedulesTable: React.FC = () => {
   );
   const { isSuperUser, hasWriteAccess } = useIsAuthorised();
 
+  // clear selected schedules on section change (nav dropdown)
+  useEffect(() => {
+    setSelectedSchedules({ isDefault: false, schedules: [] });
+  }, [sectionId]);
+
+  function handleScheduleAdd(scheduleId: string, isDefaultSchedule: boolean) {
+    const isDefault = selectedSchedules.schedules.length
+      ? selectedSchedules.isDefault
+      : isDefaultSchedule;
+
+    const schedules = _.xor(selectedSchedules.schedules, [scheduleId]);
+    setSelectedSchedules({ isDefault, schedules });
+  }
+
   const columns: TableColumn<ScheduleTableRecord>[] = [
+    {
+      field: 'id',
+      ignoreFiltering: true,
+      label: '',
+      Cell({ entry }) {
+        return (
+          <div className="flex items-center">
+            <input
+              disabled={
+                selectedSchedules.schedules.length > 0 &&
+                selectedSchedules.isDefault !== entry.isDefault
+              }
+              checked={selectedSchedules.schedules.includes(
+                entry.id.toString()
+              )}
+              onChange={() => handleScheduleAdd(entry.id, entry.isDefault)}
+              type="checkbox"
+              className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            />
+            <label className="sr-only">checkbox</label>
+          </div>
+        );
+      },
+    },
     {
       field: 'weekDay',
       label: 'Day',

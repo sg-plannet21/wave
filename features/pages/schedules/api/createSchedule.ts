@@ -8,7 +8,7 @@ type CreateScheduleDTO = {
   endTime: Schedule['end_time'];
 };
 
-export function createRoute(
+export function createSchedule(
   data: CreateScheduleDTO
 ): Promise<AxiosResponse<Schedule>> {
   return axios.post('/schedules/', {
