@@ -1,25 +1,25 @@
 import Spinner from 'components/feedback/spinner/Spinner';
-import { Route } from 'features/pages/routes/types';
+import { Prompt } from 'features/pages/messages/types';
 import { useMemo } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { Option, SelectField, SelectFieldProps } from './SelectField';
 
-const RouteSelectField: React.FC<
+const MessageSelectField: React.FC<
   Omit<SelectFieldProps, 'options' | 'groupedOptions'>
 > = (props) => {
-  const { data, error } = useCollectionRequest<Route>('routes');
+  const { data, error } = useCollectionRequest<Prompt>('prompts');
 
   const options: Option[] = useMemo(() => {
     if (!data) return [];
 
     const defaultValue: Option = {
-      label: 'Select Route',
+      label: 'Select Message',
       value: '',
     };
 
-    const options = Object.values(data).map(({ route_id, route_name }) => ({
-      label: route_name,
-      value: route_id,
+    const options = Object.values(data).map(({ prompt_id, prompt_name }) => ({
+      label: prompt_name,
+      value: prompt_id,
     }));
 
     return [defaultValue, ...options];
@@ -43,4 +43,4 @@ const RouteSelectField: React.FC<
   );
 };
 
-export default RouteSelectField;
+export default MessageSelectField;
