@@ -1,5 +1,6 @@
 import { Form } from 'components/form/Form';
 import { InputField } from 'components/form/InputField';
+import RouteSelectField from 'components/form/RouteSelectField';
 import { Option, SelectField } from 'components/form/SelectField';
 import Button from 'components/inputs/button';
 import { useState } from 'react';
@@ -24,7 +25,7 @@ type MessageField =
   | 'message5';
 
 const messageSchema = z.object({
-  message1: z.string().min(1, 'At least one message is required.'),
+  message1: z.string(),
   message2: z.string(),
   message3: z.string(),
   message4: z.string(),
@@ -37,8 +38,24 @@ const schema = z
       .string()
       .regex(/^[1-7]$/)
       .transform(Number),
+    route: z.string().min(1, 'Route is required'),
   })
-  .merge(messageSchema);
+  .merge(messageSchema.partial())
+  .superRefine((data, ctx) => {
+    if (
+      !data.message1 &&
+      !data.message2 &&
+      !data.message3 &&
+      !data.message4 &&
+      !data.message5
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['message1'],
+        message: 'At least one message must be selected',
+      });
+    }
+  });
 
 type SchedulesFormValues = z.infer<typeof schema>;
 
@@ -75,6 +92,11 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
                 label={`Message ${ele + 1}`}
               />
             ))}
+            <RouteSelectField
+              registration={register('route')}
+              error={formState.errors['route']}
+              label="Route"
+            />
             <div>
               <Button
                 disabled={!formState.isDirty || isLoading}

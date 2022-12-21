@@ -101,9 +101,9 @@ const Table = <Entry extends { [P in keyof Entry]: Entry[P] }>({
                 key={entryIndex}
                 className="odd:bg-white odd:dark:bg-slate-800 even:bg-gray-200 even:dark:bg-gray-700"
               >
-                {columns.map(({ field, label, Cell }) => (
+                {columns.map(({ field, label, Cell }, index) => (
                   <td
-                    key={label + entryIndex}
+                    key={label + entryIndex + index}
                     className="px-6 py-4 text-sm font-medium whitespace-nowrap"
                   >
                     {Cell ? (
