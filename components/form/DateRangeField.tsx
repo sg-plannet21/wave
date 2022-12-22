@@ -4,8 +4,8 @@ import { createUtcDateRange, dateFormat } from 'lib/client/date-utilities';
 import moment from 'moment';
 import {
   FieldValues,
-  useController,
   UseControllerProps,
+  useController,
 } from 'react-hook-form';
 import { FieldWrapper, FieldWrapperPassThroughProps } from './FieldWrapper';
 
@@ -44,6 +44,7 @@ const DateRangePicker = <T extends FieldValues>({
         allowClear={false}
         className="w-full"
         minuteStep={15}
+        placement="bottomLeft"
         showTime={true}
         disabledDate={(current) => current?.isBefore(moment().startOf('day'))}
       />

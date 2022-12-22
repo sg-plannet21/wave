@@ -1,31 +1,31 @@
-type SystemSchedule = {
-  is_default: true;
-  start_time: null;
-  end_time: null;
-};
+// type SystemSchedule = {
+//   is_default: true;
+//   start_time: null;
+//   end_time: null;
+// };
 
-type CustomSchedule = {
-  is_default: false;
-  start_time: string;
-  end_time: string;
-};
+// type CustomSchedule = {
+//   is_default: false;
+//   start_time: string;
+//   end_time: string;
+// };
 
-export type Schedule = (SystemSchedule | CustomSchedule) & {
+export type Schedule = {
   url: string;
   schedule_id: string;
   versions: number[];
   week_day: number;
-  // is_default: boolean;
-  // start_time?: string;
-  // end_time?: string;
+  is_default: boolean;
+  start_time: string | null;
+  end_time: string | null;
   business_unit: string;
   section: string;
   route: string;
-  message_1?: string;
-  message_2?: string;
-  message_3?: string;
-  message_4?: string;
-  message_5?: string;
+  message_1: number | null;
+  message_2: number | null;
+  message_3: number | null;
+  message_4: number | null;
+  message_5: number | null;
 };
 
 export enum Weekdays {
@@ -37,3 +37,17 @@ export enum Weekdays {
   Saturday,
   Sunday,
 }
+
+export type ScheduleDTO = {
+  section: Schedule['section'];
+  weekDay: Schedule['week_day'];
+  message1: Schedule['message_1'];
+  message2: Schedule['message_2'];
+  message3: Schedule['message_3'];
+  message4: Schedule['message_4'];
+  message5: Schedule['message_5'];
+  route: Schedule['route'];
+  isDefault: Schedule['is_default'];
+  startTime: Schedule['start_time'];
+  endTime: Schedule['end_time'];
+};

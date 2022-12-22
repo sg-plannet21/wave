@@ -6,9 +6,15 @@ import TimeRangePicker from 'components/form/TimeRangeField';
 import Button from 'components/inputs/button';
 import { timeFormat } from 'lib/client/date-utilities';
 import moment from 'moment';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { FieldError } from 'react-hook-form';
 import { z } from 'zod';
+import {
+  ExistingScheduleDTO,
+  NewScheduleDTO,
+  saveSchedule,
+} from '../api/saveSchedule';
 import { useSchedule } from '../hooks/useSchedule';
 import { Weekdays } from '../types';
 
@@ -71,23 +77,20 @@ type MessageField =
   | 'message5';
 
 const messageSchema = z.object({
-  message1: z.string(),
-  message2: z.string(),
-  message3: z.string(),
-  message4: z.string(),
-  message5: z.string(),
+  message1: z.nullable(z.string()),
+  message2: z.nullable(z.string()),
+  message3: z.nullable(z.string()),
+  message4: z.nullable(z.string()),
+  message5: z.nullable(z.string()),
 });
 
 const schema = z
   .object({
-    weekDay: z
-      .string()
-      .regex(/^[1-7]$/)
-      .transform(Number),
+    weekDay: z.string().regex(/^[1-7]$/),
     route: z.string().min(1, 'Route is required'),
     timeRange: z.array(z.any()),
   })
-  .merge(messageSchema.partial())
+  .merge(messageSchema)
   .superRefine((data, ctx) => {
     if (
       !data.message1 &&
@@ -99,7 +102,7 @@ const schema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['message1'],
-        message: 'At least one message must be selected',
+        message: 'At least one message is required.',
       });
     }
   });
@@ -107,89 +110,119 @@ const schema = z
 type SchedulesFormValues = z.infer<typeof schema>;
 
 const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
-  const { data: schedule, error: scheduleError } = useSchedule(id);
-  const [isLoading, setIsLoading] = useState(false);
   const newRecord = id === 'new';
+  const {
+    query: { sectionId },
+  } = useRouter();
+  const { data: schedule, error: scheduleError } = useSchedule(
+    newRecord ? undefined : id
+  );
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!newRecord && !schedule) return <div>Loading..</div>;
   if (scheduleError) return <div>An error has occurred</div>;
 
-  console.log('schedule :>> ', schedule);
-  console.log('start_time :>> ', schedule?.start_time);
-  console.log('end_time :>> ', schedule?.end_time);
+  function mapMessageToModel(message: string | null): number | null {
+    return typeof message === 'string' ? parseInt(message) : message;
+  }
+
+  async function handleSubmit(values: SchedulesFormValues) {
+    setIsLoading(true);
+    console.log('onSubmit');
+
+    const payload: NewScheduleDTO | ExistingScheduleDTO = {
+      ...(!newRecord && { scheduleId: schedule?.schedule_id }),
+      weekDay: parseInt(values.weekDay),
+      section: sectionId?.toString() as string,
+      message1: mapMessageToModel(values.message1),
+      message2: mapMessageToModel(values.message2),
+      message3: mapMessageToModel(values.message3),
+      message4: mapMessageToModel(values.message4),
+      message5: mapMessageToModel(values.message5),
+      route: values.route,
+      isDefault: !!schedule?.is_default,
+      startTime: !schedule?.is_default
+        ? moment.utc(values.timeRange[0]).format(timeFormat)
+        : null,
+      endTime: !schedule?.is_default
+        ? moment.utc(values.timeRange[1]).format(timeFormat)
+        : null,
+    };
+
+    try {
+      await saveSchedule(payload);
+      onSuccess();
+    } catch (error) {
+      console.log('error', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
-    <div>
-      <h1>Schedules Form - {id}</h1>
-      <Form<SchedulesFormValues, typeof schema>
-        onSubmit={async (values) => {
-          setIsLoading(true);
-          console.log('onSubmut');
-          console.log(values);
-          setIsLoading(false);
-          onSuccess();
-        }}
-        options={{
-          defaultValues: {
-            weekDay: schedule?.week_day,
-            timeRange: [
-              moment(schedule?.start_time ?? '09:00', timeFormat),
-              moment(schedule?.end_time ?? '17:00', timeFormat),
-            ],
-            message1: schedule?.message_1,
-            message2: schedule?.message_2,
-            message3: schedule?.message_3,
-            message4: schedule?.message_4,
-            message5: schedule?.message_5,
-            route: schedule?.route,
-          },
-        }}
-        schema={schema}
-        className="w-full sm:max-w-md"
-      >
-        {({ register, formState, control }) => (
-          <>
-            <SelectField
-              registration={register('weekDay')}
-              error={formState.errors['weekDay']}
-              options={weekDayOptions}
+    <Form<SchedulesFormValues, typeof schema>
+      onSubmit={handleSubmit}
+      options={{
+        defaultValues: {
+          weekDay: schedule?.week_day.toString(),
+          timeRange: [
+            moment.utc(schedule?.start_time ?? '09:00', timeFormat),
+            moment.utc(schedule?.end_time ?? '17:00', timeFormat),
+          ],
+          message1: schedule?.message_1?.toString(),
+          message2: schedule?.message_2?.toString(),
+          message3: schedule?.message_3?.toString(),
+          message4: schedule?.message_4?.toString(),
+          message5: schedule?.message_5?.toString(),
+          route: schedule?.route,
+        },
+      }}
+      schema={schema}
+      className="w-full sm:max-w-md"
+    >
+      {({ register, formState, control }) => (
+        <>
+          <SelectField
+            registration={register('weekDay')}
+            error={formState.errors['weekDay']}
+            options={weekDayOptions}
+          />
+          {!schedule?.is_default && (
+            <TimeRangePicker
+              name="timeRange"
+              error={formState.errors['timeRange'] as FieldError | undefined}
+              label="Time Range"
+              control={control}
             />
-            {schedule && !schedule.is_default && (
-              <TimeRangePicker
-                name="timeRange"
-                error={formState.errors['timeRange'] as FieldError | undefined}
-                label="Time Range"
-                control={control}
-              />
-            )}
-            {Array.from(Array(5).keys()).map((ele) => (
-              <MessageSelectField
-                key={ele}
-                registration={register(`message${ele + 1}` as MessageField)}
-                error={formState.errors[`message${ele + 1}` as MessageField]}
-                label={`Message ${ele + 1}`}
-              />
-            ))}
-            <RouteSelectField
-              registration={register('route')}
-              error={formState.errors['route']}
-              label="Route"
+          )}
+          {Array.from(Array(5).keys()).map((ele) => (
+            <MessageSelectField
+              control={control}
+              key={ele}
+              registration={register(`message${ele + 1}` as MessageField)}
+              error={formState.errors[`message${ele + 1}` as MessageField]}
+              label={`Message ${ele + 1}`}
             />
+          ))}
+          <RouteSelectField
+            registration={register('route')}
+            error={formState.errors['route']}
+            label="Route"
+          />
 
-            <div>
-              <Button
-                disabled={!formState.isDirty || isLoading}
-                isLoading={isLoading}
-                type="submit"
-                className="w-full"
-              >
-                {newRecord ? 'Create Schedule' : 'Update Schedule'}
-              </Button>
-            </div>
-          </>
-        )}
-      </Form>
-    </div>
+          <div>
+            <Button
+              disabled={!formState.isDirty || isLoading}
+              isLoading={isLoading}
+              type="submit"
+              className="w-full"
+            >
+              {newRecord ? 'Create Schedule' : 'Update Schedule'}
+            </Button>
+          </div>
+        </>
+      )}
+    </Form>
   );
 };
 

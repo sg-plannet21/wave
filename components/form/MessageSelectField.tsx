@@ -1,13 +1,41 @@
+import AudioPlayerDialog from 'components/feedback/audio-player-dialog';
 import Spinner from 'components/feedback/spinner/Spinner';
 import { Prompt } from 'features/pages/messages/types';
 import { useMemo } from 'react';
+import { Control, useWatch } from 'react-hook-form';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { Option, SelectField, SelectFieldProps } from './SelectField';
 
-const MessageSelectField: React.FC<
-  Omit<SelectFieldProps, 'options' | 'groupedOptions'>
-> = (props) => {
+type MessageSelectFieldProps = Omit<
+  SelectFieldProps,
+  'options' | 'groupedOptions'
+> & { control: Control };
+
+function PlayAudio({ control, name }: { control: Control; name: string }) {
+  const { data: prompts } = useCollectionRequest<Prompt>('prompts');
+
+  const promptId = useWatch({
+    control,
+    name,
+  });
+
+  if (!promptId || !prompts) return null;
+  return (
+    <div className="pl-2">
+      <AudioPlayerDialog
+        trackList={{
+          src: prompts[promptId].audio_file,
+          name: prompts[promptId].prompt_name,
+        }}
+      />
+    </div>
+  );
+}
+
+const MessageSelectField: React.FC<MessageSelectFieldProps> = (props) => {
   const { data, error } = useCollectionRequest<Prompt>('prompts');
+
+  const name = props.registration.name as string;
 
   const options: Option[] = useMemo(() => {
     if (!data) return [];
@@ -35,11 +63,17 @@ const MessageSelectField: React.FC<
   if (error) return <div>An Error has occurred</div>;
 
   return (
-    <SelectField
-      options={options}
-      {...props}
-      defaultValue={props.defaultValue ?? options[0]?.value.toString()}
-    />
+    <div className="flex w-full justify-between items-end">
+      <div className="flex-1">
+        <SelectField
+          options={options}
+          {...props}
+          defaultValue={props.defaultValue ?? options[0]?.value.toString()}
+        />
+      </div>
+
+      <PlayAudio name={name} control={props.control} />
+    </div>
   );
 };
 

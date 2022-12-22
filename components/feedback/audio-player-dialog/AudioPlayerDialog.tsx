@@ -44,6 +44,7 @@ const AudioPlayerDialog: React.FC<AudioPlayerDialogProps> = ({ trackList }) => {
   return (
     <>
       <button
+        type="button"
         onClick={open}
         className={classNames(
           'rounded-md border-none outline-2 outline-gray-400 hover:scale-110 duration-200',
@@ -60,12 +61,12 @@ const AudioPlayerDialog: React.FC<AudioPlayerDialogProps> = ({ trackList }) => {
           <div className="flex justify-between">
             <DialogTitle
               as="h3"
-              className="text-lg leading-6 font-medium text-gray-900"
+              className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100"
             >
               {multipleTracks ? trackList[trackNumber].name : trackList.name}
             </DialogTitle>
             {multipleTracks && (
-              <p className="text-sm text-gray-500">{`Audio ${
+              <p className="text-sm text-gray-500 dark:text-gray-300">{`Audio ${
                 trackNumber + 1
               } of ${trackList.length}`}</p>
             )}

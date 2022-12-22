@@ -4,13 +4,14 @@ import SchedulesForm from 'features/pages/schedules/components/SchedulesForm';
 import { useRouter } from 'next/router';
 import { NextPageWithLayout } from 'pages/page';
 
-function handleSuccess() {
-  console.log('success');
-}
-
 const ScheduleDetails: NextPageWithLayout = () => {
   const router = useRouter();
-  const { scheduleId } = router.query;
+  const { businessUnitId, sectionId, scheduleId } = router.query;
+
+  function handleSuccess() {
+    console.log('SUCCESS');
+    router.push(`/${businessUnitId}/schedules/${sectionId}`);
+  }
 
   return (
     <ContentLayout title="Schedule Details">
