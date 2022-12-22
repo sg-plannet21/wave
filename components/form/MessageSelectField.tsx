@@ -2,19 +2,26 @@ import AudioPlayerDialog from 'components/feedback/audio-player-dialog';
 import Spinner from 'components/feedback/spinner/Spinner';
 import { Prompt } from 'features/pages/messages/types';
 import { useMemo } from 'react';
-import { Control, useWatch } from 'react-hook-form';
+import { Control, FieldValues, useWatch } from 'react-hook-form';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { Option, SelectField, SelectFieldProps } from './SelectField';
 
-type MessageSelectFieldProps = Omit<
+type MessageSelectFieldProps<T extends FieldValues> = Omit<
   SelectFieldProps,
   'options' | 'groupedOptions'
-> & { control: Control };
+> & { control: Control<T> };
 
-function PlayAudio({ control, name }: { control: Control; name: string }) {
+function PlayAudio<T extends FieldValues>({
+  control,
+  name,
+}: {
+  control: Control<T>;
+  name: string;
+}) {
   const { data: prompts } = useCollectionRequest<Prompt>('prompts');
 
-  const promptId = useWatch({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const promptId = useWatch<any>({
     control,
     name,
   });
@@ -32,7 +39,9 @@ function PlayAudio({ control, name }: { control: Control; name: string }) {
   );
 }
 
-const MessageSelectField: React.FC<MessageSelectFieldProps> = (props) => {
+const MessageSelectField = <T extends FieldValues>(
+  props: MessageSelectFieldProps<T>
+) => {
   const { data, error } = useCollectionRequest<Prompt>('prompts');
 
   const name = props.registration.name as string;
@@ -72,7 +81,7 @@ const MessageSelectField: React.FC<MessageSelectFieldProps> = (props) => {
         />
       </div>
 
-      <PlayAudio name={name} control={props.control} />
+      <PlayAudio<T> name={name} control={props.control} />
     </div>
   );
 };
