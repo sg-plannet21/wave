@@ -2,12 +2,10 @@ import DestinationTypeField from 'components/form/DestinationTypeField';
 import { Form } from 'components/form/Form';
 import { InputField } from 'components/form/InputField';
 import Button from 'components/inputs/button';
-import _ from 'lodash';
 import { useState } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { z } from 'zod';
-import { createRoute } from '../api/createRoute';
-import { editRoute } from '../api/editRoute';
+import { saveRoute } from '../api/saveRoute';
 import { useRoute } from '../hooks/useRoute';
 
 type RoutesFormProps = {
@@ -32,13 +30,17 @@ type RouteFormValues = z.infer<typeof schema>;
 const RoutesForm: React.FC<RoutesFormProps> = ({ id, onSuccess }) => {
   const newRecord = id === 'new';
   const [isLoading, setIsLoading] = useState(false);
-  const { data: route, error: routeError } = useRoute(
-    newRecord ? undefined : id
-  );
+  const {
+    data: route,
+    error: routeError,
+    isValidating,
+  } = useRoute(newRecord ? undefined : id);
 
   const { mutate } = useCollectionRequest('routes');
 
-  if (!newRecord && !route) return <div>Loading..</div>;
+  if (isValidating) return <div>Loading..</div>;
+
+  if (!newRecord && !route) return <div>Not found..</div>;
 
   if (routeError) return <div>An error has occurred</div>;
 
@@ -46,18 +48,18 @@ const RoutesForm: React.FC<RoutesFormProps> = ({ id, onSuccess }) => {
     <Form<RouteFormValues, typeof schema>
       schema={schema}
       onSubmit={async (values) => {
-        console.log('values', values);
         setIsLoading(true);
+        const payload = {
+          ...values,
+          ...(!newRecord && { id: route?.route_id }),
+        };
         mutate(
           async (routes) => {
             try {
-              const { data } = newRecord
-                ? await createRoute(values)
-                : await editRoute({ ...values, id });
-
-              const route = _.keyBy(data, data.route_id);
+              const { data } = await saveRoute(payload);
+              const route = { [data['route_id']]: data };
               onSuccess();
-              return { ...routes, route };
+              return { ...routes, ...route };
             } catch (error) {
               console.log('error', error);
               return routes;

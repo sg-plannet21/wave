@@ -24,6 +24,7 @@ function PlayAudio<T extends FieldValues>({
   const promptId = useWatch<any>({
     control,
     name,
+    defaultValue: null,
   });
 
   if (!promptId || !prompts) return null;

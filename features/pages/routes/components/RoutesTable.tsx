@@ -57,7 +57,7 @@ const RoutesTable: React.FC = () => {
         if (entry.system) return <></>;
         return (
           <div className="text-right">
-            <DeleteRoute id={entry.id} name={entry.name} />;
+            <DeleteRoute id={entry.id} name={entry.name} />
           </div>
         );
       },

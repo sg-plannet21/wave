@@ -114,12 +114,17 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
   const {
     query: { sectionId },
   } = useRouter();
-  const { data: schedule, error: scheduleError } = useSchedule(
-    newRecord ? undefined : id
-  );
+  const {
+    data: schedule,
+    error: scheduleError,
+    isValidating,
+  } = useSchedule(newRecord ? undefined : id);
   const [isLoading, setIsLoading] = useState(false);
 
-  if (!newRecord && !schedule) return <div>Loading..</div>;
+  if (isValidating) return <div>Loading..</div>;
+
+  if (!newRecord && !schedule) return <div>Not found..</div>;
+
   if (scheduleError) return <div>An error has occurred</div>;
 
   function mapMessageToModel(message: string | null): number | null {
