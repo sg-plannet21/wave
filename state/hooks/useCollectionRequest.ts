@@ -4,7 +4,7 @@ import { entityFetcher } from 'lib/client/api-helper';
 import storage from 'lib/client/storage';
 import { WaveError } from 'lib/client/types';
 import { Dictionary } from 'lodash';
-import useSWR from 'swr';
+import useSWR, { SWRConfiguration } from 'swr';
 
 type EntityMap = {
   [key: string]: { id: string; path: string; orderBy: string };
@@ -41,7 +41,11 @@ const entities: EntityMap = {
 };
 
 export default function useCollectionRequest<Entity>(
-  entityType: keyof typeof entities
+  entityType: keyof typeof entities,
+  config?: Omit<
+    SWRConfiguration<Dictionary<Entity>, AxiosError<WaveError>>,
+    'fallbackData'
+  >
 ) {
   if (!entities[entityType]) {
     throw new Error('Unknown entity for useCollectionRequest: ' + entityType);
@@ -51,6 +55,7 @@ export default function useCollectionRequest<Entity>(
     entityFetcher(
       entities[entityType].id as keyof Entity,
       entities[entityType].orderBy as keyof Entity
-    )
+    ),
+    config
   );
 }

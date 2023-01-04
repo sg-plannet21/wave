@@ -78,7 +78,7 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
     isValidating,
   } = useSchedule(newRecord ? undefined : id, { revalidateOnFocus: false });
   const { data: schedules, isValidating: isValidatingSchedules } =
-    useCollectionRequest<Schedule>('schedules');
+    useCollectionRequest<Schedule>('schedules', { revalidateOnFocus: false });
   const { register, handleSubmit, reset, formState, control } =
     useForm<SchedulesFormValues>({
       defaultValues: {

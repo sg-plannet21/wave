@@ -1,6 +1,8 @@
 import { Meta, Story } from '@storybook/react';
 import Button from 'components/inputs/button';
-import { FieldError } from 'react-hook-form';
+import { timeFormat } from 'lib/client/date-utilities';
+import moment, { Moment } from 'moment';
+import { Controller, FieldError } from 'react-hook-form';
 import { Form } from './Form';
 import { FormDrawer } from './FormDrawer';
 import { InputField } from './InputField';
@@ -55,11 +57,23 @@ const MyForm = ({ hideSubmit = false }: { hideSubmit?: boolean }) => {
               groupedOptions={grouped}
             />
 
-            <TimeRangePicker
-              name="duration"
-              label="Duration"
+            <Controller
               control={control}
-              error={formState.errors['duration'] as FieldError | undefined}
+              name="duration"
+              render={(props) => (
+                <TimeRangePicker
+                  error={formState.errors['duration'] as FieldError | undefined}
+                  label="Time Range"
+                  value={
+                    props.field.value.map((time: string) =>
+                      moment.utc(time, timeFormat)
+                    ) as [Moment, Moment]
+                  }
+                  onChange={(_, timeString) => {
+                    props.field.onChange(timeString);
+                  }}
+                />
+              )}
             />
 
             {!hideSubmit && (
