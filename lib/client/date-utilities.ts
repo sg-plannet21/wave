@@ -1,8 +1,12 @@
 import moment, { Moment } from 'moment';
 
 export type TimeRange = {
-  startTime: string;
-  endTime: string;
+  startTime: Moment;
+  endTime: Moment;
+};
+
+export type TimeRangeWithLabel = TimeRange & {
+  label: string;
 };
 
 export const timeFormat = 'HH:mm';
@@ -22,22 +26,22 @@ export const dateFormat = 'DD-MM-YYYY HH:mm';
 //   ][dayIndex];
 // }
 
-function isValidTimeString(time: string): boolean {
-  const validTimeExp = new RegExp('([0-1]?[0-9]|2[0-3]):[0-5][0-9]$');
-  return validTimeExp.test(time);
-}
+// function isValidTimeString(time: string): boolean {
+//   const validTimeExp = new RegExp('([0-1]?[0-9]|2[0-3]):[0-5][0-9]$');
+//   return validTimeExp.test(time);
+// }
 
-export function createUtcTimeRange({
-  startTime,
-  endTime,
-}: TimeRange): Moment[] {
-  const times = [startTime, endTime];
-  times.forEach((time) => {
-    if (!isValidTimeString(time))
-      throw new Error(`Invalid time format: ${time}.`);
-  });
-  return times.map((time) => moment.utc(time, timeFormat));
-}
+// export function createUtcTimeRange({
+//   startTime,
+//   endTime,
+// }: TimeRange): Moment[] {
+//   const times = [startTime, endTime];
+//   times.forEach((time) => {
+//     if (!isValidTimeString(time))
+//       throw new Error(`Invalid time format: ${time}.`);
+//   });
+//   return times.map((time) => moment.utc(time, timeFormat));
+// }
 
 export function formatTimeString(time: string): string {
   const validTimeFormat = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/;
@@ -67,14 +71,14 @@ function formatLocalDateRange(startDate: Moment, endDate: Moment) {
 }
 
 export function validateRange(
-  timeRange: [Moment, Moment],
-  comparator: { range: [Moment, Moment]; label?: string }[],
+  timeRange: TimeRange,
+  comparator: TimeRangeWithLabel[],
   options: { type?: 'date' | 'time'; abortEarly?: boolean } = {
     abortEarly: true,
     type: 'date',
   }
 ): { result: true } | { result: false; message: string } {
-  const [startTime, endTime] = timeRange;
+  const { startTime, endTime } = timeRange;
 
   if (endTime.isSameOrBefore(startTime)) {
     return { result: false, message: 'Start time must come before end time' };
@@ -85,7 +89,8 @@ export function validateRange(
 
   for (let i = 0; i < comparator.length; i++) {
     const {
-      range: [existingStartTime, existingEndTime],
+      startTime: existingStartTime,
+      endTime: existingEndTime,
       label,
     } = comparator[i];
 

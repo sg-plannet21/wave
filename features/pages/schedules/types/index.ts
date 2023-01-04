@@ -51,3 +51,10 @@ export type ScheduleDTO = {
   startTime: Schedule['start_time'];
   endTime: Schedule['end_time'];
 };
+
+export type MessageField =
+  | 'message1'
+  | 'message2'
+  | 'message3'
+  | 'message4'
+  | 'message5';

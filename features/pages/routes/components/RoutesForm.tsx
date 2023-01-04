@@ -40,9 +40,9 @@ const RoutesForm: React.FC<RoutesFormProps> = ({ id, onSuccess }) => {
 
   if (isValidating) return <div>Loading..</div>;
 
-  if (!newRecord && !route) return <div>Not found..</div>;
-
   if (routeError) return <div>An error has occurred</div>;
+
+  if (!newRecord && !route) return <div>Not found..</div>;
 
   return (
     <Form<RouteFormValues, typeof schema>
