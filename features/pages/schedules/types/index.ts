@@ -58,3 +58,8 @@ export type MessageField =
   | 'message3'
   | 'message4'
   | 'message5';
+
+export type SelectedSchedules = {
+  isDefault: boolean;
+  schedules: string[];
+};

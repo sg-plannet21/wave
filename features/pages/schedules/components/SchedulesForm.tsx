@@ -143,7 +143,6 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
       });
 
       // const outcome = validateScheduleRange(
-      //   parseInt(values.weekDay),
       //   newTimeRange,
       //   Object.values(schedules)
       // );
