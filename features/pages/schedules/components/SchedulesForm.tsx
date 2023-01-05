@@ -7,6 +7,7 @@ import Button from 'components/inputs/button';
 import {
   TimeRange,
   TimeRangeWithLabel,
+  createMomentUtc,
   timeFormat,
   validateRange,
 } from 'lib/client/date-utilities';
@@ -16,7 +17,11 @@ import { useEffect, useState } from 'react';
 import { Controller, FieldError, useForm } from 'react-hook-form';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { z } from 'zod';
-import { ExistingScheduleDTO, NewScheduleDTO } from '../api/saveSchedule';
+import {
+  ExistingScheduleDTO,
+  NewScheduleDTO,
+  saveSchedule,
+} from '../api/saveSchedule';
 import { messageSchema } from '../helpers/schema-helper';
 import { useSchedule } from '../hooks/useSchedule';
 import { MessageField, Schedule, Weekdays } from '../types';
@@ -35,10 +40,6 @@ const weekDayOptions: Option[] = Array.from(Array(7).keys()).map((ele) => ({
 
 function mapMessageToModel(message: string | null): number | null {
   return message ? parseInt(message) : null;
-}
-
-function getMomentDate(time: string): Moment {
-  return moment.utc(time, timeFormat);
 }
 
 const schema = z
@@ -79,7 +80,7 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
   } = useSchedule(newRecord ? undefined : id, { revalidateOnFocus: false });
   const { data: schedules, isValidating: isValidatingSchedules } =
     useCollectionRequest<Schedule>('schedules', { revalidateOnFocus: false });
-  const { register, handleSubmit, reset, formState, control } =
+  const { register, handleSubmit, reset, formState, control, setError } =
     useForm<SchedulesFormValues>({
       defaultValues: {
         weekDay: '1',
@@ -96,7 +97,6 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
 
   useEffect(() => {
     if (!schedule) return;
-    console.log('resetting :>> ', schedule);
     reset({
       weekDay: schedule?.week_day.toString(),
       timeRange: [schedule.start_time ?? '9:00', schedule.end_time ?? '17:00'],
@@ -115,32 +115,43 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
 
   if (scheduleError) return <div>An error has occurred</div>;
 
-  console.log('schedules', schedules);
-
   async function onSubmit(values: SchedulesFormValues) {
     if (!schedule?.is_default && schedules) {
-      console.log('not a default schedule');
+      console.log('not a default schedule - validating');
       const newTimeRange: TimeRange = {
-        startTime: getMomentDate(values.timeRange[0]),
-        endTime: getMomentDate(values.timeRange[1]),
+        startTime: createMomentUtc(values.timeRange[0]),
+        endTime: createMomentUtc(values.timeRange[1]),
       };
 
       const existingSchedules: TimeRangeWithLabel[] = Object.values(schedules)
         .filter(
-          (schedule) =>
-            !schedule.is_default &&
-            schedule.week_day === parseInt(values.weekDay)
+          (sch) =>
+            !sch.is_default &&
+            sch.section === sectionId &&
+            sch.week_day === parseInt(values.weekDay) &&
+            sch.schedule_id !== schedule?.schedule_id
         )
         .map((schedule) => ({
-          startTime: moment.utc(schedule.start_time, timeFormat),
-          endTime: moment.utc(schedule.end_time),
+          startTime: createMomentUtc(schedule.start_time as string),
+          endTime: createMomentUtc(schedule.end_time as string),
           label: Weekdays[schedule.week_day],
         }));
-      const result = validateRange(newTimeRange, existingSchedules, {
+
+      const outcome = validateRange(newTimeRange, existingSchedules, {
         type: 'time',
         abortEarly: true,
       });
-      console.log('result :>> ', result);
+
+      // const outcome = validateScheduleRange(
+      //   parseInt(values.weekDay),
+      //   newTimeRange,
+      //   Object.values(schedules)
+      // );
+
+      if (!outcome.result) {
+        setError('timeRange', { message: outcome.message });
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -158,16 +169,15 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
       route: values.route,
       isDefault: !!schedule?.is_default,
       startTime: !schedule?.is_default
-        ? getMomentDate(values.timeRange[0]).format(timeFormat)
+        ? createMomentUtc(values.timeRange[0]).format(timeFormat)
         : null,
       endTime: !schedule?.is_default
-        ? getMomentDate(values.timeRange[1]).format(timeFormat)
+        ? createMomentUtc(values.timeRange[1]).format(timeFormat)
         : null,
     };
 
     try {
-      // await saveSchedule(payload);
-      console.log('payload :>> ', payload);
+      await saveSchedule(payload);
       onSuccess();
     } catch (error) {
       console.log('error', error);

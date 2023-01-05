@@ -43,6 +43,10 @@ export const dateFormat = 'DD-MM-YYYY HH:mm';
 //   return times.map((time) => moment.utc(time, timeFormat));
 // }
 
+export function createMomentUtc(time: string): Moment {
+  return moment.utc(time, timeFormat);
+}
+
 export function formatTimeString(time: string): string {
   const validTimeFormat = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/;
   if (!validTimeFormat.test(time))
