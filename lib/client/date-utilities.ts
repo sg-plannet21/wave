@@ -47,15 +47,25 @@ export function createMomentUtc(time: string): Moment {
   return moment.utc(time, timeFormat);
 }
 
-export function formatTimeString(time: string): string {
-  const validTimeFormat = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/;
+export function formatUtcToLocalTimeString(time: string): string {
+  const validTimeFormat = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/;
   if (!validTimeFormat.test(time))
     throw new Error('Incorrect time format: ' + time);
 
   const utcTime = moment.utc(time, timeFormat);
-  const localTime = moment(utcTime).local();
+  return formatLocalTime(utcTime);
+  // const localTime = moment(utcTime).local();
 
-  return localTime.format(timeFormat);
+  // return localTime.format(timeFormat);
+}
+
+export function formatLocalToUtcTimeString(time: string): string {
+  const validTimeFormat = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/;
+  if (!validTimeFormat.test(time))
+    throw new Error('Incorrect time format: ' + time);
+
+  const localTime = moment(time, timeFormat);
+  return moment(localTime).utc().format(timeFormat);
 }
 
 function formatLocalTime(time: Moment) {

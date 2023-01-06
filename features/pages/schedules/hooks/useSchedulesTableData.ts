@@ -1,5 +1,5 @@
 import { Route } from 'features/pages/routes/types';
-import { formatTimeString } from 'lib/client/date-utilities';
+import { formatUtcToLocalTimeString } from 'lib/client/date-utilities';
 import _ from 'lodash';
 import { useMemo, useState } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
@@ -33,10 +33,10 @@ export function useSchedulesTableData(sectionId?: string) {
       weekDay: schedule.week_day,
       isDefault: schedule.is_default,
       startTime: schedule.start_time
-        ? formatTimeString(schedule.start_time)
+        ? formatUtcToLocalTimeString(schedule.start_time)
         : 'Default',
       endTime: schedule.end_time
-        ? formatTimeString(schedule.end_time)
+        ? formatUtcToLocalTimeString(schedule.end_time)
         : 'Default',
       route: _.get(routes[schedule.route], 'route_name'),
       sectionId: schedule.section,

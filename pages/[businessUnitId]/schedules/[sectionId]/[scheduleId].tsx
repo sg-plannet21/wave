@@ -1,5 +1,6 @@
 import ContentLayout from 'components/layouts/content/Content';
 import PrimaryLayout from 'components/layouts/primary/PrimaryLayout';
+import CreateSchedule from 'features/pages/schedules/components/CreateSchedule';
 import SchedulesForm from 'features/pages/schedules/components/SchedulesForm';
 import { useRouter } from 'next/router';
 import { NextPageWithLayout } from 'pages/page';
@@ -16,10 +17,14 @@ const ScheduleDetails: NextPageWithLayout = () => {
   return (
     <ContentLayout title="Schedule Details">
       <section className="flex flex-col items-center gap-y-5 mt-12">
-        <SchedulesForm
-          onSuccess={handleSuccess}
-          id={scheduleId?.toString() ?? 'new'}
-        />
+        {scheduleId === 'new' ? (
+          <CreateSchedule />
+        ) : (
+          <SchedulesForm
+            onSuccess={handleSuccess}
+            id={scheduleId?.toString() ?? 'new'}
+          />
+        )}
       </section>
     </ContentLayout>
   );

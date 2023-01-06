@@ -1,29 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FieldWrapper } from 'components/form/FieldWrapper';
 import MessageSelectField from 'components/form/MessageSelectField';
-import RouteSelectField from 'components/form/RouteSelectField';
-import TimeRangePicker from 'components/form/TimeRangeField';
 import Button from 'components/inputs/button';
-import { timeFormat } from 'lib/client/date-utilities';
 import _ from 'lodash';
-import moment, { Moment } from 'moment';
 import React, { useState } from 'react';
-import {
-  Control,
-  Controller,
-  FieldError,
-  useController,
-  useForm,
-} from 'react-hook-form';
+import { Control, FieldError, useController, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { messageSchema } from '../helpers/schema-helper';
-import { MessageField, Weekdays } from '../types';
+import { MessageField, SelectedSchedules, Weekdays } from '../types';
+
+type CreateScheduleProps = {
+  schedules: SelectedSchedules;
+};
 
 const schema = z
   .object({
     weekDay: z.string().array(),
-    timeRange: z.array(z.string()),
-    route: z.string().min(1, 'Route is required'),
   })
   .merge(messageSchema)
   .superRefine((data, ctx) => {
@@ -68,7 +60,7 @@ const Checkboxes = ({ options, control, name }: CheckboxesProps) => {
     <>
       {options.map((option) => (
         <div key={option} className="flex items-center mb-4">
-          <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300 flex-1">
+          <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
             <input
               onChange={(e) => {
                 const valueCopy = _.xor(value, [e.target.value]);
@@ -93,19 +85,17 @@ const Checkboxes = ({ options, control, name }: CheckboxesProps) => {
   );
 };
 
-const CreateSchedule: React.FC = () => {
+const CreateSchedule: React.FC<CreateScheduleProps> = ({ schedules }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, formState, control } =
     useForm<SchedulesFormValues>({
       defaultValues: {
         weekDay: ['1', '2'],
-        timeRange: ['09:00', '17:00'],
         message1: null,
         message2: null,
         message3: null,
         message4: null,
         message5: null,
-        route: '',
       },
       resolver: zodResolver(schema),
     });
@@ -116,66 +106,53 @@ const CreateSchedule: React.FC = () => {
     setIsLoading(false);
   }
 
+  if (!schedules) return <div>No Schedules</div>;
+
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="w-full mx-auto sm:max-w-md space-y-3"
-    >
-      <FieldWrapper
-        label="Schedule Days"
-        error={formState.errors['weekDay'] as FieldError | undefined}
+    <div>
+      <h4>{schedules.isDefault ? 'Default' : 'Custom'}</h4>
+      <ul>
+        {schedules.schedules.map((scheduleId) => (
+          <li key={scheduleId}>{scheduleId}</li>
+        ))}
+      </ul>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="w-full mx-auto sm:max-w-md space-y-3"
       >
-        <Checkboxes
-          options={['1', '2', '3', '4', '5', '6', '7']}
-          control={control}
-          name="weekDay"
-        />
-      </FieldWrapper>
-
-      <Controller
-        control={control}
-        name="timeRange"
-        render={(props) => (
-          <TimeRangePicker
-            error={formState.errors['timeRange'] as FieldError | undefined}
-            label="Time Range"
-            value={
-              props.field.value.map((time: string) =>
-                moment(time, timeFormat)
-              ) as [Moment, Moment]
-            }
-            onChange={(_, timeString) => {
-              props.field.onChange(timeString);
-            }}
-          />
-        )}
-      />
-
-      {Array.from(Array(5).keys()).map((ele) => (
-        <MessageSelectField
-          control={control}
-          key={ele}
-          registration={register(`message${ele + 1}` as MessageField)}
-          error={formState.errors[`message${ele + 1}` as MessageField]}
-          label={`Message ${ele + 1}`}
-        />
-      ))}
-      <RouteSelectField
-        registration={register('route')}
-        error={formState.errors['route']}
-        label="Route"
-      />
-      <div>
-        <Button
-          disabled={!formState.isDirty || isLoading}
-          isLoading={isLoading}
-          type="submit"
-          className="w-full"
+        <FieldWrapper
+          label="Weekdays"
+          error={formState.errors['weekDay'] as FieldError | undefined}
         >
-          Create Schedules
-        </Button>
-      </div>
-    </form>
+          <Checkboxes
+            options={['1', '2', '3', '4', '5', '6', '7']}
+            control={control}
+            name="weekDay"
+          />
+        </FieldWrapper>
+
+        {Array.from(Array(5).keys()).map((ele) => (
+          <MessageSelectField
+            control={control}
+            key={ele}
+            registration={register(`message${ele + 1}` as MessageField)}
+            error={formState.errors[`message${ele + 1}` as MessageField]}
+            label={`Message ${ele + 1}`}
+          />
+        ))}
+
+        <div>
+          <Button
+            disabled={!formState.isDirty || isLoading}
+            isLoading={isLoading}
+            type="submit"
+            className="w-full"
+          >
+            Create Schedules
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };
 

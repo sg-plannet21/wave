@@ -1,7 +1,5 @@
 import Table, { TableColumn } from 'components/data-display/table';
-import { FormDrawer } from 'components/form/FormDrawer';
 import { Plus } from 'components/icons';
-import Button from 'components/inputs/button';
 import Switch from 'components/inputs/switch';
 import { mapNumberToColour } from 'components/inputs/switch/Switch';
 import SectionsSelect from 'components/navigation/SectionsSelect';
@@ -16,7 +14,6 @@ import {
   useSchedulesTableData,
 } from '../hooks/useSchedulesTableData';
 import { SelectedSchedules, Weekdays } from '../types';
-import SchedulesMultiForm from './CreateSchedule';
 import DeleteSchedule from './DeleteSchedule';
 
 const SchedulesTable: React.FC = () => {
@@ -132,28 +129,12 @@ const SchedulesTable: React.FC = () => {
     <div className="w-full flex flex-col justify-center items-center">
       <div className="flex w-full">
         <div className="w-1/4 flex flex-col p-2 space-y-3">
-          {/* <Link href={`/${businessUnitId}/schedules/${sectionId}/new`}>
+          <Link href={`/${businessUnitId}/schedules/${sectionId}/new`}>
             <a className="flex justify-center items-center space-x-1 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
               <Plus />
               <span>New Schedule</span>
             </a>
-          </Link> */}
-          <FormDrawer
-            isDone={false}
-            triggerButton={
-              <Button
-                className="w-full"
-                type="button"
-                startIcon={<Plus className="h-4 w-4" />}
-              >
-                New
-              </Button>
-            }
-            submitButton={<Button>Submit</Button>}
-            title="New Schedule(s)"
-          >
-            <SchedulesMultiForm schedules={selectedSchedules} />
-          </FormDrawer>
+          </Link>
           <Card
             title="Default Schedules"
             description="Fallback / Catch all schedules"

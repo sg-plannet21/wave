@@ -8,6 +8,8 @@ import {
   TimeRange,
   TimeRangeWithLabel,
   createMomentUtc,
+  formatLocalToUtcTimeString,
+  formatUtcToLocalTimeString,
   timeFormat,
   validateRange,
 } from 'lib/client/date-utilities';
@@ -99,7 +101,14 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
     if (!schedule) return;
     reset({
       weekDay: schedule?.week_day.toString(),
-      timeRange: [schedule.start_time ?? '9:00', schedule.end_time ?? '17:00'],
+      timeRange: [
+        schedule.start_time
+          ? formatUtcToLocalTimeString(schedule.start_time)
+          : '9:00',
+        schedule.end_time
+          ? formatUtcToLocalTimeString(schedule.end_time)
+          : '17:00',
+      ],
       message1: schedule?.message_1?.toString(),
       message2: schedule?.message_2?.toString(),
       message3: schedule?.message_3?.toString(),
@@ -168,10 +177,10 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
       route: values.route,
       isDefault: !!schedule?.is_default,
       startTime: !schedule?.is_default
-        ? createMomentUtc(values.timeRange[0]).format(timeFormat)
+        ? formatLocalToUtcTimeString(values.timeRange[0])
         : null,
       endTime: !schedule?.is_default
-        ? createMomentUtc(values.timeRange[1]).format(timeFormat)
+        ? formatLocalToUtcTimeString(values.timeRange[1])
         : null,
     };
 
@@ -207,7 +216,7 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
               label="Time Range"
               value={
                 props.field.value.map((time: string) =>
-                  moment.utc(time, timeFormat)
+                  moment(time, timeFormat)
                 ) as [Moment, Moment]
               }
               onChange={(_, timeString) => {
