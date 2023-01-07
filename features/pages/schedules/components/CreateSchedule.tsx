@@ -141,7 +141,7 @@ const CreateSchedule: React.FC = () => {
             label="Time Range"
             value={
               props.field.value.map((time: string) =>
-                moment(time, timeFormat)
+                moment.utc(time, timeFormat)
               ) as [Moment, Moment]
             }
             onChange={(_, timeString) => {
