@@ -26,10 +26,12 @@ export const dateFormat = 'DD-MM-YYYY HH:mm';
 //   ][dayIndex];
 // }
 
-// function isValidTimeString(time: string): boolean {
-//   const validTimeExp = new RegExp('([0-1]?[0-9]|2[0-3]):[0-5][0-9]$');
-//   return validTimeExp.test(time);
-// }
+function isValidTimeString(time: string): boolean {
+  const validTimeExp = new RegExp(
+    '^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$'
+  );
+  return validTimeExp.test(time);
+}
 
 // export function createUtcTimeRange({
 //   startTime,
@@ -48,8 +50,7 @@ export function createMomentUtc(time: string): Moment {
 }
 
 export function formatUtcToLocalTimeString(time: string): string {
-  const validTimeFormat = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/;
-  if (!validTimeFormat.test(time))
+  if (!isValidTimeString(time))
     throw new Error('Incorrect time format: ' + time);
 
   const utcTime = moment.utc(time, timeFormat);
@@ -60,8 +61,7 @@ export function formatUtcToLocalTimeString(time: string): string {
 }
 
 export function formatLocalToUtcTimeString(time: string): string {
-  const validTimeFormat = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/;
-  if (!validTimeFormat.test(time))
+  if (!isValidTimeString(time))
     throw new Error('Incorrect time format: ' + time);
 
   const localTime = moment(time, timeFormat);

@@ -8,6 +8,7 @@ import {
   TimeRange,
   TimeRangeWithLabel,
   createMomentUtc,
+  formatLocalToUtcTimeString,
   timeFormat,
   validateRange,
 } from 'lib/client/date-utilities';
@@ -22,6 +23,7 @@ import {
   NewScheduleDTO,
   saveSchedule,
 } from '../api/saveSchedule';
+import { mapMessageToModel } from '../helpers/form-helpers';
 import { messageSchema } from '../helpers/schema-helper';
 import { useSchedule } from '../hooks/useSchedule';
 import { MessageField, Schedule, Weekdays } from '../types';
@@ -37,10 +39,6 @@ const weekDayOptions: Option[] = Array.from(Array(7).keys()).map((ele) => ({
   label: Weekdays[ele + 1],
   value: ele + 1,
 }));
-
-function mapMessageToModel(message: string | null): number | null {
-  return message ? parseInt(message) : null;
-}
 
 const schema = z
   .object({
@@ -78,8 +76,11 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
     error: scheduleError,
     isValidating,
   } = useSchedule(newRecord ? undefined : id, { revalidateOnFocus: false });
-  const { data: schedules, isValidating: isValidatingSchedules } =
-    useCollectionRequest<Schedule>('schedules', { revalidateOnFocus: false });
+  const {
+    data: schedules,
+    isValidating: isValidatingSchedules,
+    mutate,
+  } = useCollectionRequest<Schedule>('schedules', { revalidateOnFocus: false });
   const { register, handleSubmit, reset, formState, control, setError } =
     useForm<SchedulesFormValues>({
       defaultValues: {
@@ -155,6 +156,7 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
 
     setIsLoading(true);
     console.log('onSubmit');
+    console.log('values.timeRange :>> ', values.timeRange);
 
     const payload: NewScheduleDTO | ExistingScheduleDTO = {
       ...(!newRecord && { scheduleId: schedule?.schedule_id }),
@@ -167,18 +169,30 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
       message5: mapMessageToModel(values.message5),
       route: values.route,
       isDefault: !!schedule?.is_default,
-      startTime: !schedule?.is_default ? values.timeRange[0] : null,
-      endTime: !schedule?.is_default ? values.timeRange[1] : null,
+      startTime: !schedule?.is_default
+        ? formatLocalToUtcTimeString(values.timeRange[0])
+        : null,
+      endTime: !schedule?.is_default
+        ? formatLocalToUtcTimeString(values.timeRange[1])
+        : null,
     };
 
-    try {
-      await saveSchedule(payload);
-      onSuccess();
-    } catch (error) {
-      console.log('error', error);
-    } finally {
-      setIsLoading(false);
-    }
+    mutate(
+      async (schedules) => {
+        try {
+          const { data } = await saveSchedule(payload);
+          const schedule = { [data['schedule_id']]: data };
+          onSuccess();
+          return { ...schedules, ...schedule };
+        } catch (error) {
+          console.log('error', error);
+          return schedules;
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      { revalidate: false }
+    );
   }
 
   return (

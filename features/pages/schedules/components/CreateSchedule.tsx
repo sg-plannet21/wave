@@ -4,9 +4,17 @@ import MessageSelectField from 'components/form/MessageSelectField';
 import RouteSelectField from 'components/form/RouteSelectField';
 import TimeRangePicker from 'components/form/TimeRangeField';
 import Button from 'components/inputs/button';
-import { timeFormat } from 'lib/client/date-utilities';
-import _ from 'lodash';
+import {
+  TimeRange,
+  TimeRangeWithLabel,
+  createMomentUtc,
+  formatLocalToUtcTimeString,
+  timeFormat,
+  validateRange,
+} from 'lib/client/date-utilities';
+import _, { Dictionary } from 'lodash';
 import moment, { Moment } from 'moment';
+import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import {
   Control,
@@ -15,9 +23,16 @@ import {
   useController,
   useForm,
 } from 'react-hook-form';
+import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { z } from 'zod';
+import { NewScheduleDTO, saveSchedule } from '../api/saveSchedule';
+import { mapMessageToModel } from '../helpers/form-helpers';
 import { messageSchema } from '../helpers/schema-helper';
-import { MessageField, Weekdays } from '../types';
+import { MessageField, Schedule, Weekdays } from '../types';
+
+type CreateScheduleProps = {
+  onSuccess: () => void;
+};
 
 const schema = z
   .object({
@@ -57,7 +72,7 @@ type CheckboxesProps = {
   name: 'weekDay';
 };
 
-const Checkboxes = ({ options, control, name }: CheckboxesProps) => {
+const Checkboxes: React.FC<CheckboxesProps> = ({ options, control, name }) => {
   const { field } = useController({
     control,
     name,
@@ -93,12 +108,20 @@ const Checkboxes = ({ options, control, name }: CheckboxesProps) => {
   );
 };
 
-const CreateSchedule: React.FC = () => {
+const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { register, handleSubmit, formState, control } =
+  const {
+    query: { sectionId },
+  } = useRouter();
+  const {
+    data: schedules,
+    isValidating: isValidatingSchedules,
+    mutate,
+  } = useCollectionRequest<Schedule>('schedules', { revalidateOnFocus: false });
+  const { register, handleSubmit, formState, control, setError } =
     useForm<SchedulesFormValues>({
       defaultValues: {
-        weekDay: ['1', '2'],
+        weekDay: ['1'],
         timeRange: ['09:00', '17:00'],
         message1: null,
         message2: null,
@@ -111,10 +134,87 @@ const CreateSchedule: React.FC = () => {
     });
 
   async function onSubmit(values: SchedulesFormValues) {
+    if (schedules) {
+      console.log('not a default schedule - validating');
+      const newTimeRange: TimeRange = {
+        startTime: createMomentUtc(values.timeRange[0]),
+        endTime: createMomentUtc(values.timeRange[1]),
+      };
+
+      const existingSchedules: TimeRangeWithLabel[] = Object.values(schedules)
+        .filter(
+          (sch) =>
+            !sch.is_default &&
+            sch.section === sectionId &&
+            values.weekDay.includes(sch.week_day.toString())
+        )
+        .map((schedule) => ({
+          startTime: createMomentUtc(schedule.start_time as string),
+          endTime: createMomentUtc(schedule.end_time as string),
+          label: Weekdays[schedule.week_day],
+        }));
+
+      console.log('existingSchedules :>> ', existingSchedules);
+
+      const outcome = validateRange(newTimeRange, existingSchedules, {
+        type: 'time',
+        abortEarly: true,
+      });
+
+      console.log('outcome', outcome);
+
+      if (!outcome.result) {
+        setError('timeRange', { message: outcome.message });
+        return;
+      }
+    }
+
     setIsLoading(true);
+    mutate(
+      async (existingSchedules) =>
+        Promise.all(
+          values.weekDay.map((day) => {
+            const payload: NewScheduleDTO = {
+              weekDay: parseInt(day),
+              section: sectionId?.toString() as string,
+              message1: mapMessageToModel(values.message1),
+              message2: mapMessageToModel(values.message2),
+              message3: mapMessageToModel(values.message3),
+              message4: mapMessageToModel(values.message4),
+              message5: mapMessageToModel(values.message5),
+              route: values.route,
+              isDefault: false,
+              startTime: formatLocalToUtcTimeString(values.timeRange[0]),
+              endTime: formatLocalToUtcTimeString(values.timeRange[1]),
+            };
+            return saveSchedule(payload);
+          })
+        )
+          .then((values) => {
+            const newSchedules: Dictionary<Schedule> = values
+              .map(({ data }) => data)
+              .reduce((lookup, schedule): Dictionary<Schedule> => {
+                lookup[schedule['schedule_id']] = schedule;
+                return lookup;
+              }, {} as Dictionary<Schedule>);
+
+            onSuccess();
+            return { ...existingSchedules, ...newSchedules };
+          })
+          .catch((error) => {
+            console.log('error :>> ', error);
+            return schedules;
+          })
+          .finally(() => setIsLoading(false)),
+      { revalidate: false }
+    );
+
+    // console.log('payloadList', payloadList);
+
     console.log('values :>> ', values);
-    setIsLoading(false);
   }
+
+  if (isValidatingSchedules) return <div>Loading..</div>;
 
   return (
     <form

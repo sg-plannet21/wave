@@ -59,7 +59,7 @@ const Table = <Entry extends { [P in keyof Entry]: Entry[P] }>({
     return (
       <div className="flex flex-col items-center justify-center text-gray-500 dark:text-white h-80">
         <Archive className="w-16 h-16" />
-        <h4>No Entries Found</h4>
+        <h4 className="dark:text-white">No Entries Found</h4>
       </div>
     );
   }
