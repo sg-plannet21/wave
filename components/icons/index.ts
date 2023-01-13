@@ -12,6 +12,7 @@ export { default as CreditCard } from './CreditCard';
 export { default as Cross } from './Cross';
 export { default as Dialpad } from './Dialpad';
 export { default as DoubleChevron } from './DoubleChevron';
+export { default as Edit } from './Edit';
 export { default as EntryPoint } from './EntryPoint';
 export { default as Exception } from './Exception';
 export { default as Exclamation } from './Exclamation';

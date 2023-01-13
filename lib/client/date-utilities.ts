@@ -83,11 +83,15 @@ function formatLocalDate(date: Moment) {
 function formatLocalDateRange(startDate: Moment, endDate: Moment) {
   return `${formatLocalDate(startDate)} - ${formatLocalDate(endDate)}`;
 }
+export type ValidateRangeOptions = {
+  type?: 'date' | 'time';
+  abortEarly?: boolean;
+};
 
 export function validateRange(
   timeRange: TimeRange,
   comparator: TimeRangeWithLabel[],
-  options: { type?: 'date' | 'time'; abortEarly?: boolean } = {
+  options: ValidateRangeOptions = {
     abortEarly: true,
     type: 'date',
   }

@@ -1,6 +1,7 @@
 import ContentLayout from 'components/layouts/content/Content';
 import PrimaryLayout from 'components/layouts/primary/PrimaryLayout';
 import CreateSchedule from 'features/pages/schedules/components/CreateSchedule';
+import EditSchedule from 'features/pages/schedules/components/EditSchedule';
 import SchedulesForm from 'features/pages/schedules/components/SchedulesForm';
 import { useRouter } from 'next/router';
 import { NextPageWithLayout } from 'pages/page';
@@ -14,17 +15,34 @@ const ScheduleDetails: NextPageWithLayout = () => {
     router.push(`/${businessUnitId}/schedules/${sectionId}`);
   }
 
+  function renderComponent() {
+    switch (scheduleId) {
+      case 'new':
+        return <CreateSchedule onSuccess={handleSuccess} />;
+      case 'edit':
+        return <EditSchedule onSuccess={handleSuccess} />;
+      default:
+        return (
+          <SchedulesForm
+            onSuccess={handleSuccess}
+            id={scheduleId?.toString() as string}
+          />
+        );
+    }
+  }
+
   return (
     <ContentLayout title="Schedule Details">
       <section className="flex flex-col items-center gap-y-5 mt-12">
-        {scheduleId === 'new' ? (
+        {/* {scheduleId === 'new' ? (
           <CreateSchedule onSuccess={handleSuccess} />
         ) : (
           <SchedulesForm
             onSuccess={handleSuccess}
-            id={scheduleId?.toString() ?? 'new'}
+            id={scheduleId?.toString() as string}
           />
-        )}
+        )} */}
+        {renderComponent()}
       </section>
     </ContentLayout>
   );

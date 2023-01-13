@@ -4,14 +4,7 @@ import MessageSelectField from 'components/form/MessageSelectField';
 import RouteSelectField from 'components/form/RouteSelectField';
 import TimeRangePicker from 'components/form/TimeRangeField';
 import Button from 'components/inputs/button';
-import {
-  TimeRange,
-  TimeRangeWithLabel,
-  createMomentUtc,
-  formatLocalToUtcTimeString,
-  timeFormat,
-  validateRange,
-} from 'lib/client/date-utilities';
+import { timeFormat } from 'lib/client/date-utilities';
 import _, { Dictionary } from 'lodash';
 import moment, { Moment } from 'moment';
 import { useRouter } from 'next/router';
@@ -26,50 +19,19 @@ import {
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { z } from 'zod';
 import { NewScheduleDTO, saveSchedule } from '../api/saveSchedule';
-import { mapMessageToModel } from '../helpers/form-helpers';
-import { messageSchema } from '../helpers/schema-helper';
+import { mapToViewModel } from '../helpers/form-helpers';
+import {
+  BaseSchema,
+  baseSchema,
+  messageValidation,
+} from '../helpers/schema-helper';
+import { validateScheduleRange } from '../helpers/validation-helper';
 import { MessageField, Schedule, Weekdays } from '../types';
-
-type CreateScheduleProps = {
-  onSuccess: () => void;
-};
-
-const schema = z
-  .object({
-    weekDay: z.string().array(),
-    timeRange: z.array(z.string()),
-    route: z.string().min(1, 'Route is required'),
-  })
-  .merge(messageSchema)
-  .superRefine((data, ctx) => {
-    if (!data.weekDay.length) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['weekDay'],
-        message: 'At least one weekday is required.',
-      });
-    }
-    if (
-      !data.message1 &&
-      !data.message2 &&
-      !data.message3 &&
-      !data.message4 &&
-      !data.message5
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['message1'],
-        message: 'At least one message is required.',
-      });
-    }
-  });
-
-type SchedulesFormValues = z.infer<typeof schema>;
 
 type CheckboxesProps = {
   options: string[];
   control: Control<SchedulesFormValues>;
-  name: 'weekDay';
+  name: 'weekDays';
 };
 
 const Checkboxes: React.FC<CheckboxesProps> = ({ options, control, name }) => {
@@ -108,6 +70,28 @@ const Checkboxes: React.FC<CheckboxesProps> = ({ options, control, name }) => {
   );
 };
 
+type CreateScheduleProps = {
+  onSuccess: () => void;
+};
+
+const schema = z
+  .object({
+    weekDays: z.string().array(),
+  })
+  .merge(baseSchema)
+  .superRefine(messageValidation<BaseSchema>)
+  .superRefine((data, ctx) => {
+    if (!data.weekDays.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['weekDay'],
+        message: 'At least one weekday is required.',
+      });
+    }
+  });
+
+type SchedulesFormValues = z.infer<typeof schema>;
+
 const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const {
@@ -121,7 +105,7 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
   const { register, handleSubmit, formState, control, setError } =
     useForm<SchedulesFormValues>({
       defaultValues: {
-        weekDay: ['1'],
+        weekDays: ['1'],
         timeRange: ['09:00', '17:00'],
         message1: null,
         message2: null,
@@ -134,34 +118,16 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
     });
 
   async function onSubmit(values: SchedulesFormValues) {
+    setIsLoading(true);
+
     if (schedules) {
-      console.log('not a default schedule - validating');
-      const newTimeRange: TimeRange = {
-        startTime: createMomentUtc(values.timeRange[0]),
-        endTime: createMomentUtc(values.timeRange[1]),
-      };
-
-      const existingSchedules: TimeRangeWithLabel[] = Object.values(schedules)
-        .filter(
-          (sch) =>
-            !sch.is_default &&
-            sch.section === sectionId &&
-            values.weekDay.includes(sch.week_day.toString())
-        )
-        .map((schedule) => ({
-          startTime: createMomentUtc(schedule.start_time as string),
-          endTime: createMomentUtc(schedule.end_time as string),
-          label: Weekdays[schedule.week_day],
-        }));
-
-      console.log('existingSchedules :>> ', existingSchedules);
-
-      const outcome = validateRange(newTimeRange, existingSchedules, {
-        type: 'time',
-        abortEarly: true,
+      const outcome = validateScheduleRange({
+        startTime: values.timeRange[0],
+        endTime: values.timeRange[1],
+        schedules: Object.values(schedules),
+        sectionId: sectionId?.toString() as string,
+        weekDays: values.weekDays,
       });
-
-      console.log('outcome', outcome);
 
       if (!outcome.result) {
         setError('timeRange', { message: outcome.message });
@@ -169,24 +135,19 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
       }
     }
 
-    setIsLoading(true);
     mutate(
       async (existingSchedules) =>
         Promise.all(
-          values.weekDay.map((day) => {
-            const payload: NewScheduleDTO = {
-              weekDay: parseInt(day),
-              section: sectionId?.toString() as string,
-              message1: mapMessageToModel(values.message1),
-              message2: mapMessageToModel(values.message2),
-              message3: mapMessageToModel(values.message3),
-              message4: mapMessageToModel(values.message4),
-              message5: mapMessageToModel(values.message5),
-              route: values.route,
-              isDefault: false,
-              startTime: formatLocalToUtcTimeString(values.timeRange[0]),
-              endTime: formatLocalToUtcTimeString(values.timeRange[1]),
-            };
+          values.weekDays.map((weekDay) => {
+            const payload: NewScheduleDTO = mapToViewModel(
+              {
+                ...values,
+                weekDay,
+                sectionId: sectionId?.toString() as string,
+                isDefault: false,
+              },
+              true
+            );
             return saveSchedule(payload);
           })
         )
@@ -208,10 +169,6 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
           .finally(() => setIsLoading(false)),
       { revalidate: false }
     );
-
-    // console.log('payloadList', payloadList);
-
-    console.log('values :>> ', values);
   }
 
   if (isValidatingSchedules) return <div>Loading..</div>;
@@ -223,12 +180,12 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
     >
       <FieldWrapper
         label="Schedule Days"
-        error={formState.errors['weekDay'] as FieldError | undefined}
+        error={formState.errors['weekDays'] as FieldError | undefined}
       >
         <Checkboxes
           options={['1', '2', '3', '4', '5', '6', '7']}
           control={control}
-          name="weekDay"
+          name="weekDays"
         />
       </FieldWrapper>
 

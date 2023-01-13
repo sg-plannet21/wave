@@ -4,27 +4,21 @@ import RouteSelectField from 'components/form/RouteSelectField';
 import { Option, SelectField } from 'components/form/SelectField';
 import TimeRangePicker from 'components/form/TimeRangeField';
 import Button from 'components/inputs/button';
-import {
-  TimeRange,
-  TimeRangeWithLabel,
-  createMomentUtc,
-  formatLocalToUtcTimeString,
-  timeFormat,
-  validateRange,
-} from 'lib/client/date-utilities';
+import { timeFormat } from 'lib/client/date-utilities';
 import moment, { Moment } from 'moment';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Controller, FieldError, useForm } from 'react-hook-form';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { z } from 'zod';
+import { saveSchedule } from '../api/saveSchedule';
+import { mapToViewModel } from '../helpers/form-helpers';
 import {
-  ExistingScheduleDTO,
-  NewScheduleDTO,
-  saveSchedule,
-} from '../api/saveSchedule';
-import { mapMessageToModel } from '../helpers/form-helpers';
-import { messageSchema } from '../helpers/schema-helper';
+  BaseSchema,
+  baseSchema,
+  messageValidation,
+} from '../helpers/schema-helper';
+import { validateScheduleRange } from '../helpers/validation-helper';
 import { useSchedule } from '../hooks/useSchedule';
 import { MessageField, Schedule, Weekdays } from '../types';
 
@@ -43,25 +37,9 @@ const weekDayOptions: Option[] = Array.from(Array(7).keys()).map((ele) => ({
 const schema = z
   .object({
     weekDay: z.string().regex(/^[1-7]$/),
-    route: z.string().min(1, 'Route is required'),
-    timeRange: z.array(z.string()),
   })
-  .merge(messageSchema)
-  .superRefine((data, ctx) => {
-    if (
-      !data.message1 &&
-      !data.message2 &&
-      !data.message3 &&
-      !data.message4 &&
-      !data.message5
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['message1'],
-        message: 'At least one message is required.',
-      });
-    }
-  });
+  .merge(baseSchema)
+  .superRefine(messageValidation<BaseSchema>);
 
 type SchedulesFormValues = z.infer<typeof schema>;
 
@@ -117,36 +95,17 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
   if (scheduleError) return <div>An error has occurred</div>;
 
   async function onSubmit(values: SchedulesFormValues) {
+    setIsLoading(true);
+
     if (!schedule?.is_default && schedules) {
-      console.log('not a default schedule - validating');
-      const newTimeRange: TimeRange = {
-        startTime: createMomentUtc(values.timeRange[0]),
-        endTime: createMomentUtc(values.timeRange[1]),
-      };
-
-      const existingSchedules: TimeRangeWithLabel[] = Object.values(schedules)
-        .filter(
-          (sch) =>
-            !sch.is_default &&
-            sch.section === sectionId &&
-            sch.week_day === parseInt(values.weekDay) &&
-            sch.schedule_id !== schedule?.schedule_id
-        )
-        .map((schedule) => ({
-          startTime: createMomentUtc(schedule.start_time as string),
-          endTime: createMomentUtc(schedule.end_time as string),
-          label: Weekdays[schedule.week_day],
-        }));
-
-      const outcome = validateRange(newTimeRange, existingSchedules, {
-        type: 'time',
-        abortEarly: true,
+      const outcome = validateScheduleRange({
+        startTime: values.timeRange[0],
+        endTime: values.timeRange[1],
+        schedules: Object.values(schedules),
+        sectionId: sectionId?.toString() as string,
+        scheduleId: schedule?.schedule_id,
+        weekDays: [values.weekDay],
       });
-
-      // const outcome = validateScheduleRange(
-      //   newTimeRange,
-      //   Object.values(schedules)
-      // );
 
       if (!outcome.result) {
         setError('timeRange', { message: outcome.message });
@@ -154,28 +113,15 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
       }
     }
 
-    setIsLoading(true);
-    console.log('onSubmit');
-    console.log('values.timeRange :>> ', values.timeRange);
-
-    const payload: NewScheduleDTO | ExistingScheduleDTO = {
-      ...(!newRecord && { scheduleId: schedule?.schedule_id }),
-      weekDay: parseInt(values.weekDay),
-      section: sectionId?.toString() as string,
-      message1: mapMessageToModel(values.message1),
-      message2: mapMessageToModel(values.message2),
-      message3: mapMessageToModel(values.message3),
-      message4: mapMessageToModel(values.message4),
-      message5: mapMessageToModel(values.message5),
-      route: values.route,
-      isDefault: !!schedule?.is_default,
-      startTime: !schedule?.is_default
-        ? formatLocalToUtcTimeString(values.timeRange[0])
-        : null,
-      endTime: !schedule?.is_default
-        ? formatLocalToUtcTimeString(values.timeRange[1])
-        : null,
-    };
+    const payload = mapToViewModel(
+      {
+        ...values,
+        sectionId: sectionId?.toString() as string,
+        scheduleId: schedule?.schedule_id,
+        isDefault: !!schedule?.is_default,
+      },
+      newRecord
+    );
 
     mutate(
       async (schedules) => {

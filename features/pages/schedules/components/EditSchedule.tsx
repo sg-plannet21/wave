@@ -1,159 +1,210 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FieldWrapper } from 'components/form/FieldWrapper';
 import MessageSelectField from 'components/form/MessageSelectField';
+import RouteSelectField from 'components/form/RouteSelectField';
+import TimeRangePicker from 'components/form/TimeRangeField';
 import Button from 'components/inputs/button';
-import _ from 'lodash';
-import React, { useState } from 'react';
-import { Control, FieldError, useController, useForm } from 'react-hook-form';
+import { timeFormat } from 'lib/client/date-utilities';
+import { Dictionary } from 'lodash';
+import moment, { Moment } from 'moment';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import { Controller, FieldError, useForm } from 'react-hook-form';
+import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { z } from 'zod';
-import { messageSchema } from '../helpers/schema-helper';
-import { MessageField, SelectedSchedules, Weekdays } from '../types';
+import { PatchScheduleDTO, updateSchedule } from '../api/updateSchedule';
+import { mapMessageToModel } from '../helpers/form-helpers';
+import {
+  BaseSchema,
+  baseSchema,
+  messageValidation,
+} from '../helpers/schema-helper';
+import { validateScheduleRange } from '../helpers/validation-helper';
+import { MessageField, Schedule } from '../types';
 
-type CreateScheduleProps = {
-  schedules: SelectedSchedules;
+type EditScheduleProps = {
+  onSuccess: () => void;
 };
 
-const schema = z
-  .object({
-    weekDay: z.string().array(),
-  })
-  .merge(messageSchema)
-  .superRefine((data, ctx) => {
-    if (!data.weekDay.length) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['weekDay'],
-        message: 'At least one weekday is required.',
-      });
-    }
-    if (
-      !data.message1 &&
-      !data.message2 &&
-      !data.message3 &&
-      !data.message4 &&
-      !data.message5
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['message1'],
-        message: 'At least one message is required.',
-      });
-    }
-  });
+const schema = baseSchema.superRefine(messageValidation<BaseSchema>);
 
-type SchedulesFormValues = z.infer<typeof schema>;
+type EditSchedulesFormValues = z.infer<typeof schema>;
 
-type CheckboxesProps = {
-  options: string[];
-  control: Control<SchedulesFormValues>;
-  name: 'weekDay';
-};
-
-const Checkboxes = ({ options, control, name }: CheckboxesProps) => {
-  const { field } = useController({
-    control,
-    name,
-  });
-  const [value, setValue] = React.useState(field.value || []);
-
-  return (
-    <>
-      {options.map((option) => (
-        <div key={option} className="flex items-center mb-4">
-          <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-            <input
-              onChange={(e) => {
-                const valueCopy = _.xor(value, [e.target.value]);
-
-                // send data to react hook form
-                field.onChange(valueCopy);
-
-                // update local state
-                setValue(valueCopy);
-              }}
-              key={option}
-              type="checkbox"
-              checked={value.includes(option)}
-              value={option}
-              className="mr-2 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
-            {Weekdays[parseInt(option)]}
-          </label>
-        </div>
-      ))}
-    </>
-  );
-};
-
-const CreateSchedule: React.FC<CreateScheduleProps> = ({ schedules }) => {
+const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { register, handleSubmit, formState, control } =
-    useForm<SchedulesFormValues>({
+  const {
+    query: { type, id, sectionId },
+  } = useRouter();
+  const customSchedule = type === 'custom';
+  const {
+    data: schedules,
+    isValidating: isValidatingSchedules,
+    mutate,
+  } = useCollectionRequest<Schedule>('schedules', { revalidateOnFocus: false });
+  const { register, handleSubmit, formState, control, reset, setError } =
+    useForm<EditSchedulesFormValues>({
       defaultValues: {
-        weekDay: ['1', '2'],
+        timeRange: ['09:00', '17:00'],
         message1: null,
         message2: null,
         message3: null,
         message4: null,
         message5: null,
+        route: '',
       },
       resolver: zodResolver(schema),
     });
 
-  async function onSubmit(values: SchedulesFormValues) {
+  useEffect(() => {
+    if (!schedules || !id?.length) return;
+    const {
+      start_time,
+      end_time,
+      message_1,
+      message_2,
+      message_3,
+      message_4,
+      message_5,
+      route,
+    } = schedules[id[0]];
+
+    reset({
+      timeRange: [start_time ?? '0:00', end_time ?? '0:00'],
+      message1: message_1?.toString(),
+      message2: message_2?.toString(),
+      message3: message_3?.toString(),
+      message4: message_4?.toString(),
+      message5: message_5?.toString(),
+      route,
+    });
+  }, [schedules, id, reset]);
+
+  async function onSubmit(values: EditSchedulesFormValues) {
+    // schedules are required to extract the weekday
+    if (!schedules) return;
+
     setIsLoading(true);
-    console.log('values :>> ', values);
-    setIsLoading(false);
+
+    if (customSchedule && Array.isArray(id)) {
+      if (
+        id.some((scheduleId) => {
+          const outcome = validateScheduleRange({
+            startTime: values.timeRange[0],
+            endTime: values.timeRange[1],
+            schedules: Object.values(schedules),
+            scheduleId,
+            sectionId: sectionId?.toString() as string,
+            weekDays: [schedules[scheduleId].week_day.toString()],
+          });
+
+          if (!outcome.result) {
+            setError('timeRange', { message: outcome.message });
+            return true;
+          }
+
+          return false;
+        })
+      ) {
+        // validation failed
+        return;
+      }
+    }
+
+    if (Array.isArray(id)) {
+      mutate(
+        async (existingSchedules) =>
+          Promise.all(
+            id.map((scheduleId) => {
+              const payload: PatchScheduleDTO = {
+                scheduleId,
+                section: sectionId?.toString() as string,
+                startTime: customSchedule ? values.timeRange[0] : null,
+                endTime: customSchedule ? values.timeRange[1] : null,
+                message1: mapMessageToModel(values.message1),
+                message2: mapMessageToModel(values.message2),
+                message3: mapMessageToModel(values.message3),
+                message4: mapMessageToModel(values.message4),
+                message5: mapMessageToModel(values.message5),
+                weekDay: schedules[scheduleId].week_day,
+                route: values.route,
+              };
+              return updateSchedule(payload);
+            })
+          )
+            .then((values) => {
+              const updatedSchedules: Dictionary<Schedule> = values
+                .map(({ data }) => data)
+                .reduce((lookup, schedule): Dictionary<Schedule> => {
+                  lookup[schedule['schedule_id']] = schedule;
+                  return lookup;
+                }, {} as Dictionary<Schedule>);
+
+              onSuccess();
+              return { ...existingSchedules, ...updatedSchedules };
+            })
+            .catch((error) => {
+              console.log('error :>> ', error);
+              return schedules;
+            })
+            .finally(() => setIsLoading(false)),
+        { revalidate: false }
+      );
+    }
   }
 
-  if (!schedules) return <div>No Schedules</div>;
+  if (isValidatingSchedules) return <div>Loading..</div>;
 
   return (
-    <div>
-      <h4>{schedules.isDefault ? 'Default' : 'Custom'}</h4>
-      <ul>
-        {schedules.schedules.map((scheduleId) => (
-          <li key={scheduleId}>{scheduleId}</li>
-        ))}
-      </ul>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="w-full mx-auto sm:max-w-md space-y-3"
-      >
-        <FieldWrapper
-          label="Weekdays"
-          error={formState.errors['weekDay'] as FieldError | undefined}
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="w-full mx-auto sm:max-w-md space-y-3"
+    >
+      {customSchedule && (
+        <Controller
+          control={control}
+          name="timeRange"
+          render={(props) => (
+            <TimeRangePicker
+              error={formState.errors['timeRange'] as FieldError | undefined}
+              label="Time Range"
+              value={
+                props.field.value.map((time: string) =>
+                  moment.utc(time, timeFormat)
+                ) as [Moment, Moment]
+              }
+              onChange={(_, timeString) => {
+                props.field.onChange(timeString);
+              }}
+            />
+          )}
+        />
+      )}
+
+      {Array.from(Array(5).keys()).map((ele) => (
+        <MessageSelectField
+          control={control}
+          key={ele}
+          registration={register(`message${ele + 1}` as MessageField)}
+          error={formState.errors[`message${ele + 1}` as MessageField]}
+          label={`Message ${ele + 1}`}
+        />
+      ))}
+      <RouteSelectField
+        registration={register('route')}
+        error={formState.errors['route']}
+        label="Route"
+      />
+      <div>
+        <Button
+          disabled={!formState.isDirty || isLoading}
+          isLoading={isLoading}
+          type="submit"
+          className="w-full"
         >
-          <Checkboxes
-            options={['1', '2', '3', '4', '5', '6', '7']}
-            control={control}
-            name="weekDay"
-          />
-        </FieldWrapper>
-
-        {Array.from(Array(5).keys()).map((ele) => (
-          <MessageSelectField
-            control={control}
-            key={ele}
-            registration={register(`message${ele + 1}` as MessageField)}
-            error={formState.errors[`message${ele + 1}` as MessageField]}
-            label={`Message ${ele + 1}`}
-          />
-        ))}
-
-        <div>
-          <Button
-            disabled={!formState.isDirty || isLoading}
-            isLoading={isLoading}
-            type="submit"
-            className="w-full"
-          >
-            Create Schedules
-          </Button>
-        </div>
-      </form>
-    </div>
+          Update Schedules
+        </Button>
+      </div>
+    </form>
   );
 };
 
-export default CreateSchedule;
+export default EditSchedule;
