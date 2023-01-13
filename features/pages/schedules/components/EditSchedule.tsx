@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react';
 import { Controller, FieldError, useForm } from 'react-hook-form';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { z } from 'zod';
-import { PatchScheduleDTO, updateSchedule } from '../api/updateSchedule';
+import { ExistingScheduleDTO, saveSchedule } from '../api/saveSchedule';
 import { mapMessageToModel } from '../helpers/form-helpers';
 import {
   BaseSchema,
@@ -114,7 +114,7 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
         async (existingSchedules) =>
           Promise.all(
             id.map((scheduleId) => {
-              const payload: PatchScheduleDTO = {
+              const payload: ExistingScheduleDTO = {
                 scheduleId,
                 section: sectionId?.toString() as string,
                 startTime: customSchedule ? values.timeRange[0] : null,
@@ -126,8 +126,9 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
                 message5: mapMessageToModel(values.message5),
                 weekDay: schedules[scheduleId].week_day,
                 route: values.route,
+                isDefault: false,
               };
-              return updateSchedule(payload);
+              return saveSchedule(payload);
             })
           )
             .then((values) => {
