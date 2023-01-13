@@ -34,7 +34,7 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
   const {
     query: { type, id, sectionId },
   } = useRouter();
-  const customSchedule = type === 'custom';
+  const isDefaultSchedule = type === 'default';
   const {
     data: schedules,
     isValidating: isValidatingSchedules,
@@ -84,7 +84,7 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
 
     setIsLoading(true);
 
-    if (customSchedule && Array.isArray(id)) {
+    if (!isDefaultSchedule && Array.isArray(id)) {
       if (
         id.some((scheduleId) => {
           const outcome = validateScheduleRange({
@@ -117,8 +117,8 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
               const payload: ExistingScheduleDTO = {
                 scheduleId,
                 section: sectionId?.toString() as string,
-                startTime: customSchedule ? values.timeRange[0] : null,
-                endTime: customSchedule ? values.timeRange[1] : null,
+                startTime: !isDefaultSchedule ? values.timeRange[0] : null,
+                endTime: !isDefaultSchedule ? values.timeRange[1] : null,
                 message1: mapMessageToModel(values.message1),
                 message2: mapMessageToModel(values.message2),
                 message3: mapMessageToModel(values.message3),
@@ -126,7 +126,7 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
                 message5: mapMessageToModel(values.message5),
                 weekDay: schedules[scheduleId].week_day,
                 route: values.route,
-                isDefault: false,
+                isDefault: isDefaultSchedule,
               };
               return saveSchedule(payload);
             })
@@ -159,7 +159,7 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
       onSubmit={handleSubmit(onSubmit)}
       className="w-full mx-auto sm:max-w-md space-y-3"
     >
-      {customSchedule && (
+      {!isDefaultSchedule && (
         <Controller
           control={control}
           name="timeRange"
