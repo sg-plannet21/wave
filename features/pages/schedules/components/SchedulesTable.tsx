@@ -33,10 +33,10 @@ const SchedulesTable: React.FC = () => {
   );
   const { isSuperUser, hasWriteAccess } = useIsAuthorised();
 
-  // clear selected schedules on section change (nav dropdown)
+  // clear selected schedules on section change (nav dropdown) or filter change
   useEffect(() => {
     setSelectedSchedules({ isDefault: false, schedules: [] });
-  }, [sectionId]);
+  }, [sectionId, filters.isSystemRoutes, filters.dayExceptions]);
 
   function handleScheduleAdd(scheduleId: string, isDefaultSchedule: boolean) {
     const isDefault = selectedSchedules.schedules.length
