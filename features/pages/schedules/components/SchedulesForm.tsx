@@ -7,9 +7,10 @@ import Button from 'components/inputs/button';
 import { timeFormat } from 'lib/client/date-utilities';
 import moment, { Moment } from 'moment';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Controller, FieldError, useForm } from 'react-hook-form';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
+import NotificationContext from 'state/notifications/NotificationContext';
 import { z } from 'zod';
 import { saveSchedule } from '../api/saveSchedule';
 import { mapToViewModel } from '../helpers/form-helpers';
@@ -73,6 +74,7 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
       },
       resolver: zodResolver(schema),
     });
+  const { addNotification } = useContext(NotificationContext);
 
   useEffect(() => {
     if (!schedule) return;
@@ -128,6 +130,12 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
         try {
           const { data } = await saveSchedule(payload);
           const schedule = { [data['schedule_id']]: data };
+          addNotification({
+            title: newRecord ? 'Schedule Added' : 'Schedule Updated',
+            message: 'Success',
+            type: 'success',
+            duration: 5000,
+          });
           onSuccess();
           return { ...schedules, ...schedule };
         } catch (error) {

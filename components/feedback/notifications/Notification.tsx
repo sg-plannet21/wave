@@ -60,7 +60,7 @@ const Notification: React.FC<NotificationProps> = ({
         leaveFrom="translate-x-0"
         leaveTo="translate-x-full"
       >
-        <div className="max-w-sm w-full bg-white dark:bg-slate-700 rounded-lg shadow-lg pointer-events-auto ring-1 ring-black dark:ring-white ring-opacity-5 overflow-hidden">
+        <div className="max-w-sm w-full bg-white dark:bg-slate-700 rounded-lg shadow-lg pointer-events-auto ring-1 ring-black dark:ring-gray-500 ring-opacity-5 overflow-hidden">
           <div className="p-4" role="alert" aria-label={title}>
             <div className="flex items-start">
               <div className="flex-shrink-0">{icons[type]}</div>

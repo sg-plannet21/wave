@@ -1,4 +1,4 @@
-import Axios, { AxiosRequestConfig } from 'axios';
+import Axios, { AxiosHeaders, AxiosRequestConfig } from 'axios';
 import storage from './storage';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -9,7 +9,9 @@ console.log('API_URL :>> ', API_URL);
 function businessUnitRequestInterceptor(config: AxiosRequestConfig) {
   const businessUnit = storage.getBusinessUnit();
   if (!config.headers) config.headers = { Accept: 'application/json' };
-  if (businessUnit) config.headers['businessunit'] = businessUnit;
+  if (businessUnit)
+    (config.headers as AxiosHeaders).set('businessunit', businessUnit);
+  // if (businessUnit) config.headers['businessunit'] = businessUnit;
 
   if (config.method === 'post' || config.method === 'patch')
     config.data.business_unit = businessUnit;
