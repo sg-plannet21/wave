@@ -126,7 +126,7 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
                 message5: mapMessageToModel(values.message5),
                 weekDay: schedules[scheduleId].week_day,
                 route: values.route,
-                isDefault: isDefaultSchedule,
+                isDefault: schedules[scheduleId].is_default,
               };
               return saveSchedule(payload);
             })

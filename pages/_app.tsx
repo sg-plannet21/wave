@@ -1,8 +1,10 @@
+import Notifications from 'components/feedback/notifications/Notifications';
 import AuthRoute from 'components/utility/AuthRoute';
 import { Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
 import { ThemeProvider } from 'next-themes';
 import type { AppProps } from 'next/app';
+import { NotificationProvider } from 'state/notifications/NotificationContext';
 import './globals.css';
 import { NextPageWithLayout } from './page';
 
@@ -20,11 +22,14 @@ function MyApp({
   return (
     <ThemeProvider enableSystem={true} attribute="class">
       <SessionProvider session={session}>
-        {Component.publicRoute ? (
-          getLayout(<Component {...pageProps} />)
-        ) : (
-          <AuthRoute>{getLayout(<Component {...pageProps} />)}</AuthRoute>
-        )}
+        <NotificationProvider>
+          <Notifications />
+          {Component.publicRoute ? (
+            getLayout(<Component {...pageProps} />)
+          ) : (
+            <AuthRoute>{getLayout(<Component {...pageProps} />)}</AuthRoute>
+          )}
+        </NotificationProvider>
       </SessionProvider>
     </ThemeProvider>
   );
