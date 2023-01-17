@@ -43,7 +43,9 @@ function PlayAudio<T extends FieldValues>({
 const MessageSelectField = <T extends FieldValues>(
   props: MessageSelectFieldProps<T>
 ) => {
-  const { data, error } = useCollectionRequest<Prompt>('prompts');
+  const { data, error } = useCollectionRequest<Prompt>('prompts', {
+    revalidateOnFocus: false,
+  });
 
   const name = props.registration.name as string;
 

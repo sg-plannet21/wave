@@ -1,8 +1,9 @@
 import ConfirmationDialog from 'components/feedback/confirmation-dialog';
 import { Trash } from 'components/icons';
 import Button from 'components/inputs/button';
-import React from 'react';
+import React, { useContext } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
+import NotificationContext from 'state/notifications/NotificationContext';
 import deleteRoute from '../api/deleteRoute';
 import { Route } from '../types';
 
@@ -17,21 +18,31 @@ const DeleteRoute: React.FC<DeleteRouteProps> = ({ id, name }) => {
     'idle'
   );
   const { mutate } = useCollectionRequest<Route>('routes');
+  const { addNotification } = useContext(NotificationContext);
 
   async function handleDelete() {
     try {
       setStatus('loading');
       mutate(
         async (routes) => {
-          if (!routes) return;
           try {
             await deleteRoute(id);
 
-            if (routes[id]) delete routes[id];
+            addNotification({
+              type: 'success',
+              title: `${
+                routes ? `${routes[id].route_name} ` : ''
+              }Route Deleted`,
+              duration: 2000,
+            });
+
+            if (routes && routes[id]) delete routes[id];
+
+            return { ...routes };
           } catch (error) {
             console.log('error', error);
+            return routes;
           }
-          return { ...routes };
         },
         { revalidate: false }
       );

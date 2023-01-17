@@ -1,5 +1,8 @@
+import { AxiosResponse } from 'axios';
 import { formatLocalToUtcTimeString } from 'lib/client/date-utilities';
+import { Dictionary } from 'lodash';
 import { ExistingScheduleDTO, NewScheduleDTO } from '../api/saveSchedule';
+import { Schedule } from '../types';
 import { BaseSchema } from './schema-helper';
 
 export function mapMessageToModel(message: string | null): number | null {
@@ -37,4 +40,16 @@ export function mapToViewModel(
   };
 
   return payload;
+}
+
+export function reduceSchedulesResponse(
+  response: AxiosResponse<Schedule, unknown>[]
+): Dictionary<Schedule> {
+  const updatedSchedules: Dictionary<Schedule> = response
+    .map(({ data }) => data)
+    .reduce((lookup, schedule): Dictionary<Schedule> => {
+      lookup[schedule['schedule_id']] = schedule;
+      return lookup;
+    }, {} as Dictionary<Schedule>);
+  return updatedSchedules;
 }

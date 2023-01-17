@@ -11,9 +11,11 @@ interface Error {
     pointer: string;
   };
   title: string;
-  detail: { business_unit: string[] };
+  detail: { [key: string]: string[] };
 }
 
 export interface WaveError {
   errors: Error[];
 }
+
+export type DeleteResponse = null;

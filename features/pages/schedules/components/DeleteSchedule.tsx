@@ -1,11 +1,12 @@
 import ConfirmationDialog from 'components/feedback/confirmation-dialog';
 import { Trash } from 'components/icons';
 import Button from 'components/inputs/button';
-import React from 'react';
+import React, { useContext } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import deleteSchedule from '../api/deleteSchedule';
 
-import { Schedule } from '../types';
+import NotificationContext from 'state/notifications/NotificationContext';
+import { Schedule, Weekdays } from '../types';
 
 type DeleteScheduleProps = {
   id: Schedule['schedule_id'];
@@ -18,21 +19,31 @@ const DeleteSchedule: React.FC<DeleteScheduleProps> = ({ id, name }) => {
     'idle'
   );
   const { mutate } = useCollectionRequest<Schedule>('schedules');
+  const { addNotification } = useContext(NotificationContext);
 
   async function handleDelete() {
     try {
       setStatus('loading');
       mutate(
         async (schedules) => {
-          if (!schedules) return;
           try {
             await deleteSchedule(id);
 
-            if (schedules[id]) delete schedules[id];
+            addNotification({
+              type: 'success',
+              title: `${
+                schedules ? `${Weekdays[schedules[id].week_day]} ` : ''
+              }Schedule Deleted`,
+              duration: 2000,
+            });
+
+            if (schedules && schedules[id]) delete schedules[id];
+
+            return { ...schedules };
           } catch (error) {
             console.log('error', error);
+            return schedules;
           }
-          return { ...schedules };
         },
         { revalidate: false }
       );
@@ -46,7 +57,7 @@ const DeleteSchedule: React.FC<DeleteScheduleProps> = ({ id, name }) => {
   return (
     <ConfirmationDialog
       title="Delete Schedule"
-      body={`Delete Schedule ${name}?`}
+      body={`Delete ${Weekdays[parseInt(name)]} Schedule?`}
       isDone={status === 'complete'}
       triggerButton={
         <button className="text-red-600 dark:text-red-400 transition-transform hover:scale-110">

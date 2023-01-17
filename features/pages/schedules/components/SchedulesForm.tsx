@@ -132,7 +132,9 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
           const schedule = { [data['schedule_id']]: data };
           addNotification({
             title: newRecord ? 'Schedule Added' : 'Schedule Updated',
-            message: 'Success',
+            message: `Successfully ${newRecord ? 'added' : 'updated'} ${
+              Weekdays[data.week_day]
+            } schedule.`,
             type: 'success',
             duration: 5000,
           });

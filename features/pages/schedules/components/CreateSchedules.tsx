@@ -8,7 +8,7 @@ import { timeFormat } from 'lib/client/date-utilities';
 import _, { Dictionary } from 'lodash';
 import moment, { Moment } from 'moment';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Control,
   Controller,
@@ -17,9 +17,13 @@ import {
   useForm,
 } from 'react-hook-form';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
+import NotificationContext from 'state/notifications/NotificationContext';
 import { z } from 'zod';
 import { NewScheduleDTO, saveSchedule } from '../api/saveSchedule';
-import { mapToViewModel } from '../helpers/form-helpers';
+import {
+  mapToViewModel,
+  reduceSchedulesResponse,
+} from '../helpers/form-helpers';
 import {
   BaseSchema,
   baseSchema,
@@ -116,6 +120,7 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
       },
       resolver: zodResolver(schema),
     });
+  const { addNotification } = useContext(NotificationContext);
 
   async function onSubmit(values: SchedulesFormValues) {
     setIsLoading(true);
@@ -151,13 +156,23 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
             return saveSchedule(payload);
           })
         )
-          .then((values) => {
-            const newSchedules: Dictionary<Schedule> = values
-              .map(({ data }) => data)
-              .reduce((lookup, schedule): Dictionary<Schedule> => {
-                lookup[schedule['schedule_id']] = schedule;
-                return lookup;
-              }, {} as Dictionary<Schedule>);
+          .then((responseCollection) => {
+            const newSchedules: Dictionary<Schedule> =
+              reduceSchedulesResponse(responseCollection);
+
+            const weekdayLabels = values.weekDays
+              .sort()
+              .map((weekdayIndex) => Weekdays[parseInt(weekdayIndex)])
+              .join(', ');
+
+            addNotification({
+              title: 'Schedules Added',
+              message: `Created ${
+                weekdayLabels.length > 1 ? 'schedules' : 'schedule'
+              } for ${weekdayLabels}`,
+              type: 'success',
+              duration: 5000,
+            });
 
             onSuccess();
             return { ...existingSchedules, ...newSchedules };

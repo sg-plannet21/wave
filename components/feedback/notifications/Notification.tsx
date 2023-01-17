@@ -60,22 +60,24 @@ const Notification: React.FC<NotificationProps> = ({
         leaveFrom="translate-x-0"
         leaveTo="translate-x-full"
       >
-        <div className="max-w-sm w-full bg-white dark:bg-slate-700 rounded-lg shadow-lg pointer-events-auto ring-1 ring-black dark:ring-gray-500 ring-opacity-5 overflow-hidden">
+        <div className="max-w-sm w-full rounded-lg shadow-lg bg-white dark:bg-slate-700 dark:text-gray-50 pointer-events-auto ring-1 ring-black dark:ring-gray-500 ring-opacity-5 overflow-hidden">
           <div className="p-4" role="alert" aria-label={title}>
             <div className="flex items-start">
               <div className="flex-shrink-0">{icons[type]}</div>
               <div className="ml-3 w-0 flex-1 pt-0.5">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                <p className="text-sm mb-0 font-medium text-gray-900 dark:text-white">
                   {title}
                 </p>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p className="mt-1 mb-0 text-sm text-gray-500 dark:text-gray-300">
                   {message}
                 </p>
               </div>
               <div className="ml-4 flex-shrink-0 flex">
                 <button
-                  onClick={() => setShow(false)}
-                  className="bg-white dark:bg-slate-600 rounded-md inline-flex text-gray-400 dark:text-gray-300 hover:text-gray-500 hover:dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="bg-white dark:bg-slate-600 rounded-md inline-flex text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-emerald-400"
+                  onClick={() => {
+                    setShow(false);
+                  }}
                 >
                   <span className="sr-only">Close</span>
                   <XMark className="h-5 w-5" aria-hidden="true" />

@@ -7,19 +7,23 @@ import { timeFormat } from 'lib/client/date-utilities';
 import { Dictionary } from 'lodash';
 import moment, { Moment } from 'moment';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Controller, FieldError, useForm } from 'react-hook-form';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
+import NotificationContext from 'state/notifications/NotificationContext';
 import { z } from 'zod';
 import { ExistingScheduleDTO, saveSchedule } from '../api/saveSchedule';
-import { mapMessageToModel } from '../helpers/form-helpers';
+import {
+  mapMessageToModel,
+  reduceSchedulesResponse,
+} from '../helpers/form-helpers';
 import {
   BaseSchema,
   baseSchema,
   messageValidation,
 } from '../helpers/schema-helper';
 import { validateScheduleRange } from '../helpers/validation-helper';
-import { MessageField, Schedule } from '../types';
+import { MessageField, Schedule, Weekdays } from '../types';
 
 type EditScheduleProps = {
   onSuccess: () => void;
@@ -53,6 +57,7 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
       },
       resolver: zodResolver(schema),
     });
+  const { addNotification } = useContext(NotificationContext);
 
   useEffect(() => {
     if (!schedules || !id?.length) return;
@@ -131,13 +136,23 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
               return saveSchedule(payload);
             })
           )
-            .then((values) => {
-              const updatedSchedules: Dictionary<Schedule> = values
-                .map(({ data }) => data)
-                .reduce((lookup, schedule): Dictionary<Schedule> => {
-                  lookup[schedule['schedule_id']] = schedule;
-                  return lookup;
-                }, {} as Dictionary<Schedule>);
+            .then((responseCollection) => {
+              const updatedSchedules: Dictionary<Schedule> =
+                reduceSchedulesResponse(responseCollection);
+
+              const weekdayLabels = Object.values(updatedSchedules)
+                .map((schedule) => schedule.week_day)
+                .map((weekDay) => Weekdays[weekDay])
+                .join(', ');
+
+              addNotification({
+                title: 'Schedules Updated',
+                message: `Created ${
+                  weekdayLabels.length > 1 ? 'schedules' : 'schedule'
+                } for ${weekdayLabels}`,
+                type: 'success',
+                duration: 5000,
+              });
 
               onSuccess();
               return { ...existingSchedules, ...updatedSchedules };

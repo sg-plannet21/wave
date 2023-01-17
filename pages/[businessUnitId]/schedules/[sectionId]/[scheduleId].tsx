@@ -1,7 +1,7 @@
 import ContentLayout from 'components/layouts/content/Content';
 import PrimaryLayout from 'components/layouts/primary/PrimaryLayout';
-import CreateSchedule from 'features/pages/schedules/components/CreateSchedule';
-import EditSchedule from 'features/pages/schedules/components/EditSchedule';
+import CreateSchedule from 'features/pages/schedules/components/CreateSchedules';
+import EditSchedule from 'features/pages/schedules/components/EditSchedules';
 import SchedulesForm from 'features/pages/schedules/components/SchedulesForm';
 import { useRouter } from 'next/router';
 import { NextPageWithLayout } from 'pages/page';

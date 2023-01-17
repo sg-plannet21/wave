@@ -1,5 +1,6 @@
 import { AxiosResponse } from 'axios';
 import { axios } from 'lib/client/axios';
+import { WaveError } from 'lib/client/types';
 import { Schedule, ScheduleDTO } from '../types';
 
 export type NewScheduleDTO = ScheduleDTO;
@@ -35,7 +36,7 @@ function mapScheduleToDTO(
 
 export function saveSchedule(
   data: NewScheduleDTO | ExistingScheduleDTO
-): Promise<AxiosResponse<Schedule>> {
+): Promise<AxiosResponse<Schedule, WaveError>> {
   const payload = mapScheduleToDTO(data);
   if (isExistingSchedule(data)) {
     return axios.patch(`/schedules/${data.scheduleId}/`, payload);
