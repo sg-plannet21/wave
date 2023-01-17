@@ -127,42 +127,42 @@ const SchedulesTable: React.FC = () => {
   }
 
   return (
-    <div className="w-full flex flex-col justify-center items-center">
-      <div className="flex w-full">
-        <div className="w-1/4 flex flex-col p-2 space-y-3">
-          <Link href={`/${businessUnitId}/schedules/${sectionId}/new`}>
-            <a className="flex justify-center items-center space-x-1 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-              <Plus />
-              <span>New Schedules</span>
-            </a>
-          </Link>
-          <Link
-            // href={`/${businessUnitId}/schedules/${sectionId}/new`}
-            href={{
-              pathname: `/${businessUnitId}/schedules/${sectionId}/edit`,
-              query: {
-                type: selectedSchedules.isDefault ? 'default' : 'custom',
-                id: selectedSchedules.schedules,
+    <div className="w-full flex flex-col md:flex-row">
+      <div className="md:w-1/4 flex justify-center md:flex-col p-2 space-x-3 md:space-y-3 md:space-x-0">
+        <Link href={`/${businessUnitId}/schedules/${sectionId}/new`}>
+          <a className="flex justify-center items-center md:w-full space-x-1 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+            <Plus />
+            <span>New Schedules</span>
+          </a>
+        </Link>
+        <Link
+          // href={`/${businessUnitId}/schedules/${sectionId}/new`}
+          href={{
+            pathname: `/${businessUnitId}/schedules/${sectionId}/edit`,
+            query: {
+              type: selectedSchedules.isDefault ? 'default' : 'custom',
+              id: selectedSchedules.schedules,
+            },
+          }}
+        >
+          <a
+            className={classNames(
+              'flex justify-center md:w-full items-center space-x-1 focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5  focus:outline-none',
+              {
+                'text-white bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 focus:ring-emerald-300 dark:focus:ring-emerald-800  dark:hover:bg-emerald-700':
+                  selectedSchedules.schedules.length,
               },
-            }}
+              {
+                'pointer-events-none bg-slate-400 text-gray-500':
+                  !selectedSchedules.schedules.length,
+              }
+            )}
           >
-            <a
-              className={classNames(
-                'flex justify-center items-center space-x-1 focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5  focus:outline-none',
-                {
-                  'text-white bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 focus:ring-emerald-300 dark:focus:ring-emerald-800  dark:hover:bg-emerald-700':
-                    selectedSchedules.schedules.length,
-                },
-                {
-                  'pointer-events-none bg-slate-400 text-gray-500':
-                    !selectedSchedules.schedules.length,
-                }
-              )}
-            >
-              <Edit />
-              <span>Edit Selected</span>
-            </a>
-          </Link>
+            <Edit />
+            <span>Edit Selected</span>
+          </a>
+        </Link>
+        <div className="hidden md:block">
           <Card
             title="Default Schedules"
             description="Fallback / Catch all schedules"
@@ -173,6 +173,8 @@ const SchedulesTable: React.FC = () => {
               onChange={handleSystemFilterToggle}
             />
           </Card>
+        </div>
+        <div className="hidden md:block">
           <Card title="Days" description="Filter by Day">
             {Array.from(Array(7).keys())
               .map((day) => day + 1)
@@ -187,14 +189,14 @@ const SchedulesTable: React.FC = () => {
               ))}
           </Card>
         </div>
-        <div className="w-full">
-          <div className="py-2 px-4 flex justify-end">
-            <div className="w-72">
-              <SectionsSelect />
-            </div>
+      </div>
+      <div className="w-full">
+        <div className="py-2 px-4 flex justify-end">
+          <div className="w-72">
+            <SectionsSelect />
           </div>
-          <Table<ScheduleTableRecord> columns={columns} data={data} />
         </div>
+        <Table<ScheduleTableRecord> columns={columns} data={data} />
       </div>
     </div>
   );

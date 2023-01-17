@@ -3,7 +3,7 @@ import MessageSelectField from 'components/form/MessageSelectField';
 import RouteSelectField from 'components/form/RouteSelectField';
 import TimeRangePicker from 'components/form/TimeRangeField';
 import Button from 'components/inputs/button';
-import { timeFormat } from 'lib/client/date-utilities';
+import { formatUtcTime, timeFormat } from 'lib/client/date-utilities';
 import { Dictionary } from 'lodash';
 import moment, { Moment } from 'moment';
 import { useRouter } from 'next/router';
@@ -122,8 +122,12 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
               const payload: ExistingScheduleDTO = {
                 scheduleId,
                 section: sectionId?.toString() as string,
-                startTime: !isDefaultSchedule ? values.timeRange[0] : null,
-                endTime: !isDefaultSchedule ? values.timeRange[1] : null,
+                startTime: !isDefaultSchedule
+                  ? formatUtcTime(values.timeRange[0])
+                  : null,
+                endTime: !isDefaultSchedule
+                  ? formatUtcTime(values.timeRange[1])
+                  : null,
                 message1: mapMessageToModel(values.message1),
                 message2: mapMessageToModel(values.message2),
                 message3: mapMessageToModel(values.message3),
@@ -147,7 +151,7 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
 
               addNotification({
                 title: 'Schedules Updated',
-                message: `Created ${
+                message: `Updated ${
                   weekdayLabels.length > 1 ? 'schedules' : 'schedule'
                 } for ${weekdayLabels}`,
                 type: 'success',

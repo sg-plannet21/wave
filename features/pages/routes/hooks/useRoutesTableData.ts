@@ -39,11 +39,11 @@ export function useRouteTableData() {
     }));
   }, [routes, destinationTypes]);
 
-  const filteredBySystem = useMemo(() => {
+  const filteredBySystem: RouteTableRecord[] = useMemo(() => {
     return showSystemRoutes ? data : data.filter((route) => !route.system);
   }, [data, showSystemRoutes]);
 
-  const filteredByDestination = useMemo(() => {
+  const filteredByDestination: RouteTableRecord[] = useMemo(() => {
     return filteredBySystem.filter(
       (route) => !destinationExceptionList.includes(route.destinationTypeLabel)
     );

@@ -18,7 +18,9 @@ function PlayAudio<T extends FieldValues>({
   control: Control<T>;
   name: string;
 }) {
-  const { data: prompts } = useCollectionRequest<Prompt>('prompts');
+  const { data: prompts } = useCollectionRequest<Prompt>('prompts', {
+    revalidateOnFocus: false,
+  });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const promptId = useWatch<any>({

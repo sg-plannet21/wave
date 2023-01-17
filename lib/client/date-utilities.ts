@@ -33,6 +33,13 @@ function isValidTimeString(time: string): boolean {
   return validTimeExp.test(time);
 }
 
+export function formatUtcTime(time: string): string {
+  if (!isValidTimeString(time))
+    throw new Error('Incorrect time format: ' + time);
+
+  return moment.utc(time, timeFormat).format(timeFormat);
+}
+
 // export function createUtcTimeRange({
 //   startTime,
 //   endTime,

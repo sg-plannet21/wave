@@ -54,13 +54,13 @@ export function useSchedulesTableData(sectionId?: string) {
       : filterBySection.filter((schedule) => !schedule.isDefault);
   }, [filterBySection, showDefaultSchedules]);
 
-  const filterByDays = useMemo(() => {
+  const filterByDays: ScheduleTableRecord[] = useMemo(() => {
     return filteredBySystem.filter(
       (schedule) => !dayExceptions.includes(schedule.weekDay)
     );
   }, [filteredBySystem, dayExceptions]);
 
-  const ordered = useMemo(() => {
+  const ordered: ScheduleTableRecord[] = useMemo(() => {
     return _.orderBy(filterByDays, ['weekDay', 'start_time'], ['asc', 'asc']);
   }, [filterByDays]);
 

@@ -5,6 +5,7 @@ import React, { useContext } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import deleteSchedule from '../api/deleteSchedule';
 
+import axios from 'axios';
 import NotificationContext from 'state/notifications/NotificationContext';
 import { Schedule, Weekdays } from '../types';
 
@@ -34,14 +35,25 @@ const DeleteSchedule: React.FC<DeleteScheduleProps> = ({ id, name }) => {
               title: `${
                 schedules ? `${Weekdays[schedules[id].week_day]} ` : ''
               }Schedule Deleted`,
-              duration: 2000,
+              duration: 3000,
             });
 
             if (schedules && schedules[id]) delete schedules[id];
 
             return { ...schedules };
           } catch (error) {
-            console.log('error', error);
+            if (error instanceof Error) {
+              console.log('error.message', error.message);
+            }
+            if (axios.isAxiosError(error)) {
+              console.log('axios error :>> ', error);
+              if (error.response?.data.errors) {
+                console.log(
+                  'error.response?.data.errors',
+                  error.response?.data.errors
+                );
+              }
+            }
             return schedules;
           }
         },

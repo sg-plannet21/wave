@@ -97,6 +97,7 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
   if (scheduleError) return <div>An error has occurred</div>;
 
   async function onSubmit(values: SchedulesFormValues) {
+    console.log('values', values);
     setIsLoading(true);
 
     if (!schedule?.is_default && schedules) {

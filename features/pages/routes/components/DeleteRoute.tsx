@@ -33,7 +33,7 @@ const DeleteRoute: React.FC<DeleteRouteProps> = ({ id, name }) => {
               title: `${
                 routes ? `${routes[id].route_name} ` : ''
               }Route Deleted`,
-              duration: 2000,
+              duration: 3000,
             });
 
             if (routes && routes[id]) delete routes[id];

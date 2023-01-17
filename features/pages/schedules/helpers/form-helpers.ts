@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { formatLocalToUtcTimeString } from 'lib/client/date-utilities';
+import { formatUtcTime } from 'lib/client/date-utilities';
 import { Dictionary } from 'lodash';
 import { ExistingScheduleDTO, NewScheduleDTO } from '../api/saveSchedule';
 import { Schedule } from '../types';
@@ -31,12 +31,8 @@ export function mapToViewModel(
     message5: mapMessageToModel(values.message5),
     route: values.route,
     isDefault: values.isDefault,
-    startTime: !values.isDefault
-      ? formatLocalToUtcTimeString(values.timeRange[0])
-      : null,
-    endTime: !values.isDefault
-      ? formatLocalToUtcTimeString(values.timeRange[1])
-      : null,
+    startTime: !values.isDefault ? formatUtcTime(values.timeRange[0]) : null,
+    endTime: !values.isDefault ? formatUtcTime(values.timeRange[1]) : null,
   };
 
   return payload;
