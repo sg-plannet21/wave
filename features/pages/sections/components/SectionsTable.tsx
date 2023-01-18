@@ -60,19 +60,17 @@ const SectionsTable: React.FC = () => {
   if (error) return <div>We have encountered an error..</div>;
 
   return (
-    <div className="w-full flex flex-col justify-center items-center">
-      <div className="flex w-full">
-        <div className="w-1/4 flex flex-col p-2 space-y-3">
-          <Link href={`/${businessUnitId}/sections/new`}>
-            <a className="flex justify-center items-center space-x-1 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-              <Plus />
-              <span>New Section</span>
-            </a>
-          </Link>
-        </div>
-        <div className="w-full">
-          <WaveTable columns={columns} data={data} />
-        </div>
+    <div className="w-full flex flex-col md:flex-row">
+      <div className="md:w-1/4 flex md:flex-col p-2 space-x-3 md:space-y-3 md:space-x-0">
+        <Link href={`/${businessUnitId}/sections/new`}>
+          <a className="flex justify-center items-center space-x-1 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+            <Plus />
+            <span>New Section</span>
+          </a>
+        </Link>
+      </div>
+      <div className="w-full">
+        <WaveTable columns={columns} data={data} />
       </div>
     </div>
   );

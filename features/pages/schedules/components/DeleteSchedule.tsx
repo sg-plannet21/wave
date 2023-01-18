@@ -19,51 +19,47 @@ const DeleteSchedule: React.FC<DeleteScheduleProps> = ({ id, name }) => {
   const [status, setStatus] = React.useState<'idle' | 'loading' | 'complete'>(
     'idle'
   );
-  const { mutate } = useCollectionRequest<Schedule>('schedules');
+  const { mutate } = useCollectionRequest<Schedule>('schedules', {
+    revalidateOnFocus: false,
+  });
   const { addNotification } = useContext(NotificationContext);
 
   async function handleDelete() {
-    try {
-      setStatus('loading');
-      mutate(
-        async (schedules) => {
-          try {
-            await deleteSchedule(id);
+    setStatus('loading');
+    mutate(
+      async (schedules) => {
+        try {
+          await deleteSchedule(id);
 
-            addNotification({
-              type: 'success',
-              title: `${
-                schedules ? `${Weekdays[schedules[id].week_day]} ` : ''
-              }Schedule Deleted`,
-              duration: 3000,
-            });
+          addNotification({
+            type: 'success',
+            title: `${
+              schedules ? `${Weekdays[schedules[id].week_day]} ` : ''
+            }Schedule Deleted`,
+            duration: 3000,
+          });
 
-            if (schedules && schedules[id]) delete schedules[id];
+          if (schedules && schedules[id]) delete schedules[id];
 
-            return { ...schedules };
-          } catch (error) {
-            if (error instanceof Error) {
-              console.log('error.message', error.message);
-            }
-            if (axios.isAxiosError(error)) {
-              console.log('axios error :>> ', error);
-              if (error.response?.data.errors) {
-                console.log(
-                  'error.response?.data.errors',
-                  error.response?.data.errors
-                );
-              }
-            }
-            return schedules;
+          return { ...schedules };
+        } catch (error) {
+          if (error instanceof Error) {
+            console.log('error.message', error.message);
           }
-        },
-        { revalidate: false }
-      );
-    } catch (error) {
-      console.log('error :>> ', error);
-    } finally {
-      setStatus('complete');
-    }
+          if (axios.isAxiosError(error)) {
+            console.log('axios error :>> ', error);
+            if (error.response?.data.errors) {
+              console.log(
+                'error.response?.data.errors',
+                error.response?.data.errors
+              );
+            }
+          }
+          return schedules;
+        }
+      },
+      { revalidate: false }
+    ).finally(() => setStatus('complete'));
   }
 
   return (

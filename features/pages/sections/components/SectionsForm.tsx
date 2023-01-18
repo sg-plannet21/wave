@@ -1,9 +1,9 @@
 import { Form } from 'components/form/Form';
 import { InputField } from 'components/form/InputField';
 import Button from 'components/inputs/button';
-import _ from 'lodash';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
+import NotificationContext from 'state/notifications/NotificationContext';
 import { z } from 'zod';
 import { createSection } from '../api/createSection';
 import { editSection } from '../api/editSection';
@@ -23,13 +23,17 @@ type SectionsFormValues = z.infer<typeof schema>;
 const SectionsForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
   const newRecord = id === 'new';
   const [isLoading, setIsLoading] = useState(false);
-  const { data: section, error: sectionError } = useSection(
-    newRecord ? undefined : id
-  );
+  const {
+    data: section,
+    error: sectionError,
+    isValidating,
+  } = useSection(newRecord ? undefined : id);
+  const { addNotification } = useContext(NotificationContext);
 
   const { mutate } = useCollectionRequest('section');
 
-  if (!newRecord && !section) return <div>Loading..</div>;
+  // if (!newRecord && !section) return <div>Loading..</div>;
+  if (isValidating) return <div>Loading..</div>;
 
   if (sectionError) return <div>An error has occurred</div>;
 
@@ -37,7 +41,6 @@ const SectionsForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
     <Form<SectionsFormValues, typeof schema>
       schema={schema}
       onSubmit={async (values) => {
-        console.log('values', values);
         setIsLoading(true);
         mutate(
           async (sections) => {
@@ -46,9 +49,18 @@ const SectionsForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
                 ? await createSection(values)
                 : await editSection({ ...values, id });
 
-              const section = _.keyBy(data, data.section_id);
+              const section = { [data['section_id']]: data };
+
+              addNotification({
+                title: `${data.section} Section ${
+                  newRecord ? 'Created' : 'Updated'
+                }`,
+                type: 'success',
+                duration: 3000,
+              });
+
               onSuccess();
-              return { ...sections, section };
+              return { ...sections, ...section };
             } catch (error) {
               console.log('error', error);
               return sections;

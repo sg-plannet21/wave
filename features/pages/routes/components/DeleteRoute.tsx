@@ -17,40 +17,34 @@ const DeleteRoute: React.FC<DeleteRouteProps> = ({ id, name }) => {
   const [status, setStatus] = React.useState<'idle' | 'loading' | 'complete'>(
     'idle'
   );
-  const { mutate } = useCollectionRequest<Route>('routes');
+  const { mutate } = useCollectionRequest<Route>('routes', {
+    revalidateOnFocus: false,
+  });
   const { addNotification } = useContext(NotificationContext);
 
   async function handleDelete() {
-    try {
-      setStatus('loading');
-      mutate(
-        async (routes) => {
-          try {
-            await deleteRoute(id);
+    setStatus('loading');
+    mutate(
+      async (routes) => {
+        try {
+          await deleteRoute(id);
 
-            addNotification({
-              type: 'success',
-              title: `${
-                routes ? `${routes[id].route_name} ` : ''
-              }Route Deleted`,
-              duration: 3000,
-            });
+          addNotification({
+            type: 'success',
+            title: `${routes ? `${routes[id].route_name} ` : ''}Route Deleted`,
+            duration: 3000,
+          });
 
-            if (routes && routes[id]) delete routes[id];
+          if (routes && routes[id]) delete routes[id];
 
-            return { ...routes };
-          } catch (error) {
-            console.log('error', error);
-            return routes;
-          }
-        },
-        { revalidate: false }
-      );
-    } catch (error) {
-      console.log('error :>> ', error);
-    } finally {
-      setStatus('complete');
-    }
+          return { ...routes };
+        } catch (error) {
+          console.log('error', error);
+          return routes;
+        }
+      },
+      { revalidate: false }
+    ).finally(() => setStatus('complete'));
   }
 
   return (

@@ -1,8 +1,9 @@
 import ConfirmationDialog from 'components/feedback/confirmation-dialog';
 import { Trash } from 'components/icons';
 import Button from 'components/inputs/button';
-import React from 'react';
+import React, { useContext } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
+import NotificationContext from 'state/notifications/NotificationContext';
 import deleteSection from '../api/deleteSection';
 import { Section } from '../types';
 
@@ -16,30 +17,36 @@ const DeleteSection: React.FC<DeleteSectionProps> = ({ id, name }) => {
   const [status, setStatus] = React.useState<'idle' | 'loading' | 'complete'>(
     'idle'
   );
-  const { mutate } = useCollectionRequest<Section>('section');
+  const { mutate } = useCollectionRequest<Section>('section', {
+    revalidateOnFocus: false,
+  });
+  const { addNotification } = useContext(NotificationContext);
 
   async function handleDelete() {
-    try {
-      setStatus('loading');
-      mutate(
-        async (sections) => {
-          if (!sections) return;
-          try {
-            await deleteSection(id);
+    setStatus('loading');
+    mutate(
+      async (sections) => {
+        try {
+          await deleteSection(id);
 
-            if (sections[id]) delete sections[id];
-          } catch (error) {
-            console.log('error', error);
-          }
+          addNotification({
+            type: 'success',
+            title: `${
+              sections ? `${sections[id].section} ` : ''
+            }Section Deleted`,
+            duration: 3000,
+          });
+
+          if (sections && sections[id]) delete sections[id];
+
           return { ...sections };
-        },
-        { revalidate: false }
-      );
-    } catch (error) {
-      console.log('error :>> ', error);
-    } finally {
-      setStatus('complete');
-    }
+        } catch (error) {
+          console.log('error', error);
+          return sections;
+        }
+      },
+      { revalidate: false }
+    ).finally(() => setStatus('complete'));
   }
 
   return (
