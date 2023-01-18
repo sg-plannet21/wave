@@ -123,8 +123,6 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
   const { addNotification } = useContext(NotificationContext);
 
   async function onSubmit(values: SchedulesFormValues) {
-    setIsLoading(true);
-
     if (schedules) {
       const outcome = validateScheduleRange({
         startTime: values.timeRange[0],
@@ -139,6 +137,8 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
         return;
       }
     }
+
+    setIsLoading(true);
 
     mutate(
       async (existingSchedules) =>
@@ -168,7 +168,7 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
             addNotification({
               title: 'Schedules Added',
               message: `Created ${
-                weekdayLabels.length > 1 ? 'schedules' : 'schedule'
+                values.weekDays.length > 1 ? 'schedules' : 'schedule'
               } for ${weekdayLabels}`,
               type: 'success',
               duration: 5000,

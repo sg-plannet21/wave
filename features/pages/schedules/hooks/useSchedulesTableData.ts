@@ -61,7 +61,7 @@ export function useSchedulesTableData(sectionId?: string) {
   }, [filteredBySystem, dayExceptions]);
 
   const ordered: ScheduleTableRecord[] = useMemo(() => {
-    return _.orderBy(filterByDays, ['weekDay', 'start_time'], ['asc', 'asc']);
+    return _.orderBy(filterByDays, ['weekDay', 'startTime'], ['asc', 'asc']);
   }, [filterByDays]);
 
   return {

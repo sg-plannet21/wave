@@ -9,6 +9,7 @@ export type TimeRangeWithLabel = TimeRange & {
   label: string;
 };
 
+export const serverTimeFormat = 'HH:mm:ss';
 export const timeFormat = 'HH:mm';
 export const dateFormat = 'DD-MM-YYYY HH:mm';
 
@@ -33,11 +34,11 @@ function isValidTimeString(time: string): boolean {
   return validTimeExp.test(time);
 }
 
-export function formatUtcTime(time: string): string {
+export function formatServerTime(time: string): string {
   if (!isValidTimeString(time))
     throw new Error('Incorrect time format: ' + time);
 
-  return moment.utc(time, timeFormat).format(timeFormat);
+  return moment.utc(time, 'HH:mm:ss').format(timeFormat);
 }
 
 // export function createUtcTimeRange({

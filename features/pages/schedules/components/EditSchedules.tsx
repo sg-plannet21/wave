@@ -3,7 +3,7 @@ import MessageSelectField from 'components/form/MessageSelectField';
 import RouteSelectField from 'components/form/RouteSelectField';
 import TimeRangePicker from 'components/form/TimeRangeField';
 import Button from 'components/inputs/button';
-import { formatUtcTime, timeFormat } from 'lib/client/date-utilities';
+import { serverTimeFormat, timeFormat } from 'lib/client/date-utilities';
 import { Dictionary } from 'lodash';
 import moment, { Moment } from 'moment';
 import { useRouter } from 'next/router';
@@ -70,10 +70,13 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
       message_4,
       message_5,
       route,
-    } = schedules[id[0]];
+    } = schedules[Array.isArray(id) ? id[0] : id];
 
     reset({
-      timeRange: [start_time ?? '0:00', end_time ?? '0:00'],
+      timeRange: [
+        moment.utc(start_time, serverTimeFormat).format(timeFormat) ?? '0:00',
+        moment.utc(end_time, serverTimeFormat).format(timeFormat) ?? '0:00',
+      ],
       message1: message_1?.toString(),
       message2: message_2?.toString(),
       message3: message_3?.toString(),
@@ -85,9 +88,8 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
 
   async function onSubmit(values: EditSchedulesFormValues) {
     // schedules are required to extract the weekday
-    if (!schedules) return;
-
-    setIsLoading(true);
+    if (!schedules || !id) return;
+    console.log('values', values);
 
     if (!isDefaultSchedule && Array.isArray(id)) {
       if (
@@ -114,61 +116,58 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
       }
     }
 
-    if (Array.isArray(id)) {
-      mutate(
-        async (existingSchedules) =>
-          Promise.all(
-            id.map((scheduleId) => {
-              const payload: ExistingScheduleDTO = {
-                scheduleId,
-                section: sectionId?.toString() as string,
-                startTime: !isDefaultSchedule
-                  ? formatUtcTime(values.timeRange[0])
-                  : null,
-                endTime: !isDefaultSchedule
-                  ? formatUtcTime(values.timeRange[1])
-                  : null,
-                message1: mapMessageToModel(values.message1),
-                message2: mapMessageToModel(values.message2),
-                message3: mapMessageToModel(values.message3),
-                message4: mapMessageToModel(values.message4),
-                message5: mapMessageToModel(values.message5),
-                weekDay: schedules[scheduleId].week_day,
-                route: values.route,
-                isDefault: schedules[scheduleId].is_default,
-              };
-              return saveSchedule(payload);
-            })
-          )
-            .then((responseCollection) => {
-              const updatedSchedules: Dictionary<Schedule> =
-                reduceSchedulesResponse(responseCollection);
+    setIsLoading(true);
 
-              const weekdayLabels = Object.values(updatedSchedules)
-                .map((schedule) => schedule.week_day)
-                .map((weekDay) => Weekdays[weekDay])
-                .join(', ');
+    const idList = Array.isArray(id) ? id : [id];
 
-              addNotification({
-                title: 'Schedules Updated',
-                message: `Updated ${
-                  weekdayLabels.length > 1 ? 'schedules' : 'schedule'
-                } for ${weekdayLabels}`,
-                type: 'success',
-                duration: 5000,
-              });
+    mutate(
+      async (existingSchedules) =>
+        Promise.all(
+          idList.map((scheduleId) => {
+            const payload: ExistingScheduleDTO = {
+              scheduleId,
+              section: sectionId?.toString() as string,
+              startTime: !isDefaultSchedule ? values.timeRange[0] : null,
+              endTime: !isDefaultSchedule ? values.timeRange[1] : null,
+              message1: mapMessageToModel(values.message1),
+              message2: mapMessageToModel(values.message2),
+              message3: mapMessageToModel(values.message3),
+              message4: mapMessageToModel(values.message4),
+              message5: mapMessageToModel(values.message5),
+              weekDay: schedules[scheduleId].week_day,
+              route: values.route,
+              isDefault: schedules[scheduleId].is_default,
+            };
+            return saveSchedule(payload);
+          })
+        )
+          .then((responseCollection) => {
+            const updatedSchedules: Dictionary<Schedule> =
+              reduceSchedulesResponse(responseCollection);
 
-              onSuccess();
-              return { ...existingSchedules, ...updatedSchedules };
-            })
-            .catch((error) => {
-              console.log('error :>> ', error);
-              return schedules;
-            })
-            .finally(() => setIsLoading(false)),
-        { revalidate: false }
-      );
-    }
+            const weekdayLabels = Object.values(updatedSchedules)
+              .map((schedule) => schedule.week_day)
+              .map((weekDay) => Weekdays[weekDay]);
+
+            addNotification({
+              title: 'Schedules Updated',
+              message: `Updated ${isDefaultSchedule && 'Default'} ${
+                weekdayLabels.length > 1 ? 'schedules' : 'schedule'
+              } for ${weekdayLabels.join(', ')}`,
+              type: 'success',
+              duration: 5000,
+            });
+
+            onSuccess();
+            return { ...existingSchedules, ...updatedSchedules };
+          })
+          .catch((error) => {
+            console.log('error :>> ', error);
+            return schedules;
+          })
+          .finally(() => setIsLoading(false)),
+      { revalidate: false }
+    );
   }
 
   if (isValidatingSchedules) return <div>Loading..</div>;

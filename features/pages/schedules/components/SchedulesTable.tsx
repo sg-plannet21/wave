@@ -79,8 +79,11 @@ const SchedulesTable: React.FC = () => {
         return (
           <Link
             href={{
-              pathname: '/[businessUnitId]/schedules/[sectionId]/[scheduleId]',
-              query: { businessUnitId, sectionId, scheduleId: entry.id },
+              pathname: `/${businessUnitId}/schedules/${sectionId}/edit`,
+              query: {
+                type: entry.isDefault ? 'default' : 'custom',
+                id: entry.id,
+              },
             }}
           >
             <a className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
@@ -149,7 +152,7 @@ const SchedulesTable: React.FC = () => {
             className={classNames(
               'flex justify-center md:w-full items-center space-x-1 focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5  focus:outline-none',
               {
-                'text-white bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 focus:ring-emerald-300 dark:focus:ring-emerald-800  dark:hover:bg-emerald-700':
+                'text-white bg-fuchsia-700 hover:bg-fuchsia-800 dark:bg-fuchsia-600 focus:ring-fuchsia-300 dark:focus:ring-fuchsia-800  dark:hover:bg-fuchsia-700':
                   selectedSchedules.schedules.length,
               },
               {

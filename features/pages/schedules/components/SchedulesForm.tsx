@@ -4,7 +4,7 @@ import RouteSelectField from 'components/form/RouteSelectField';
 import { Option, SelectField } from 'components/form/SelectField';
 import TimeRangePicker from 'components/form/TimeRangeField';
 import Button from 'components/inputs/button';
-import { timeFormat } from 'lib/client/date-utilities';
+import { serverTimeFormat, timeFormat } from 'lib/client/date-utilities';
 import moment, { Moment } from 'moment';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
@@ -80,7 +80,12 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
     if (!schedule) return;
     reset({
       weekDay: schedule?.week_day.toString(),
-      timeRange: [schedule.start_time ?? '9:00', schedule.end_time ?? '17:00'],
+      timeRange: [
+        moment.utc(schedule.start_time, serverTimeFormat).format(timeFormat) ??
+          '9:00',
+        moment.utc(schedule.end_time, serverTimeFormat).format(timeFormat) ??
+          '17:00',
+      ],
       message1: schedule?.message_1?.toString(),
       message2: schedule?.message_2?.toString(),
       message3: schedule?.message_3?.toString(),
@@ -98,7 +103,6 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
 
   async function onSubmit(values: SchedulesFormValues) {
     console.log('values', values);
-    setIsLoading(true);
 
     if (!schedule?.is_default && schedules) {
       const outcome = validateScheduleRange({
@@ -115,6 +119,8 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
         return;
       }
     }
+
+    setIsLoading(true);
 
     const payload = mapToViewModel(
       {
