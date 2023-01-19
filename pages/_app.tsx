@@ -4,6 +4,7 @@ import { Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
 import { ThemeProvider } from 'next-themes';
 import type { AppProps } from 'next/app';
+import { BusinessUnitProvider } from 'state/business-units/BusinessUnitContext';
 import { NotificationProvider } from 'state/notifications/NotificationContext';
 import './globals.css';
 import { NextPageWithLayout } from './page';
@@ -27,7 +28,9 @@ function MyApp({
           {Component.publicRoute ? (
             getLayout(<Component {...pageProps} />)
           ) : (
-            <AuthRoute>{getLayout(<Component {...pageProps} />)}</AuthRoute>
+            <BusinessUnitProvider>
+              <AuthRoute>{getLayout(<Component {...pageProps} />)}</AuthRoute>
+            </BusinessUnitProvider>
           )}
         </NotificationProvider>
       </SessionProvider>
