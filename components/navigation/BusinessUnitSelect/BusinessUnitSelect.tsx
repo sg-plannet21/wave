@@ -11,29 +11,12 @@ type BusinessUnitSelectProps = {
   businessUnits: User['business_unit_roles'];
 };
 
-// export type SelectOption = {
-//   label: React.ReactNode;
-//   value: string | number | string[];
-// };
-
 const BusinessUnitSelect: React.FC<BusinessUnitSelectProps> = ({
   businessUnits = [],
 }) => {
   const router = useRouter();
   const { activeBusinessUnit, setActiveBusinessUnit } =
     useContext(BusinessUnitContext);
-  // const [selectedBusinessUnit, setSelectedBusinessUnit] = useState<
-  //   SelectOption | undefined
-  // >(undefined);
-
-  // const getUserBusinessUnit = useCallback(
-  //   (businessUnit: string): BusinessUnitOption | undefined => {
-  //     const bu = businessUnits.find((bu) => bu.business_unit === businessUnit);
-  //     if (!bu) return undefined;
-  //     return { name: bu.business_unit_name, id: bu.business_unit };
-  //   },
-  //   [businessUnits]
-  // );
 
   const handleChange = useCallback(
     ({ label, value }: SelectOption) => {
@@ -58,28 +41,6 @@ const BusinessUnitSelect: React.FC<BusinessUnitSelectProps> = ({
     },
     [router, setActiveBusinessUnit]
   );
-
-  // useEffect(() => {
-  //   if (!selectedBusinessUnit && router.query.businessUnitId) {
-  //     console.log(
-  //       'useEffect. setBusinessUnit to:',
-  //       router.query.businessUnitId?.toString()
-  //     );
-
-  //     const businessUnit = getUserBusinessUnit(
-  //       router.query.businessUnitId.toString()
-  //     );
-
-  //     if (businessUnit) {
-  //       storage.setBusinessUnit(businessUnit.value.toString());
-  //       setSelectedBusinessUnit(businessUnit);
-  //     } else {
-  //       // router.replace('/')
-  //       // todo: invalid bu
-  //       console.log('invalid BU');
-  //     }
-  //   }
-  // }, [selectedBusinessUnit, router.query.businessUnitId, getUserBusinessUnit]);
 
   const options = useMemo(() => {
     return businessUnits.map((bu) => ({

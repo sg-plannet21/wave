@@ -22,6 +22,7 @@ import {
   baseSchema,
   messageValidation,
 } from '../helpers/schema-helper';
+import { formatWeekdaysString } from '../helpers/utilites';
 import { validateScheduleRange } from '../helpers/validation-helper';
 import { MessageField, Schedule, Weekdays } from '../types';
 
@@ -151,9 +152,9 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
 
             addNotification({
               title: 'Schedules Updated',
-              message: `Updated ${isDefaultSchedule && 'Default'} ${
+              message: `Updated ${isDefaultSchedule ? 'Default' : 'Custom'} ${
                 weekdayLabels.length > 1 ? 'schedules' : 'schedule'
-              } for ${weekdayLabels.join(', ')}`,
+              } for ${formatWeekdaysString(weekdayLabels)}.`,
               type: 'success',
               duration: 5000,
             });

@@ -1,5 +1,6 @@
 import { AxiosResponse } from 'axios';
 import { axios } from 'lib/client/axios';
+import { WaveError } from 'lib/client/types';
 import { Section } from '../types';
 
 type EditSectionDTO = {
@@ -9,7 +10,7 @@ type EditSectionDTO = {
 
 export function editSection(
   data: EditSectionDTO
-): Promise<AxiosResponse<Section>> {
+): Promise<AxiosResponse<Section, WaveError>> {
   return axios.patch(`/section/${data.id}/`, {
     section_id: data.id,
     section: data.name,

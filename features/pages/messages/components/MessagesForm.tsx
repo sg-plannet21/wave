@@ -5,66 +5,62 @@ import { useContext, useState } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import NotificationContext from 'state/notifications/NotificationContext';
 import { z } from 'zod';
-import { createSection } from '../api/createSection';
-import { editSection } from '../api/editSection';
-import { useSection } from '../hooks/useSection';
-import { Section } from '../types';
+import { editMessage } from '../api/editMessage';
+import { useSection } from '../hooks/useMessage';
+import { Prompt } from '../types';
 
-type SectionsFormProps = {
+type MessagesFormProps = {
   onSuccess: () => void;
   id: string;
 };
 
 const schema = z.object({
-  name: z.string().min(1, ' Section name is required'),
+  name: z.string().min(1, ' Message name is required').max(20),
 });
 
-type SectionsFormValues = z.infer<typeof schema>;
+type MessagesFormValues = z.infer<typeof schema>;
 
-const SectionsForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
-  const newRecord = id === 'new';
+const MessagesForm: React.FC<MessagesFormProps> = ({ id, onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const {
-    data: section,
-    error: sectionError,
-    isValidating,
-  } = useSection(newRecord ? undefined : id);
+  const { data: prompt, error: promptsError, isValidating } = useSection(id);
   const { addNotification } = useContext(NotificationContext);
 
-  const { mutate } = useCollectionRequest<Section>('section');
+  const { mutate } = useCollectionRequest<Prompt>('prompts');
 
-  // if (!newRecord && !section) return <div>Loading..</div>;
   if (isValidating) return <div>Loading..</div>;
 
-  if (sectionError) return <div>An error has occurred</div>;
+  if (promptsError) return <div>An error has occurred</div>;
 
   return (
-    <Form<SectionsFormValues, typeof schema>
+    <Form<MessagesFormValues, typeof schema>
       schema={schema}
       onSubmit={async (values) => {
-        setIsLoading(true);
-        mutate(
-          async (sections) => {
-            try {
-              const { data } = newRecord
-                ? await createSection(values)
-                : await editSection({ ...values, id });
+        if (!prompt) return;
 
-              const section = { [data['section_id']]: data };
+        setIsLoading(true);
+
+        mutate(
+          async (prompts) => {
+            try {
+              const { data } = await editMessage({
+                ...values,
+                detail: prompt.prompt_detail,
+                id: parseInt(id),
+              });
+
+              const updatedPrompt = { [data['prompt_id']]: data };
 
               addNotification({
-                title: `${data.section} Section ${
-                  newRecord ? 'Created' : 'Updated'
-                }`,
+                title: `${data.prompt_name} Message Updated`,
                 type: 'success',
                 duration: 3000,
               });
 
               onSuccess();
-              return { ...sections, ...section };
+              return { ...prompts, ...updatedPrompt };
             } catch (error) {
               console.log('error', error);
-              return sections;
+              return prompts;
             } finally {
               setIsLoading(false);
             }
@@ -74,7 +70,7 @@ const SectionsForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
       }}
       options={{
         defaultValues: {
-          name: section?.section,
+          name: prompt?.prompt_name,
         },
       }}
       className="w-full sm:max-w-md"
@@ -83,7 +79,7 @@ const SectionsForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
         <>
           <InputField
             registration={register('name')}
-            label="Section Name"
+            label="Message Name"
             error={formState.errors['name']}
           />
 
@@ -94,7 +90,7 @@ const SectionsForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
               type="submit"
               className="w-full"
             >
-              {newRecord ? 'Create Section' : 'Update Section'}
+              Update Message
             </Button>
           </div>
         </>
@@ -103,4 +99,4 @@ const SectionsForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
   );
 };
 
-export default SectionsForm;
+export default MessagesForm;

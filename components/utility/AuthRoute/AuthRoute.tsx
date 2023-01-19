@@ -12,13 +12,6 @@ type AuthRouteProps = {
   children: React.ReactNode;
 };
 
-// function getBusinessUnit(
-//   businessUnit: string,
-//   businessUnits: BusinessUnitRole[]
-// ): BusinessUnitRole | undefined {
-//   return businessUnits.find((bu) => bu.business_unit === businessUnit);
-// }
-
 const AuthRoute: React.FC<AuthRouteProps> = ({ children }) => {
   const [calledPush, setCalledPush] = useState(false);
   const { data: user, status } = useSession();
@@ -94,67 +87,6 @@ const AuthRoute: React.FC<AuthRouteProps> = ({ children }) => {
       // router.replace('/404');
     }
   }, [activeBusinessUnit, calledPush, user, router, setActiveBusinessUnit]);
-
-  // useEffect(() => {
-  //   if (
-  //     !activeBusinessUnit &&
-  //     user?.user.business_unit_roles &&
-  //     router.query.businessUnitId
-  //   ) {
-  //     console.log('useEffect - initialise BU context value');
-  //     const businessUnit = getBusinessUnit(
-  //       router.query.businessUnitId.toString(),
-  //       user.user.business_unit_roles
-  //     );
-  //     if (businessUnit) {
-  //       setActiveBusinessUnit({
-  //         id: businessUnit.business_unit,
-  //         name: businessUnit.business_unit_name,
-  //       });
-  //     }
-  //   }
-  // }, [activeBusinessUnit, user?.user, router.query, setActiveBusinessUnit]);
-
-  // useEffect(() => {
-  //   if (
-  //     !activeBusinessUnit &&
-  //     !calledPush &&
-  //     !Object.keys(router.query).length &&
-  //     user?.user
-  //   ) {
-  //     console.log('useEffect - navigate from root');
-  //     console.log('router :>> ', router);
-  //     console.log('Object.keys(router.query)', Object.keys(router.query));
-
-  //     const selectedBusinessUnit = getBusinessUnit(
-  //       storage.getBusinessUnit() ?? user.user.business_unit_roles[0],
-  //       user.user.business_unit_roles
-  //     );
-  //     if (selectedBusinessUnit) {
-  //       setActiveBusinessUnit({
-  //         id: selectedBusinessUnit.business_unit,
-  //         name: selectedBusinessUnit.business_unit_name,
-  //       });
-
-  //       const businessUnitId = selectedBusinessUnit.business_unit;
-
-  //       setCalledPush(true);
-  //       router.replace({
-  //         pathname: '/[businessUnitId]',
-  //         query: { businessUnitId },
-  //       });
-  //     } else {
-  //       setCalledPush(true);
-  //       router.replace('/404');
-  //     }
-  //   }
-  // }, [
-  //   router,
-  //   calledPush,
-  //   user?.user,
-  //   setActiveBusinessUnit,
-  //   activeBusinessUnit,
-  // ]);
 
   if (isAuthUser && activeBusinessUnit) {
     setAuthHeader(user?.accessToken);
