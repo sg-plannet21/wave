@@ -164,7 +164,7 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
           })
           .catch((error) => {
             console.log('error :>> ', error);
-            return schedules;
+            return existingSchedules;
           })
           .finally(() => setIsLoading(false)),
       { revalidate: false }

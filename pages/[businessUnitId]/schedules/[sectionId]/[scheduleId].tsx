@@ -34,14 +34,6 @@ const ScheduleDetails: NextPageWithLayout = () => {
   return (
     <ContentLayout title="Schedule Details">
       <section className="flex flex-col items-center gap-y-5 mt-12">
-        {/* {scheduleId === 'new' ? (
-          <CreateSchedule onSuccess={handleSuccess} />
-        ) : (
-          <SchedulesForm
-            onSuccess={handleSuccess}
-            id={scheduleId?.toString() as string}
-          />
-        )} */}
         {renderComponent()}
       </section>
     </ContentLayout>

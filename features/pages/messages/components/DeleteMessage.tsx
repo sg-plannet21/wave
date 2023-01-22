@@ -33,7 +33,7 @@ const DeleteMessage: React.FC<DeleteMessageProps> = ({ id, name }) => {
             type: 'success',
             title: `${
               prompts ? `${prompts[id].prompt_name} ` : ''
-            }Prompt Deleted`,
+            }Message Deleted`,
             duration: 3000,
           });
 

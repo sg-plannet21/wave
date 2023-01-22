@@ -179,7 +179,7 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
           })
           .catch((error) => {
             console.log('error :>> ', error);
-            return schedules;
+            return existingSchedules;
           })
           .finally(() => setIsLoading(false)),
       { revalidate: false }

@@ -10,7 +10,7 @@ import {
   MessagessTableRecord,
   useMessagesTableData,
 } from '../hooks/useMessagesTableData';
-import DeleteSection from './DeleteMessage';
+import DeleteMessage from './DeleteMessage';
 
 const MessagesTable: React.FC = () => {
   const {
@@ -48,6 +48,7 @@ const MessagesTable: React.FC = () => {
         return (
           <AudioPlayerDialog
             trackList={{ src: entry.audioFile, name: entry.name }}
+            iconClassName="h-7 w-7"
           />
         );
       },
@@ -62,7 +63,7 @@ const MessagesTable: React.FC = () => {
       Cell({ entry }) {
         return (
           <div className="text-right">
-            <DeleteSection id={entry.id} name={entry.name} />
+            <DeleteMessage id={entry.id} name={entry.name} />
           </div>
         );
       },

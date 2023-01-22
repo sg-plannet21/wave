@@ -20,7 +20,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onDrop }) => {
         title: `${fileRejection.file.name} Rejected`,
         message: `${fileRejection.errors
           .map((error) => error.message)
-          .join(', ')}`,
+          .join('. ')}`,
         duration: 10000,
         type: 'warning',
       });
@@ -93,7 +93,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onDrop }) => {
               { 'text-gray-500 dark:text-gray-400': !isDragActive }
             )}
           >
-            WAV, MP3, ACC or MIDI (MAX. {maxFileSize / 1000} KB)
+            WAV, MP3, ACC or M4A (MAX. {maxFileSize / 1000} KB)
           </p>
         </div>
         <input

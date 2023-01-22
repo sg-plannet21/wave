@@ -14,9 +14,13 @@ type Track = {
 
 export type AudioPlayerDialogProps = {
   trackList: Track | Track[];
+  iconClassName?: string;
 };
 
-const AudioPlayerDialog: React.FC<AudioPlayerDialogProps> = ({ trackList }) => {
+const AudioPlayerDialog: React.FC<AudioPlayerDialogProps> = ({
+  trackList,
+  iconClassName = 'h-10 w-10',
+}) => {
   const { isOpen, open, close } = useDisclosure();
   const [trackNumber, setTrackNumber] = useState(0);
   const multipleTracks = Array.isArray(trackList);
@@ -54,7 +58,7 @@ const AudioPlayerDialog: React.FC<AudioPlayerDialogProps> = ({ trackList }) => {
           }
         )}
       >
-        <Play className="w-10 h-10" />
+        <Play className={classNames(iconClassName)} />
       </button>
       <Dialog isOpen={isOpen} onClose={close} initialFocus={cancelButtonRef}>
         <div className="w-full">

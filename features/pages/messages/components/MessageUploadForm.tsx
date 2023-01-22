@@ -1,7 +1,24 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { InputField } from 'components/form/InputField';
+import { Trash } from 'components/icons';
+import Button from 'components/inputs/button';
+import { Dictionary } from 'lodash';
+import { useSession } from 'next-auth/react';
+import { useContext, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import BusinessUnitContext from 'state/business-units/BusinessUnitContext';
+import useCollectionRequest from 'state/hooks/useCollectionRequest';
+import NotificationContext from 'state/notifications/NotificationContext';
 import { z } from 'zod';
+import { UploadMessageDTO, uploadMessage } from '../api/uploadMessage';
+import { Prompt } from '../types';
 import FileUpload from './FileUpload';
+
+type UploadMessageProps = {
+  onSuccess: () => void;
+};
+
+const fallbackRegionId = 52;
 
 const schema = z.object({
   files: z
@@ -13,20 +30,30 @@ const schema = z.object({
     .min(1, 'At least one prompt is required.'),
 });
 
-type Prompt = {
+type PromptDetail = {
   file: File;
   name: string;
 };
 
 type FormValues = {
-  files: Prompt[];
+  files: PromptDetail[];
 };
 
 function removeExtension(value: string) {
   return value.replace(/\.[^/.]+$/, '');
 }
 
-const MessageUploadForm: React.FC = () => {
+const MessageUploadForm: React.FC<UploadMessageProps> = ({ onSuccess }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const { data } = useSession();
+  const { activeBusinessUnit } = useContext(BusinessUnitContext);
+  const currentRegionId =
+    data?.user.business_unit_roles.find(
+      (bu) => bu.business_unit === activeBusinessUnit?.id
+    )?.default_region ?? fallbackRegionId;
+  const { mutate } = useCollectionRequest<Prompt>('prompts', {
+    revalidateOnFocus: false,
+  });
   const {
     handleSubmit,
     control,
@@ -42,11 +69,11 @@ const MessageUploadForm: React.FC = () => {
     control,
     name: 'files',
   });
+  const { addNotification } = useContext(NotificationContext);
 
   function handleDrop(acceptedFiles: File[]) {
     // Do something with the files
-    console.log(acceptedFiles);
-    const mappedFiles: Prompt[] = acceptedFiles.map((file) => ({
+    const mappedFiles: PromptDetail[] = acceptedFiles.map((file) => ({
       file,
       name: removeExtension(file.name),
     }));
@@ -54,52 +81,98 @@ const MessageUploadForm: React.FC = () => {
     replace(mappedFiles);
   }
 
-  function onSubmit(values: FormValues) {
-    console.log('submit');
-    console.log(values);
+  async function onSubmit(values: FormValues) {
+    setIsLoading(true);
+
+    const businessUnit = activeBusinessUnit?.id as string;
+
+    mutate(
+      async (existingMessages) =>
+        Promise.all(
+          values.files.map((fileData) => {
+            const payload: UploadMessageDTO = {
+              file: fileData.file,
+              name: fileData.name,
+              region: currentRegionId,
+              businessUnit,
+            };
+
+            return uploadMessage(payload).then(({ data }) => {
+              addNotification({
+                type: 'success',
+                title: `${data.prompt_name} Successfully Uploaded`,
+                duration: 3000,
+              });
+              return data;
+            });
+          })
+        )
+          .then((data) => {
+            const reduced: Dictionary<Prompt> = data.reduce(
+              (lookup, prompt) => {
+                lookup[prompt['prompt_id']] = prompt;
+                return lookup;
+              },
+              {} as Dictionary<Prompt>
+            );
+
+            onSuccess();
+            return { ...existingMessages, ...reduced };
+          })
+          .catch((error) => {
+            console.log('error', error);
+            addNotification({
+              type: 'error',
+              title: 'Something went wrong',
+              duration: 3000,
+            });
+            return existingMessages;
+          })
+          .finally(() => setIsLoading(false)),
+      { revalidate: false }
+    );
   }
 
   return (
     <div className="w-full max-w-lg mx-auto">
-      <h4 className="text-3xl text-emerald-500 font-bold">File Upload</h4>
-
       <form onSubmit={handleSubmit(onSubmit)} className="my-4 space-y-3">
         <FileUpload onDrop={handleDrop} />
+
         {fields.map((field, index) => {
           return (
             <section key={field.id}>
               <div className="my-1 flex items-end space-x-2">
-                <label className="w-full">
-                  <span>Message {index + 1} Name</span>
-                  <input
-                    type="text"
-                    className="px-3 py-1 bg-zinc-800 text-gray-50 w-full flex-1"
-                    {...register(`files.${index}.name`)}
+                <div className="flex-1">
+                  <InputField
+                    registration={register(`files.${index}.name`)}
+                    label={`Message ${index + 1} Name`}
+                    error={errors.files?.[index]?.name}
+                    className="flex-1"
                   />
-                </label>
+                </div>
                 <button
-                  type="button"
-                  className="px-2 py-1 bg-red-800 text-gray-50"
-                  onClick={() => {
-                    remove(index);
-                  }}
+                  onClick={() => remove(index)}
+                  className="mb-2 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
                 >
-                  Remove
+                  <Trash className="h-7 w-7" />
                 </button>
-              </div>
-              <div className="text-red-500">
-                {errors.files?.[index]?.name?.message}
               </div>
             </section>
           );
         })}
         <div className="text-red-500">{errors.files?.message}</div>
-        <button
-          type="submit"
-          className="w-full p-2 bg-indigo-500 text-purple-800 rounded"
-        >
-          Submit
-        </button>
+        {fields.length > 0 && (
+          <div>
+            <Button
+              disabled={isLoading}
+              isLoading={isLoading}
+              type="submit"
+              className="w-full"
+            >
+              {fields.length > 1 ? 'Upload Messages' : 'Upload Message'}
+            </Button>
+          </div>
+        )}
       </form>
     </div>
   );
