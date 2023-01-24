@@ -6,7 +6,7 @@ import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import NotificationContext from 'state/notifications/NotificationContext';
 import { z } from 'zod';
 import { editMessage } from '../api/editMessage';
-import { useSection } from '../hooks/useMessage';
+import { useMessage } from '../hooks/useMessage';
 import { Prompt } from '../types';
 
 type MessagesFormProps = {
@@ -22,7 +22,7 @@ type MessagesFormValues = z.infer<typeof schema>;
 
 const MessagesForm: React.FC<MessagesFormProps> = ({ id, onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { data: prompt, error: promptsError, isValidating } = useSection(id);
+  const { data: prompt, error: promptsError, isValidating } = useMessage(id);
   const { addNotification } = useContext(NotificationContext);
 
   const { mutate } = useCollectionRequest<Prompt>('prompts');

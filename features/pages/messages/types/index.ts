@@ -1,3 +1,5 @@
+import { Version } from 'lib/client/types';
+
 interface PromptDetail {
   region: string;
   version: number;
@@ -8,7 +10,7 @@ export interface Prompt {
   url: string;
   prompt_id: number;
   versions: number[];
-  dependencies?: number[];
+  dependencies?: Version[];
   audio_file: string;
   prompt_name: string;
   prompt_detail: PromptDetail;

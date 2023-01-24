@@ -4,6 +4,8 @@
 //   end_time: null;
 // };
 
+import { Version } from 'lib/client/types';
+
 // type CustomSchedule = {
 //   is_default: false;
 //   start_time: string;
@@ -13,7 +15,7 @@
 export type Schedule = {
   url: string;
   schedule_id: string;
-  versions: number[];
+  versions: Version[];
   week_day: number;
   is_default: boolean;
   start_time: string | null;

@@ -72,12 +72,10 @@ const MessageUploadForm: React.FC<UploadMessageProps> = ({ onSuccess }) => {
   const { addNotification } = useContext(NotificationContext);
 
   function handleDrop(acceptedFiles: File[]) {
-    // Do something with the files
     const mappedFiles: PromptDetail[] = acceptedFiles.map((file) => ({
       file,
       name: removeExtension(file.name),
     }));
-    // setFiles(mappedFiles);
     replace(mappedFiles);
   }
 
