@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import Table, { TableColumn } from 'components/data-display/table';
 import Select, { SelectOption } from 'components/inputs/select';
 import { Version } from 'lib/client/types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   CommonVersionFields,
   DeserialiseEntityReturn,
@@ -31,6 +31,13 @@ const VersionsTable = <Entity extends { versions: Version[] }>({
 
   console.log('selectedVersion', selectedVersion);
 
+  useEffect(() => {
+    setSelectedVersion({
+      label: `Version ${previousVersions.length}`,
+      value: 0,
+    });
+  }, [previousVersions.length]);
+
   if (!previousVersions.length) return <div>No Previous versions</div>;
 
   const columns: TableColumn<{
@@ -52,7 +59,21 @@ const VersionsTable = <Entity extends { versions: Version[] }>({
       field: 'key',
       label: 'Current Version',
       Cell({ entry }) {
-        return <span>{currentVersion[entry.key]}</span>;
+        const currentValue = currentVersion[entry.key];
+        const versionValue =
+          previousVersions[parseInt(selectedVersion.value as string)][
+            entry.key
+          ];
+        return (
+          <span
+            className={classNames({
+              'text-green-500 dark:text-green-400 font-medium':
+                currentValue !== versionValue,
+            })}
+          >
+            {currentVersion[entry.key]}
+          </span>
+        );
       },
     },
     {
@@ -79,6 +100,8 @@ const VersionsTable = <Entity extends { versions: Version[] }>({
       },
     },
   ];
+
+  console.log('previouVersions.length', previousVersions.length);
 
   return (
     <div className="w-full max-w-4xl mx-auto">

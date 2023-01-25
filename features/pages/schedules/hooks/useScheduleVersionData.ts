@@ -4,10 +4,10 @@ import {
   FormattedToVersionTable,
 } from 'features/entity-versions/types';
 import { deserialiseEntity } from 'features/entity-versions/utilities/deserialiseEntity';
+import { getVersionObjectValue } from 'features/entity-versions/utilities/formatObjectReference';
 import { Prompt } from 'features/pages/messages/types';
 import { Route } from 'features/pages/routes/types';
 import { timeFormat } from 'lib/client/date-utilities';
-import _ from 'lodash';
 import moment from 'moment';
 import { useMemo } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
@@ -49,6 +49,7 @@ import { useSchedule } from './useSchedule';
 //       : '',
 //   };
 // }
+
 export default function useScheduleVersionData(scheduleId: string) {
   const { data: schedule, error: scheduleError } = useSchedule(
     `${scheduleId}?versions=true`
@@ -83,22 +84,25 @@ export default function useScheduleVersionData(scheduleId: string) {
           end_time: schedule.end_time
             ? moment.utc(schedule.end_time, timeFormat).format(timeFormat)
             : '',
-          ...(schedule.message_1 && {
-            message_1: _.get(messages[schedule['message_1']], 'prompt_name'),
-          }),
-          ...(schedule.message_2 && {
-            message_2: _.get(messages[schedule['message_2']], 'prompt_name'),
-          }),
-          ...(schedule.message_3 && {
-            message_3: _.get(messages[schedule['message_3']], 'prompt_name'),
-          }),
-          ...(schedule.message_4 && {
-            message_4: _.get(messages[schedule['message_4']], 'prompt_name'),
-          }),
-          ...(schedule.message_5 && {
-            message_5: _.get(messages[schedule['message_5']], 'prompt_name'),
-          }),
-          route: _.get(routes[schedule.route], 'route_name'),
+          ...[
+            'message_1',
+            'message_2',
+            'message_3',
+            'message_4',
+            'message_5',
+          ].reduce((lookup, message) => {
+            lookup[
+              message as keyof Partial<DeserialiseEntityReturn<Schedule>>
+            ] = getVersionObjectValue(
+              messages,
+              schedule[message as keyof Omit<Schedule, 'versions'>] as
+                | string
+                | null,
+              'prompt_name'
+            );
+            return lookup;
+          }, {} as Partial<DeserialiseEntityReturn<Schedule>>),
+          route: getVersionObjectValue(routes, schedule.route, 'route_name'),
         };
       });
     }, [deserialisedSchedule, routes, messages]);
