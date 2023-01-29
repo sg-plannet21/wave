@@ -19,10 +19,6 @@ const WaveTable = <Entry extends { [P in keyof Entry]: Entry[P] }>({
   const [searchTerm, setSearchTerm] = useState('');
   const [sortCol, setSortCol] = useState<SortColumn<Entry>>(sortColumn);
 
-  // useEffect(() => {
-  //   if (searchTerm.trim().length) setCurrentPage(1);
-  // }, [searchTerm]);
-
   useEffect(() => {
     setCurrentPage(1);
   }, [data.length]);
@@ -58,7 +54,7 @@ const WaveTable = <Entry extends { [P in keyof Entry]: Entry[P] }>({
 
   return (
     <>
-      <div className="py-2 px-4 flex justify-end">
+      <div className="py-2 px-4 flex justify-end sm:px-6 lg:px-8">
         <div className="w-72">
           <Search
             value={searchTerm}
@@ -72,7 +68,7 @@ const WaveTable = <Entry extends { [P in keyof Entry]: Entry[P] }>({
         onSort={setSortCol}
         sortColumn={sortCol}
       />
-      <div className="px-6">
+      <div className="sm:px-6 lg:px-8">
         <Pagination
           currentPage={currentPage}
           onPageChange={setCurrentPage}

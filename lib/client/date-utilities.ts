@@ -1,4 +1,7 @@
 import moment, { Moment } from 'moment';
+import getConfig from 'next/config';
+
+const { timeFormat, dateFormat } = getConfig();
 
 export type TimeRange = {
   startTime: Moment;
@@ -8,24 +11,6 @@ export type TimeRange = {
 export type TimeRangeWithLabel = TimeRange & {
   label: string;
 };
-
-export const serverTimeFormat = 'HH:mm:ss';
-export const timeFormat = 'HH:mm';
-export const dateFormat = 'DD-MM-YYYY HH:mm';
-
-// export function formatDay(dayIndex: number): string {
-//   if (dayIndex < 1 || dayIndex > 7)
-//     throw new Error(`Day index out of range: ${dayIndex}`);
-//   return [
-//     'Monday',
-//     'Tuesday',
-//     'Wednesday',
-//     'Thursday',
-//     'Friday',
-//     'Saturday',
-//     'Sunday',
-//   ][dayIndex];
-// }
 
 function isValidTimeString(time: string): boolean {
   const validTimeExp = new RegExp(
@@ -41,18 +26,6 @@ export function formatServerTime(time: string): string {
   return moment.utc(time, 'HH:mm:ss').format(timeFormat);
 }
 
-// export function createUtcTimeRange({
-//   startTime,
-//   endTime,
-// }: TimeRange): Moment[] {
-//   const times = [startTime, endTime];
-//   times.forEach((time) => {
-//     if (!isValidTimeString(time))
-//       throw new Error(`Invalid time format: ${time}.`);
-//   });
-//   return times.map((time) => moment.utc(time, timeFormat));
-// }
-
 export function createMomentUtc(time: string): Moment {
   return moment.utc(time, timeFormat);
 }
@@ -62,10 +35,7 @@ export function formatUtcToLocalTimeString(time: string): string {
     throw new Error('Incorrect time format: ' + time);
 
   const utcTime = moment.utc(time, timeFormat);
-  return formatLocalTime(utcTime);
-  // const localTime = moment(utcTime).local();
-
-  // return localTime.format(timeFormat);
+  return utcTime.local().format(timeFormat);
 }
 
 export function formatLocalToUtcTimeString(time: string): string {

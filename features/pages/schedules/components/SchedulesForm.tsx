@@ -4,8 +4,8 @@ import RouteSelectField from 'components/form/RouteSelectField';
 import { Option, SelectField } from 'components/form/SelectField';
 import TimeRangePicker from 'components/form/TimeRangeField';
 import Button from 'components/inputs/button';
-import { serverTimeFormat, timeFormat } from 'lib/client/date-utilities';
 import moment, { Moment } from 'moment';
+import getConfig from 'next/config';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 import { Controller, FieldError, useForm } from 'react-hook-form';
@@ -22,6 +22,8 @@ import {
 import { validateScheduleRange } from '../helpers/validation-helper';
 import { useSchedule } from '../hooks/useSchedule';
 import { MessageField, Schedule, Weekdays } from '../types';
+
+const { serverTimeFormat, timeFormat } = getConfig();
 
 // https://stackoverflow.com/questions/67059069/set-default-value-in-datepicker-antd-with-react-hook-form-v7
 

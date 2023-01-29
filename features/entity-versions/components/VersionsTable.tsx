@@ -29,8 +29,6 @@ const VersionsTable = <Entity extends { versions: Version[] }>({
     value: 0,
   });
 
-  console.log('selectedVersion', selectedVersion);
-
   useEffect(() => {
     setSelectedVersion({
       label: `Version ${previousVersions.length}`,
@@ -67,7 +65,7 @@ const VersionsTable = <Entity extends { versions: Version[] }>({
         return (
           <span
             className={classNames({
-              'text-green-500 dark:text-green-400 font-medium':
+              'text-green-500 dark:text-green-400':
                 currentValue !== versionValue,
             })}
           >
@@ -90,8 +88,7 @@ const VersionsTable = <Entity extends { versions: Version[] }>({
         return (
           <span
             className={classNames({
-              'text-red-500 dark:text-red-400 font-medium':
-                currentValue !== versionValue,
+              'text-red-500 dark:text-red-400': currentValue !== versionValue,
             })}
           >
             {versionValue}
@@ -101,11 +98,8 @@ const VersionsTable = <Entity extends { versions: Version[] }>({
     },
   ];
 
-  console.log('previouVersions.length', previousVersions.length);
-
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <h4 className="text-3xl text-emerald-500 font-bold">File Upload</h4>
       <div className="flex justify-end p-1">
         <Select
           className="w-64"

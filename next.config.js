@@ -5,6 +5,14 @@ const nextConfig = {
   images: {
     domains: ['i.pravatar.cc'],
   },
+  publicRuntimeConfig: {
+    // Will be available on both server and client
+    yourKey: 'your-value',
+    changeDateFormat: 'MMM Do YYYY, h:mm:ss a',
+    dateFormat: 'DD-MM-YYYY HH:mm',
+    timeFormat: 'HH:mm',
+    serverTimeFormat: 'HH:mm:ss',
+  },
 };
 
 module.exports = nextConfig;

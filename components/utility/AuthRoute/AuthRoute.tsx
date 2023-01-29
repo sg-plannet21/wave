@@ -29,16 +29,16 @@ const AuthRoute: React.FC<AuthRouteProps> = ({ children }) => {
     if (activeBusinessUnit || calledPush || !router.isReady || !user?.user)
       return;
 
-    console.log('useEffect - AuthRoute');
-    console.log('activeBusinessUnit :>> ', activeBusinessUnit);
-    console.log('calledPush :>> ', calledPush);
-    console.log('router.isReady :>> ', router.isReady);
-    console.log('user :>> ', user);
+    // console.log('useEffect - AuthRoute');
+    // console.log('activeBusinessUnit :>> ', activeBusinessUnit);
+    // console.log('calledPush :>> ', calledPush);
+    // console.log('router.isReady :>> ', router.isReady);
+    // console.log('user :>> ', user);
 
     // user has no business units
     if (!user.user.business_unit_roles.length) {
-      console.log('no business units assigned to user :>> ');
-      router.push('/login?reason=noBUs');
+      // console.log('no business units assigned to user :>> ');
+      // router.push('/login?reason=noBUs');
       return;
     }
 
@@ -51,8 +51,8 @@ const AuthRoute: React.FC<AuthRouteProps> = ({ children }) => {
 
     // reroute requests from the base dir to BU home
     if (router.pathname === '/') {
-      console.log('pathname', router.pathname);
-      console.log('redirecting from /');
+      // console.log('pathname', router.pathname);
+      // console.log('redirecting from /');
       const selectedBusinessUnit =
         getBusinessUnit(storage.getBusinessUnit()) ??
         user.user.business_unit_roles[0];
@@ -72,8 +72,8 @@ const AuthRoute: React.FC<AuthRouteProps> = ({ children }) => {
     }
     // initialise the active business unit
     else if (router.query.businessUnitId) {
-      console.log('pathname', router.pathname);
-      console.log('initialise the active business unit');
+      // console.log('pathname', router.pathname);
+      // console.log('initialise the active business unit');
       const businessUnit = getBusinessUnit(
         router.query.businessUnitId.toString()
       );

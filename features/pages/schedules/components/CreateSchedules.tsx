@@ -4,9 +4,9 @@ import MessageSelectField from 'components/form/MessageSelectField';
 import RouteSelectField from 'components/form/RouteSelectField';
 import TimeRangePicker from 'components/form/TimeRangeField';
 import Button from 'components/inputs/button';
-import { timeFormat } from 'lib/client/date-utilities';
 import _, { Dictionary } from 'lodash';
 import moment, { Moment } from 'moment';
+import getConfig from 'next/config';
 import { useRouter } from 'next/router';
 import React, { useContext, useState } from 'react';
 import {
@@ -32,6 +32,8 @@ import {
 import { formatWeekdaysString } from '../helpers/utilites';
 import { validateScheduleRange } from '../helpers/validation-helper';
 import { MessageField, Schedule, Weekdays } from '../types';
+
+const { timeFormat } = getConfig();
 
 type CheckboxesProps = {
   options: string[];

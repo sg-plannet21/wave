@@ -65,58 +65,62 @@ const Table = <Entry extends { [P in keyof Entry]: Entry[P] }>({
   }
 
   return (
-    <div className="flex flex-col w-full">
-      <div className="rounded-lg inline-block min-w-full align-middle overflow-x-auto py-2 sm:px-4 lg:px-6">
-        <table className="min-w-full divide-y-2 divide-indigo-500 dark:divide-orange-400 text-gray-500 dark:text-gray-400">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-              {columns.map((column, index) => {
-                const isFilterable = !!onSort && !column.ignoreFiltering;
-                return (
-                  <th
-                    key={column.label + index}
-                    scope="col"
-                    {...(isFilterable && {
-                      onClick: () => raiseSort(column.field),
-                    })}
-                    className={classNames(
-                      'px-6 py-3 font-medium tracking-wider text-left',
-                      {
-                        'cursor-pointer': isFilterable,
-                      }
-                    )}
+    <div role="status" className="flex flex-col">
+      <div className="my-2 overflow-x-auto">
+        <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div className="overflow-hidden border-b border-gray-200 dark:border-slate-500 shadow sm:rounded-lg">
+            <table className="min-w-full divide-y-2 divide-indigo-500 dark:divide-orange-400 text-gray-500 dark:text-gray-400">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                  {columns.map((column, index) => {
+                    const isFilterable = !!onSort && !column.ignoreFiltering;
+                    return (
+                      <th
+                        key={column.label + index}
+                        scope="col"
+                        {...(isFilterable && {
+                          onClick: () => raiseSort(column.field),
+                        })}
+                        className={classNames(
+                          'px-6 py-3 font-medium tracking-wider text-left',
+                          {
+                            'cursor-pointer': isFilterable,
+                          }
+                        )}
+                      >
+                        <div className="flex items-center space-x-1">
+                          {column.label}
+                          {isFilterable && renderSortIcon(column.field)}
+                        </div>
+                      </th>
+                    );
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((record, entryIndex) => (
+                  <tr
+                    key={entryIndex}
+                    className="odd:bg-white odd:dark:bg-slate-800 even:bg-gray-200 even:dark:bg-gray-700"
                   >
-                    <div className="flex items-center space-x-1">
-                      {column.label}
-                      {isFilterable && renderSortIcon(column.field)}
-                    </div>
-                  </th>
-                );
-              })}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((record, entryIndex) => (
-              <tr
-                key={entryIndex}
-                className="odd:bg-white odd:dark:bg-slate-800 even:bg-gray-200 even:dark:bg-gray-700"
-              >
-                {columns.map(({ field, label, Cell }, index) => (
-                  <td
-                    key={label + entryIndex + index}
-                    className="px-6 py-4 text-sm font-medium whitespace-nowrap"
-                  >
-                    {Cell ? (
-                      <Cell entry={record} />
-                    ) : (
-                      (record[field] as string | number)
-                    )}
-                  </td>
+                    {columns.map(({ field, label, Cell }, index) => (
+                      <td
+                        key={label + entryIndex + index}
+                        className="px-6 py-4 text-sm font-medium whitespace-nowrap"
+                      >
+                        {Cell ? (
+                          <Cell entry={record} />
+                        ) : (
+                          (record[field] as string | number)
+                        )}
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );
