@@ -1,13 +1,16 @@
 import { DatePicker } from 'antd';
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
-import { createUtcDateRange, dateFormat } from 'lib/client/date-utilities';
+import { createUtcDateRange } from 'lib/client/date-utilities';
 import moment from 'moment';
+import getConfig from 'next/config';
 import {
   FieldValues,
   UseControllerProps,
   useController,
 } from 'react-hook-form';
 import { FieldWrapper, FieldWrapperPassThroughProps } from './FieldWrapper';
+
+const { dateFormat } = getConfig();
 
 type DateRangePickerProps<T extends FieldValues> =
   FieldWrapperPassThroughProps & UseControllerProps<T> & { name: string };

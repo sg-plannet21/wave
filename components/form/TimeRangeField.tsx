@@ -3,8 +3,10 @@ import {
   TimePicker,
 } from 'antd';
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
-import { timeFormat } from 'lib/client/date-utilities';
+import getConfig from 'next/config';
 import { FieldWrapper, FieldWrapperPassThroughProps } from './FieldWrapper';
+
+const { timeFormat } = getConfig();
 
 type TimeRangePickerProps = AntDTimeRangePickerProps &
   FieldWrapperPassThroughProps;

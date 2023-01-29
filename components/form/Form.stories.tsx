@@ -1,13 +1,15 @@
 import { Meta, Story } from '@storybook/react';
 import Button from 'components/inputs/button';
-import { timeFormat } from 'lib/client/date-utilities';
 import moment, { Moment } from 'moment';
+import getConfig from 'next/config';
 import { Controller, FieldError } from 'react-hook-form';
 import { Form } from './Form';
 import { FormDrawer } from './FormDrawer';
 import { InputField } from './InputField';
 import { SelectField } from './SelectField';
 import TimeRangePicker from './TimeRangeField';
+
+const { timeFormat } = getConfig();
 
 type FormValues = {
   title: string;
