@@ -28,7 +28,7 @@ const BusinessUnitSelect: React.FC<BusinessUnitSelectProps> = ({
 
       // filter the businessUnitId dynamic route and path up to proceeding '/'
       // const regex = /\/\[businessUnitId\]\/.*\//;
-      const regex = /\/\[businessUnitId\]\/\w*/;
+      const regex = /\/\[businessUnitId\]\/[a-zA-Z-]*/;
       const resultsArray = regex.exec(router.pathname);
       const pathname = resultsArray?.length
         ? resultsArray[0]

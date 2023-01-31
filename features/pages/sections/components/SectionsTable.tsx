@@ -59,6 +59,7 @@ const SectionsTable: React.FC = () => {
 
   if (isLoading)
     return <WaveTablePage filters={[]} numberOfColumns={columns.length} />;
+
   if (error) return <div>We have encountered an error..</div>;
 
   return (

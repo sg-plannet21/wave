@@ -13,7 +13,10 @@ function businessUnitRequestInterceptor(config: AxiosRequestConfig) {
     (config.headers as AxiosHeaders).set('businessunit', businessUnit);
   // if (businessUnit) config.headers['businessunit'] = businessUnit;
 
-  if (config.method === 'post' || config.method === 'patch')
+  if (
+    (config.method === 'post' || config.method === 'patch') &&
+    !config.data.business_unit
+  )
     config.data.business_unit = businessUnit;
 
   return config;

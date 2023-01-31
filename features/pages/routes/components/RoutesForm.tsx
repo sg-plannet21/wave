@@ -7,36 +7,62 @@ import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { z } from 'zod';
 import { saveRoute } from '../api/saveRoute';
 import { useRoute } from '../hooks/useRoute';
+import { Route, RouteDestinationType } from '../types';
 
 type RoutesFormProps = {
   onSuccess: () => void;
   id: string;
 };
 
-const schema = z.object({
-  name: z.string().min(1, ' Route name is required'),
-  destination: z.string().min(1, ' Destination is required'),
-  destinationType: z.string().min(1, ' Destination is required'),
-});
+type RouteFormValues = {
+  name: string;
+  destination: string;
+  destinationType: string;
+};
 
-type RouteFormValues = z.infer<typeof schema>;
-
-// type RouteFormValues = {
-//   name: string;
-//   destination: string;
-//   destinationType: string;
-// };
+const searchPattern = new RegExp('external', 'i');
 
 const RoutesForm: React.FC<RoutesFormProps> = ({ id, onSuccess }) => {
   const newRecord = id === 'new';
   const [isLoading, setIsLoading] = useState(false);
+
   const {
     data: route,
     error: routeError,
     isValidating,
   } = useRoute(newRecord ? undefined : id);
 
-  const { mutate } = useCollectionRequest('routes');
+  const { data: destinationTypes } = useCollectionRequest<RouteDestinationType>(
+    'routeDestinationTypes',
+    { revalidateOnFocus: false }
+  );
+
+  const externalDestinationTypeId =
+    destinationTypes &&
+    Object.values(destinationTypes).find((destType) =>
+      searchPattern.test(destType.destination_type)
+    )?.destination_type_id;
+
+  const { mutate } = useCollectionRequest<Route>('routes', {
+    revalidateOnFocus: false,
+  });
+
+  const schema = z
+    .object({
+      name: z.string().min(1, ' Route name is required').trim(),
+      destination: z.string().min(1, ' Destination is required').trim(),
+      destinationType: z.string().min(1, ' Destination is required').trim(),
+    })
+    .refine(
+      (val) =>
+        val.destinationType === externalDestinationTypeId
+          ? /^\d+$/.test(val.destination)
+          : true,
+      {
+        message: 'A number is required when the Destination Type is External',
+        path: ['destination'],
+      }
+    );
 
   if (isValidating) return <div>Loading..</div>;
 

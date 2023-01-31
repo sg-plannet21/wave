@@ -126,8 +126,9 @@ const SideNavigation: React.FC = () => {
   const { businessUnitId } = router.query;
   const { data } = useSession();
   const businessUnits = data?.user.business_unit_roles ?? [];
-  // TODO: check access & filter admin routes
-  const sideNavigation = [
+
+  const isSuperUser = data?.user.is_wave_superuser;
+  const superAdminNavigationItems = [
     {
       name: 'Unassigned Entities',
       href: `/${businessUnitId}/unassigned-entities`,
@@ -148,6 +149,10 @@ const SideNavigation: React.FC = () => {
       href: `/${businessUnitId}/users`,
       icon: Users,
     },
+  ];
+
+  const sideNavigation = [
+    ...(isSuperUser ? superAdminNavigationItems : []),
     {
       name: 'Entry Points',
       href: `/${businessUnitId}/entry-points`,
