@@ -6,7 +6,9 @@ import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 import getConfig from 'next/config';
 import { FieldWrapper, FieldWrapperPassThroughProps } from './FieldWrapper';
 
-const { timeFormat } = getConfig();
+const {
+  publicRuntimeConfig: { timeFormat },
+} = getConfig();
 
 type TimeRangePickerProps = AntDTimeRangePickerProps &
   FieldWrapperPassThroughProps;

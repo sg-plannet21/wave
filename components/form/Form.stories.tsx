@@ -9,7 +9,9 @@ import { InputField } from './InputField';
 import { SelectField } from './SelectField';
 import TimeRangePicker from './TimeRangeField';
 
-const { timeFormat } = getConfig();
+const {
+  publicRuntimeConfig: { timeFormat },
+} = getConfig();
 
 type FormValues = {
   title: string;

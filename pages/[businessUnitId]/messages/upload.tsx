@@ -13,7 +13,7 @@ const SectionsHome: NextPageWithLayout = () => {
   }
 
   return (
-    <ContentLayout title="Message Details">
+    <ContentLayout title="Upload Messages">
       <section className="flex flex-col items-center gap-y-5 mt-12">
         <MessageUploadForm onSuccess={handleSuccess} />
       </section>

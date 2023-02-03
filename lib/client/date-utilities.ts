@@ -1,7 +1,9 @@
 import moment, { Moment } from 'moment';
 import getConfig from 'next/config';
 
-const { timeFormat, dateFormat } = getConfig();
+const {
+  publicRuntimeConfig: { timeFormat, dateFormat },
+} = getConfig();
 
 export type TimeRange = {
   startTime: Moment;

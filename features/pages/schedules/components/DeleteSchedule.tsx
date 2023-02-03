@@ -69,7 +69,7 @@ const DeleteSchedule: React.FC<DeleteScheduleProps> = ({ id, name }) => {
       isDone={status === 'complete'}
       triggerButton={
         <button className="text-red-600 dark:text-red-400 transition-transform hover:scale-110">
-          <Trash className="h-4 w-4" />
+          <Trash className="h-5 w-5" />
         </button>
       }
       confirmButton={

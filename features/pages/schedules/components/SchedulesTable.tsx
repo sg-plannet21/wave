@@ -17,6 +17,7 @@ import {
 } from '../hooks/useSchedulesTableData';
 import { SelectedSchedules, Weekdays } from '../types';
 import DeleteSchedule from './DeleteSchedule';
+import ScheduleVersions from './ScheduleVersions';
 
 const SchedulesTable: React.FC = () => {
   const [selectedSchedules, setSelectedSchedules] = useState<SelectedSchedules>(
@@ -99,6 +100,14 @@ const SchedulesTable: React.FC = () => {
     {
       field: 'route',
       label: 'Route',
+    },
+    {
+      field: 'id',
+      label: '',
+      ignoreFiltering: true,
+      Cell({ entry }) {
+        return <ScheduleVersions scheduleId={entry.id} />;
+      },
     },
   ];
 

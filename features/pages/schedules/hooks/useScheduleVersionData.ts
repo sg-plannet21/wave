@@ -13,7 +13,10 @@ import { useMemo } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { Schedule, Weekdays } from '../types';
 import { useSchedule } from './useSchedule';
-const { changeDateFormat, timeFormat } = getConfig();
+
+const {
+  publicRuntimeConfig: { timeFormat, changeDateFormat },
+} = getConfig();
 
 export default function useScheduleVersionData(scheduleId: string) {
   const { data: schedule, error: scheduleError } = useSchedule(
@@ -92,7 +95,13 @@ export default function useScheduleVersionData(scheduleId: string) {
 
   return {
     error: scheduleError || routesError || messagesError,
-    isLoading: !schedule && !routes && !messages,
+    isLoading:
+      !schedule &&
+      !routes &&
+      !messages &&
+      !scheduleError &&
+      !routesError &&
+      !messagesError,
     data: formattedSchedules,
     mappings,
   };

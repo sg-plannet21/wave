@@ -23,8 +23,9 @@ import { validateScheduleRange } from '../helpers/validation-helper';
 import { useSchedule } from '../hooks/useSchedule';
 import { MessageField, Schedule, Weekdays } from '../types';
 
-const { serverTimeFormat, timeFormat } = getConfig();
-
+const {
+  publicRuntimeConfig: { timeFormat, serverTimeFormat },
+} = getConfig();
 // https://stackoverflow.com/questions/67059069/set-default-value-in-datepicker-antd-with-react-hook-form-v7
 
 type SchedulesFormProps = {

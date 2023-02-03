@@ -20,6 +20,7 @@ export { default as Exclamation } from './Exclamation';
 export { default as ExclamationCircle } from './ExclamationCircle';
 export { default as Github } from './Github';
 export { default as Heart } from './Heart';
+export { default as History } from './History';
 export { default as Info } from './Info';
 export { default as InformationCircle } from './InformationCircle';
 export { default as Logout } from './Logout';

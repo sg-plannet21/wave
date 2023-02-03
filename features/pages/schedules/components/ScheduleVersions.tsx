@@ -1,3 +1,4 @@
+import VersionsDrawer from 'features/entity-versions/components/VersionsDrawer';
 import VersionsTable from 'features/entity-versions/components/VersionsTable';
 import useScheduleVersionData from '../hooks/useScheduleVersionData';
 
@@ -13,13 +14,13 @@ const ScheduleVersions: React.FC<ScheduleVersionsProps> = ({ scheduleId }) => {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div>
+    <VersionsDrawer title="Schedule Versions">
       <VersionsTable
         mappings={mappings}
         currentVersion={data[0]}
         previousVersions={data.slice(1)}
       />
-    </div>
+    </VersionsDrawer>
   );
 };
 

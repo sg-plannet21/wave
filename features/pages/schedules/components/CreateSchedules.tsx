@@ -33,7 +33,9 @@ import { formatWeekdaysString } from '../helpers/utilites';
 import { validateScheduleRange } from '../helpers/validation-helper';
 import { MessageField, Schedule, Weekdays } from '../types';
 
-const { timeFormat } = getConfig();
+const {
+  publicRuntimeConfig: { timeFormat },
+} = getConfig();
 
 type CheckboxesProps = {
   options: string[];

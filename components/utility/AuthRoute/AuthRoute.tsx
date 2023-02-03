@@ -78,6 +78,7 @@ const AuthRoute: React.FC<AuthRouteProps> = ({ children }) => {
         router.query.businessUnitId.toString()
       );
       if (businessUnit) {
+        storage.setBusinessUnit(businessUnit.business_unit);
         setActiveBusinessUnit({
           id: businessUnit.business_unit,
           name: businessUnit.business_unit_name,
