@@ -21,6 +21,7 @@ export type SelectFieldProps = FieldWrapperPassThroughProps &
     defaultValue?: string;
     placeholder?: string;
     registration: Partial<UseFormRegisterReturn>;
+    disabled?: boolean;
   };
 
 function renderOption({ label, value }: Option) {
@@ -41,12 +42,14 @@ export const SelectField = (props: SelectFieldProps) => {
     defaultValue,
     registration,
     placeholder,
+    disabled = false,
   } = props;
   return (
     <FieldWrapper label={label} error={error}>
       <select
         placeholder={placeholder}
         name="location"
+        disabled={disabled}
         className={cn(
           'mt-1 block w-full pl-3 pr-10 py-2 text-base rounded-md border text-gray-900 focus:outline-none sm:text-sm dark:text-white dark:bg-gray-700',
           {

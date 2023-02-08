@@ -16,6 +16,8 @@ import {
   useController,
   useForm,
 } from 'react-hook-form';
+import { EntityRoles } from 'state/auth/types';
+import { useIsAuthorised } from 'state/hooks/useAuthorisation';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import NotificationContext from 'state/notifications/NotificationContext';
 import { z } from 'zod';
@@ -41,9 +43,15 @@ type CheckboxesProps = {
   options: string[];
   control: Control<SchedulesFormValues>;
   name: 'weekDays';
+  disabled?: boolean;
 };
 
-const Checkboxes: React.FC<CheckboxesProps> = ({ options, control, name }) => {
+const Checkboxes: React.FC<CheckboxesProps> = ({
+  options,
+  control,
+  name,
+  disabled = false,
+}) => {
   const { field } = useController({
     control,
     name,
@@ -65,6 +73,7 @@ const Checkboxes: React.FC<CheckboxesProps> = ({ options, control, name }) => {
                 // update local state
                 setValue(valueCopy);
               }}
+              disabled={disabled}
               key={option}
               type="checkbox"
               checked={value.includes(option)}
@@ -126,6 +135,11 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
       resolver: zodResolver(schema),
     });
   const { addNotification } = useContext(NotificationContext);
+  const { isSuperUser, hasWriteAccess } = useIsAuthorised([
+    EntityRoles.Schedules,
+  ]);
+
+  const hasWritePermissions = isSuperUser || hasWriteAccess;
 
   async function onSubmit(values: SchedulesFormValues) {
     if (schedules) {
@@ -205,6 +219,7 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
           options={['1', '2', '3', '4', '5', '6', '7']}
           control={control}
           name="weekDays"
+          disabled={!hasWritePermissions}
         />
       </FieldWrapper>
 
@@ -213,6 +228,7 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
         name="timeRange"
         render={(props) => (
           <TimeRangePicker
+            disabled={!hasWritePermissions}
             error={formState.errors['timeRange'] as FieldError | undefined}
             label="Time Range"
             value={
@@ -229,6 +245,7 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
 
       {Array.from(Array(5).keys()).map((ele) => (
         <MessageSelectField
+          disabled={!hasWritePermissions}
           control={control}
           key={ele}
           registration={register(`message${ele + 1}` as MessageField)}
@@ -237,13 +254,14 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ onSuccess }) => {
         />
       ))}
       <RouteSelectField
+        disabled={!hasWritePermissions}
         registration={register('route')}
         error={formState.errors['route']}
         label="Route"
       />
       <div>
         <Button
-          disabled={!formState.isDirty || isLoading}
+          disabled={!formState.isDirty || isLoading || !hasWritePermissions}
           isLoading={isLoading}
           type="submit"
           className="w-full"

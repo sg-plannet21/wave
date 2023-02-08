@@ -9,6 +9,8 @@ import getConfig from 'next/config';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 import { Controller, FieldError, useForm } from 'react-hook-form';
+import { EntityRoles } from 'state/auth/types';
+import { useIsAuthorised } from 'state/hooks/useAuthorisation';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import NotificationContext from 'state/notifications/NotificationContext';
 import { z } from 'zod';
@@ -78,6 +80,12 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
       resolver: zodResolver(schema),
     });
   const { addNotification } = useContext(NotificationContext);
+
+  const { isSuperUser, hasWriteAccess } = useIsAuthorised([
+    EntityRoles.Schedules,
+  ]);
+
+  const hasWritePermissions = isSuperUser || hasWriteAccess;
 
   useEffect(() => {
     if (!schedule) return;
@@ -171,6 +179,7 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
         registration={register('weekDay')}
         error={formState.errors['weekDay']}
         options={weekDayOptions}
+        disabled={!hasWritePermissions}
       />
 
       {!schedule?.is_default && (
@@ -179,6 +188,7 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
           name="timeRange"
           render={(props) => (
             <TimeRangePicker
+              disabled={!hasWritePermissions}
               error={formState.errors['timeRange'] as FieldError | undefined}
               label="Time Range"
               value={
@@ -201,6 +211,7 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
           registration={register(`message${ele + 1}` as MessageField)}
           error={formState.errors[`message${ele + 1}` as MessageField]}
           label={`Message ${ele + 1}`}
+          disabled={!hasWritePermissions}
         />
       ))}
 
@@ -208,10 +219,11 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
         registration={register('route')}
         error={formState.errors['route']}
         label="Route"
+        disabled={!hasWritePermissions}
       />
       <div>
         <Button
-          disabled={!formState.isDirty || isLoading}
+          disabled={!formState.isDirty || isLoading || !hasWritePermissions}
           isLoading={isLoading}
           type="submit"
           className="w-full"

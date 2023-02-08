@@ -7,14 +7,14 @@ type ScheduleVersionsProps = {
 };
 
 const ScheduleVersions: React.FC<ScheduleVersionsProps> = ({ scheduleId }) => {
-  const { data, mappings, error, isLoading } =
+  const { data, mappings, error, isLoading, label } =
     useScheduleVersionData(scheduleId);
 
   if (error) return <div>We encountered an error...</div>;
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <VersionsDrawer title="Schedule Versions">
+    <VersionsDrawer title={label}>
       <VersionsTable
         mappings={mappings}
         currentVersion={data[0]}

@@ -4,9 +4,11 @@ import { Trash } from 'components/icons';
 import Button from 'components/inputs/button';
 import { Dictionary } from 'lodash';
 import { useSession } from 'next-auth/react';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { EntityRoles } from 'state/auth/types';
 import BusinessUnitContext from 'state/business-units/BusinessUnitContext';
+import { useIsAuthorised } from 'state/hooks/useAuthorisation';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import NotificationContext from 'state/notifications/NotificationContext';
 import { z } from 'zod';
@@ -70,6 +72,23 @@ const MessageUploadForm: React.FC<UploadMessageProps> = ({ onSuccess }) => {
     name: 'files',
   });
   const { addNotification } = useContext(NotificationContext);
+
+  const { isSuperUser, hasWriteAccess } = useIsAuthorised([
+    EntityRoles.Prompts,
+  ]);
+
+  const hasWritePermissions = isSuperUser || hasWriteAccess;
+
+  useEffect(() => {
+    if (!hasWritePermissions) {
+      addNotification({
+        title: 'Unauthorised',
+        message: 'Insufficeient privileges to upload messages',
+        type: 'error',
+      });
+      onSuccess();
+    }
+  }, [hasWritePermissions, onSuccess, addNotification]);
 
   function handleDrop(acceptedFiles: File[]) {
     const mappedFiles: PromptDetail[] = acceptedFiles.map((file) => ({
@@ -162,7 +181,7 @@ const MessageUploadForm: React.FC<UploadMessageProps> = ({ onSuccess }) => {
         {fields.length > 0 && (
           <div>
             <Button
-              disabled={isLoading}
+              disabled={isLoading || !hasWritePermissions}
               isLoading={isLoading}
               type="submit"
               className="w-full"

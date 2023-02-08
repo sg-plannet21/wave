@@ -6,6 +6,7 @@ type InputFieldProps = FieldWrapperPassThroughProps & {
   type?: 'text' | 'email' | 'password' | 'number';
   className?: string;
   registration: Partial<UseFormRegisterReturn>;
+  disabled?: boolean;
   // registration: UseFormReturn["register"];
   // registration: (name: string, options?: RegisterOptions) => UseFormRegisterReturn;
 };
@@ -16,11 +17,13 @@ export const InputField: React.FC<InputFieldProps> = ({
   className,
   registration,
   type = 'text',
+  disabled = false,
 }) => {
   return (
     <FieldWrapper label={label} error={error}>
       <input
         type={type}
+        disabled={disabled}
         className={classNames(
           'appearance-none block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none sm:text-sm dark:shadow-sm-light text-gray-900 dark:bg-gray-700',
           {

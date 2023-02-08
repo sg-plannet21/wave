@@ -2,6 +2,8 @@ import { Form } from 'components/form/Form';
 import { InputField } from 'components/form/InputField';
 import Button from 'components/inputs/button';
 import { useContext, useState } from 'react';
+import { EntityRoles } from 'state/auth/types';
+import { useIsAuthorised } from 'state/hooks/useAuthorisation';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import NotificationContext from 'state/notifications/NotificationContext';
 import { z } from 'zod';
@@ -32,6 +34,11 @@ const SectionsForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
   const { addNotification } = useContext(NotificationContext);
 
   const { mutate } = useCollectionRequest<Section>('section');
+  const { isSuperUser, hasWriteAccess } = useIsAuthorised([
+    EntityRoles.Schedules,
+  ]);
+
+  const hasWritePermissions = isSuperUser || hasWriteAccess;
 
   // if (!newRecord && !section) return <div>Loading..</div>;
   if (isValidating) return <div>Loading..</div>;
@@ -85,11 +92,12 @@ const SectionsForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
             registration={register('name')}
             label="Section Name"
             error={formState.errors['name']}
+            disabled={!hasWritePermissions}
           />
 
           <div>
             <Button
-              disabled={!formState.isDirty || isLoading}
+              disabled={!formState.isDirty || isLoading || !hasWritePermissions}
               isLoading={isLoading}
               type="submit"
               className="w-full"

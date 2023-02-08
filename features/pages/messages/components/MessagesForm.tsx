@@ -2,6 +2,8 @@ import { Form } from 'components/form/Form';
 import { InputField } from 'components/form/InputField';
 import Button from 'components/inputs/button';
 import { useContext, useState } from 'react';
+import { EntityRoles } from 'state/auth/types';
+import { useIsAuthorised } from 'state/hooks/useAuthorisation';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import NotificationContext from 'state/notifications/NotificationContext';
 import { z } from 'zod';
@@ -26,6 +28,12 @@ const MessagesForm: React.FC<MessagesFormProps> = ({ id, onSuccess }) => {
   const { addNotification } = useContext(NotificationContext);
 
   const { mutate } = useCollectionRequest<Prompt>('prompts');
+
+  const { isSuperUser, hasWriteAccess } = useIsAuthorised([
+    EntityRoles.Prompts,
+  ]);
+
+  const hasWritePermissions = isSuperUser || hasWriteAccess;
 
   if (isValidating) return <div>Loading..</div>;
 
@@ -81,11 +89,12 @@ const MessagesForm: React.FC<MessagesFormProps> = ({ id, onSuccess }) => {
             registration={register('name')}
             label="Message Name"
             error={formState.errors['name']}
+            disabled={!hasWritePermissions}
           />
 
           <div>
             <Button
-              disabled={!formState.isDirty || isLoading}
+              disabled={!formState.isDirty || isLoading || !hasWritePermissions}
               isLoading={isLoading}
               type="submit"
               className="w-full"

@@ -104,5 +104,8 @@ export default function useScheduleVersionData(scheduleId: string) {
       !messagesError,
     data: formattedSchedules,
     mappings,
+    label: `${
+      formattedSchedules.length && `${formattedSchedules[0].week_day} `
+    }Schedule Versions`,
   };
 }

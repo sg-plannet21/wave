@@ -9,6 +9,8 @@ import getConfig from 'next/config';
 import { useRouter } from 'next/router';
 import React, { useContext, useEffect, useState } from 'react';
 import { Controller, FieldError, useForm } from 'react-hook-form';
+import { EntityRoles } from 'state/auth/types';
+import { useIsAuthorised } from 'state/hooks/useAuthorisation';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import NotificationContext from 'state/notifications/NotificationContext';
 import { z } from 'zod';
@@ -63,6 +65,12 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
       resolver: zodResolver(schema),
     });
   const { addNotification } = useContext(NotificationContext);
+
+  const { isSuperUser, hasWriteAccess } = useIsAuthorised([
+    EntityRoles.Schedules,
+  ]);
+
+  const hasWritePermissions = isSuperUser || hasWriteAccess;
 
   useEffect(() => {
     if (!schedules || !id?.length) return;
@@ -188,6 +196,7 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
           name="timeRange"
           render={(props) => (
             <TimeRangePicker
+              disabled={!hasWritePermissions}
               error={formState.errors['timeRange'] as FieldError | undefined}
               label="Time Range"
               value={
@@ -205,6 +214,7 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
 
       {Array.from(Array(5).keys()).map((ele) => (
         <MessageSelectField
+          disabled={!hasWritePermissions}
           control={control}
           key={ele}
           registration={register(`message${ele + 1}` as MessageField)}
@@ -213,13 +223,14 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
         />
       ))}
       <RouteSelectField
+        disabled={!hasWritePermissions}
         registration={register('route')}
         error={formState.errors['route']}
         label="Route"
       />
       <div>
         <Button
-          disabled={!formState.isDirty || isLoading}
+          disabled={!formState.isDirty || isLoading || !hasWritePermissions}
           isLoading={isLoading}
           type="submit"
           className="w-full"

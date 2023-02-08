@@ -9,8 +9,13 @@
 }
 
 /* Date Picker Styles Start */
-.dark .ant-picker {
+.dark .ant-picker,
+.dark .ant-picker.ant-picker-disabled {
   background-color: rgb(51 65 85);
+}
+
+.dark .ant-picker-input > input[disabled] {
+  color: white;
 }
 
 .dark .ant-picker input,
