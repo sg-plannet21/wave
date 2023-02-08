@@ -9,7 +9,7 @@ export type SectionsTableRecord = {
 
 export function useSectionsTableData() {
   const { data: sections, error: sectionsError } =
-    useCollectionRequest<Section>('section');
+    useCollectionRequest<Section>('sections');
 
   const data: SectionsTableRecord[] = useMemo(() => {
     if (!sections) return [];

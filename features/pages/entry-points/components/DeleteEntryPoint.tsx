@@ -4,20 +4,20 @@ import Button from 'components/inputs/button';
 import React, { useContext } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import NotificationContext from 'state/notifications/NotificationContext';
-import deleteSection from '../api/deleteSection';
-import { Section } from '../types';
+import deleteEntryPoint from '../api/deleteEntryPoint';
+import { EntryPoint } from '../types';
 
-type DeleteSectionProps = {
-  id: Section['section_id'];
+type DeleteEntryPointProps = {
+  id: EntryPoint['entry_point_id'];
   name: string;
 };
 
 // idle - loading - complete
-const DeleteSection: React.FC<DeleteSectionProps> = ({ id, name }) => {
+const DeleteEntryPoint: React.FC<DeleteEntryPointProps> = ({ id, name }) => {
   const [status, setStatus] = React.useState<'idle' | 'loading' | 'complete'>(
     'idle'
   );
-  const { mutate } = useCollectionRequest<Section>('sections', {
+  const { mutate } = useCollectionRequest<EntryPoint>('entrypoints', {
     revalidateOnFocus: false,
   });
   const { addNotification } = useContext(NotificationContext);
@@ -25,24 +25,24 @@ const DeleteSection: React.FC<DeleteSectionProps> = ({ id, name }) => {
   async function handleDelete() {
     setStatus('loading');
     mutate(
-      async (sections) => {
+      async (entryPoints) => {
         try {
-          await deleteSection(id);
+          await deleteEntryPoint(id);
 
           addNotification({
             type: 'success',
             title: `${
-              sections ? `${sections[id].section} ` : ''
-            }Section Deleted`,
+              entryPoints ? `${entryPoints[id].entry_point} ` : ''
+            }Route Deleted`,
             duration: 3000,
           });
 
-          if (sections && sections[id]) delete sections[id];
+          if (entryPoints && entryPoints[id]) delete entryPoints[id];
 
-          return { ...sections };
+          return { ...entryPoints };
         } catch (error) {
           console.log('error', error);
-          return sections;
+          return entryPoints;
         }
       },
       { revalidate: false }
@@ -51,11 +51,11 @@ const DeleteSection: React.FC<DeleteSectionProps> = ({ id, name }) => {
 
   return (
     <ConfirmationDialog
-      title="Delete Section"
-      body={`Delete ${name}?`}
+      title="Delete Route"
+      body={`Delete route ${name}?`}
       isDone={status === 'complete'}
       triggerButton={
-        <button className="p-1 text-red-600 dark:text-red-400 transition-transform hover:scale-110 outline-none focus:outline-none">
+        <button className="text-red-600 dark:text-red-400 transition-transform hover:scale-110">
           <Trash className="h-4 w-4" />
         </button>
       }
@@ -63,7 +63,7 @@ const DeleteSection: React.FC<DeleteSectionProps> = ({ id, name }) => {
         <Button
           type="button"
           isLoading={status === 'loading'}
-          variant="danger"
+          className="bg-red-600"
           onClick={handleDelete}
         >
           Delete
@@ -73,4 +73,4 @@ const DeleteSection: React.FC<DeleteSectionProps> = ({ id, name }) => {
   );
 };
 
-export default DeleteSection;
+export default DeleteEntryPoint;

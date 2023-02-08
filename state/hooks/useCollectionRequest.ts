@@ -27,7 +27,7 @@ const entities: EntityMap = {
   menus: { id: 'menu_id', path: '/menus/', orderBy: 'menu_name' },
   queues: { id: 'queue_id', path: '/queues/', orderBy: 'queue_name' },
   prompts: { id: 'prompt_id', path: '/prompts/', orderBy: 'prompt_name' },
-  section: { id: 'section_id', path: '/section/', orderBy: 'section' },
+  sections: { id: 'section_id', path: '/section/', orderBy: 'section' },
   schedules: {
     id: 'schedule_id',
     path: '/schedules/',

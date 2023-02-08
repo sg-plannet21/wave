@@ -60,7 +60,7 @@ export function useRouteTableData() {
 
   return {
     isLoading:
-      !routes && !destinationTypes && !routesError && !destinationTypesError,
+      (!routes || !destinationTypes) && !routesError && !destinationTypesError,
     error: routesError || destinationTypesError,
     data: filteredByDestination,
     filters: {

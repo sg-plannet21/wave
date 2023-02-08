@@ -65,7 +65,7 @@ export function useSchedulesTableData(sectionId?: string) {
   }, [filterByDays]);
 
   return {
-    isLoading: !schedules && !routes && !schedulesError && !routesError,
+    isLoading: (!schedules || !routes) && !routesError && !schedulesError,
     error: schedulesError || routesError,
     data: ordered,
     filters: {
