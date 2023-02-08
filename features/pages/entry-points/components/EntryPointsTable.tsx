@@ -7,6 +7,7 @@ import Card from 'components/surfaces/card';
 import _ from 'lodash';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { EntityRoles } from 'state/auth/types';
 import { useIsAuthorised } from 'state/hooks/useAuthorisation';
 import {
   EntryPointTableRecord,
@@ -19,7 +20,9 @@ const EntryPointsTable: React.FC = () => {
     query: { businessUnitId },
   } = useRouter();
   const { data, filters, isLoading, error } = useEntryPointsTableData();
-  const { isSuperUser } = useIsAuthorised();
+  const { isSuperUser, hasWriteAccess } = useIsAuthorised([
+    EntityRoles.EntryPoints,
+  ]);
 
   const columns: TableColumn<EntryPointTableRecord>[] = [
     {
@@ -44,7 +47,7 @@ const EntryPointsTable: React.FC = () => {
     { field: 'region', label: 'Region' },
   ];
 
-  if (isSuperUser) {
+  if (isSuperUser || hasWriteAccess) {
     columns.push({
       field: 'id',
       label: '',

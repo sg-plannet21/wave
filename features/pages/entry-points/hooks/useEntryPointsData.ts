@@ -68,7 +68,7 @@ export function useEntryPointsTableData() {
       !entryPointsError &&
       !sectionsError &&
       !regionsError,
-    error: entryPointsError,
+    error: entryPointsError || sectionsError || regionsError,
     data: filteredData,
     filters: {
       sectionList,

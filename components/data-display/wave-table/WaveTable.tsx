@@ -56,10 +56,12 @@ const WaveTable = <Entry extends { [P in keyof Entry]: Entry[P] }>({
     <>
       <div className="py-2 px-4 flex justify-end sm:px-6 lg:px-8">
         <div className="w-72">
-          <Search
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+          {pagedData.length > 0 && (
+            <Search
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          )}
         </div>
       </div>
       <Table<Entry>

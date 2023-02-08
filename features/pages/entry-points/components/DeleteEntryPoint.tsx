@@ -33,7 +33,7 @@ const DeleteEntryPoint: React.FC<DeleteEntryPointProps> = ({ id, name }) => {
             type: 'success',
             title: `${
               entryPoints ? `${entryPoints[id].entry_point} ` : ''
-            }Route Deleted`,
+            }Entry Point Deleted`,
             duration: 3000,
           });
 
@@ -51,8 +51,8 @@ const DeleteEntryPoint: React.FC<DeleteEntryPointProps> = ({ id, name }) => {
 
   return (
     <ConfirmationDialog
-      title="Delete Route"
-      body={`Delete route ${name}?`}
+      title="Delete Entry Point"
+      body={`Delete ${name}?`}
       isDone={status === 'complete'}
       triggerButton={
         <button className="text-red-600 dark:text-red-400 transition-transform hover:scale-110">
