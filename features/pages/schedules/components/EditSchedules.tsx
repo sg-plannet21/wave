@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import MessageSelectField from 'components/form/MessageSelectField';
-import RouteSelectField from 'components/form/RouteSelectField';
+import RouteSelectInfoField from 'components/form/RouteSelectInfoField';
 import TimeRangePicker from 'components/form/TimeRangeField';
 import Button from 'components/inputs/button';
 import { Dictionary } from 'lodash';
@@ -222,12 +222,15 @@ const EditSchedule: React.FC<EditScheduleProps> = ({ onSuccess }) => {
           label={`Message ${ele + 1}`}
         />
       ))}
-      <RouteSelectField
+
+      <RouteSelectInfoField
+        control={control}
         disabled={!hasWritePermissions}
         registration={register('route')}
         error={formState.errors['route']}
         label="Route"
       />
+
       <div>
         <Button
           disabled={!formState.isDirty || isLoading || !hasWritePermissions}

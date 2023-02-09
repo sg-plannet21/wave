@@ -20,7 +20,7 @@ const SectionsSelect: React.FC<SectionsSelectProps> = () => {
   const [selectedSection, setSelectedSection] = useState<
     SelectOption | undefined
   >(undefined);
-  const { data: sections } = useCollectionRequest<Section>('section');
+  const { data: sections } = useCollectionRequest<Section>('sections');
 
   const handleChange = useCallback(
     (section: SelectOption) => {

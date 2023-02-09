@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import MessageSelectField from 'components/form/MessageSelectField';
-import RouteSelectField from 'components/form/RouteSelectField';
+import RouteSelectInfoField from 'components/form/RouteSelectInfoField';
 import { Option, SelectField } from 'components/form/SelectField';
 import TimeRangePicker from 'components/form/TimeRangeField';
 import Button from 'components/inputs/button';
@@ -215,12 +215,14 @@ const SchedulesForm: React.FC<SchedulesFormProps> = ({ id, onSuccess }) => {
         />
       ))}
 
-      <RouteSelectField
+      <RouteSelectInfoField
+        control={control}
+        disabled={!hasWritePermissions}
         registration={register('route')}
         error={formState.errors['route']}
         label="Route"
-        disabled={!hasWritePermissions}
       />
+
       <div>
         <Button
           disabled={!formState.isDirty || isLoading || !hasWritePermissions}

@@ -10,7 +10,7 @@ import useCollectionRequest from 'state/hooks/useCollectionRequest';
 
 const SchedulesHome: NextPageWithLayout = () => {
   const [calledPush, setCalledPush] = useState(false);
-  const { data } = useCollectionRequest<Section>('section');
+  const { data } = useCollectionRequest<Section>('sections');
   const router = useRouter();
 
   const sections: Section[] = useMemo(() => {

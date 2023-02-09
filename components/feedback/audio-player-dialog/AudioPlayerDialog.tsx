@@ -51,7 +51,7 @@ const AudioPlayerDialog: React.FC<AudioPlayerDialogProps> = ({
         type="button"
         onClick={open}
         className={classNames(
-          'rounded-md border-none outline-2 outline-gray-400 hover:scale-110 duration-200',
+          'rounded-md border-none outline-2 outline-gray-400 hover:scale-110 duration-200 transition-all',
           {
             'text-green-500 animate-spin': isOpen,
             'text-indigo-500': !isOpen,
