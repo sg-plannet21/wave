@@ -15,9 +15,11 @@ function businessUnitRequestInterceptor(config: AxiosRequestConfig) {
 
   if (
     (config.method === 'post' || config.method === 'patch') &&
-    !config.data.business_unit
-  )
+    !config.data?.business_unit
+  ) {
+    if (!config.data) config.data = {};
     config.data.business_unit = businessUnit;
+  }
 
   return config;
 }

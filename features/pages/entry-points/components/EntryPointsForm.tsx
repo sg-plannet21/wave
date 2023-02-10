@@ -2,6 +2,7 @@ import { Form } from 'components/form/Form';
 import { InputField } from 'components/form/InputField';
 import RegionSelectField from 'components/form/RegionSelectField';
 import Button from 'components/inputs/button';
+import getConfig from 'next/config';
 import { useState } from 'react';
 import { z } from 'zod';
 import { useEntryPoint } from '../hooks/useEntryPoint';
@@ -16,6 +17,10 @@ type EntryPointsFormValues = {
   region: number;
   section: string;
 };
+
+const {
+  publicRuntimeConfig: { fallbackRegionId },
+} = getConfig();
 
 const EntryPointsForm: React.FC<EntryPointsFormProps> = ({ id, onSuccess }) => {
   const newRecord = id === 'new';
@@ -55,7 +60,7 @@ const EntryPointsForm: React.FC<EntryPointsFormProps> = ({ id, onSuccess }) => {
       options={{
         defaultValues: {
           name: entryPoint?.entry_point,
-          region: entryPoint?.region,
+          region: entryPoint?.region ?? fallbackRegionId,
           section: entryPoint?.section,
         },
       }}

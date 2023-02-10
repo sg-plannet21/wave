@@ -135,15 +135,16 @@ export function entityFetcher<Data>(
 
     const results: Data[] = [];
     let hasNext = true;
-    let page = 1;
+    const page = 1;
     let reqUrl = `${url}?page=${page}`;
     do {
       const { data } = await axios.get<ApiCollectionResponse<Data>>(reqUrl);
       results.push(...data.results);
+      // `${url}?page=${++page}`
       if (data.next) {
         reqUrl =
           process.env.NODE_ENV === 'development'
-            ? `${url}?page=${++page}`
+            ? data.next.replace(/^https:\/\//i, 'http://')
             : data.next;
       } else {
         hasNext = false;

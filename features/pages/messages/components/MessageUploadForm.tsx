@@ -4,6 +4,7 @@ import { Trash } from 'components/icons';
 import Button from 'components/inputs/button';
 import { Dictionary } from 'lodash';
 import { useSession } from 'next-auth/react';
+import getConfig from 'next/config';
 import { useContext, useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { EntityRoles } from 'state/auth/types';
@@ -20,7 +21,9 @@ type UploadMessageProps = {
   onSuccess: () => void;
 };
 
-const fallbackRegionId = 52;
+const {
+  publicRuntimeConfig: { fallbackRegionId },
+} = getConfig();
 
 const schema = z.object({
   files: z

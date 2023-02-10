@@ -74,6 +74,7 @@ const SchedulesTable: React.FC = () => {
         );
       },
     },
+
     {
       field: 'weekDay',
       label: 'Day',
@@ -88,8 +89,11 @@ const SchedulesTable: React.FC = () => {
               },
             }}
           >
-            <a className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+            <a className="relative font-medium text-blue-600 dark:text-blue-500 hover:underline">
               {Weekdays[entry.weekDay]}
+              {entry.isActive && (
+                <span className="top-0 -left-6 absolute  w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-gray-800 animate-pulse rounded-full" />
+              )}
             </a>
           </Link>
         );

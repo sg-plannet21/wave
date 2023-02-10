@@ -8,8 +8,8 @@ import { EntryPoint } from '../types';
 export type EntryPointTableRecord = {
   id: string;
   name: string;
-  section: string;
-  region: string;
+  section?: string;
+  region?: string;
 };
 
 export function useEntryPointsTableData() {
@@ -37,19 +37,31 @@ export function useEntryPointsTableData() {
   }, [entryPoints, sections, regions]);
 
   const sectionList: string[] = useMemo(
-    () => data.map((entryPoint) => entryPoint.section),
+    () =>
+      _.chain(data)
+        .map((entryPoint) => entryPoint.section)
+        .compact()
+        .sortBy((section) => section.toLowerCase())
+        .uniq()
+        .value(),
     [data]
   );
 
   const regionList: string[] = useMemo(
-    () => data.map((entryPoint) => entryPoint.region),
+    () =>
+      _.chain(data)
+        .map((entryPoint) => entryPoint.region)
+        .compact()
+        .sortBy((region) => region.toLowerCase())
+        .uniq()
+        .value(),
     [data]
   );
 
   const filteredBySection: EntryPointTableRecord[] = useMemo(
     () =>
       data.filter(
-        (entryPoint) => !sectionExceptionList.includes(entryPoint.section)
+        (entryPoint) => !sectionExceptionList.includes(entryPoint.section ?? '')
       ),
     [data, sectionExceptionList]
   );
@@ -57,7 +69,7 @@ export function useEntryPointsTableData() {
   const filteredData: EntryPointTableRecord[] = useMemo(
     () =>
       filteredBySection.filter(
-        (entryPoint) => !regionExceptionList.includes(entryPoint.region)
+        (entryPoint) => !regionExceptionList.includes(entryPoint.region ?? '')
       ),
     [filteredBySection, regionExceptionList]
   );
@@ -74,7 +86,7 @@ export function useEntryPointsTableData() {
       sectionList,
       sectionExceptionList,
       setSectionExceptionList,
-      regionList,
+      regionList: regionList.filter(Boolean),
       regionExceptionList,
       setRegionExceptionList,
     },

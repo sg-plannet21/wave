@@ -1,6 +1,10 @@
 import { Route } from 'features/pages/routes/types';
-import { formatUtcToLocalTimeString } from 'lib/client/date-utilities';
+import {
+  createMomentUtc,
+  formatUtcToLocalTimeString,
+} from 'lib/client/date-utilities';
 import _ from 'lodash';
+import moment from 'moment';
 import { useMemo, useState } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { Schedule } from '../types';
@@ -13,6 +17,7 @@ export type ScheduleTableRecord = {
   endTime: string | null;
   route: string;
   sectionId: string;
+  isActive: boolean;
 };
 
 export function useSchedulesTableData(sectionId?: string) {
@@ -40,13 +45,39 @@ export function useSchedulesTableData(sectionId?: string) {
         : 'Default',
       route: _.get(routes[schedule.route], 'route_name'),
       sectionId: schedule.section,
+      isActive: false,
     }));
   }, [schedules, routes]);
 
+  const dataWithActiveSchedule: ScheduleTableRecord[] = useMemo(() => {
+    if (!data) return [];
+    const now = moment();
+    const filtered = data.filter((schedule) => schedule.weekDay === now.day());
+    const activeSchedule = filtered.find(
+      ({ startTime, endTime, isDefault }) => {
+        if (isDefault) return false;
+        return now.isBetween(
+          createMomentUtc(startTime as string),
+          createMomentUtc(endTime as string)
+        );
+      }
+    );
+    const activeScheduleId = activeSchedule
+      ? activeSchedule.id
+      : filtered.find((schedule) => schedule.isDefault)?.id;
+
+    return data.map((schedule) => ({
+      ...schedule,
+      isActive: schedule.id === activeScheduleId,
+    }));
+  }, [data]);
+
   const filterBySection: ScheduleTableRecord[] = useMemo(() => {
-    if (!sectionId) return data;
-    return data.filter((schedule) => schedule.sectionId === sectionId);
-  }, [data, sectionId]);
+    if (!sectionId) return dataWithActiveSchedule;
+    return dataWithActiveSchedule.filter(
+      (schedule) => schedule.sectionId === sectionId
+    );
+  }, [dataWithActiveSchedule, sectionId]);
 
   const filteredBySystem: ScheduleTableRecord[] = useMemo(() => {
     return showDefaultSchedules

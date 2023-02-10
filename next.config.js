@@ -12,6 +12,7 @@ const nextConfig = {
     dateFormat: 'DD-MM-YYYY HH:mm',
     timeFormat: 'HH:mm',
     serverTimeFormat: 'HH:mm:ss',
+    fallbackRegionId: 52,
   },
 };
 

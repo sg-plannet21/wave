@@ -1,6 +1,6 @@
 import ContentLayout from 'components/layouts/content/Content';
 import PrimaryLayout from 'components/layouts/primary/PrimaryLayout';
-import SectionsForm from 'features/pages/sections/components/SectionsForm';
+import EntryPointsForm from 'features/pages/entry-points/components/EntryPointsForm';
 import { useRouter } from 'next/router';
 import { NextPageWithLayout } from 'pages/page';
 
@@ -14,9 +14,9 @@ const SectionsDetails: NextPageWithLayout = () => {
   }
 
   return (
-    <ContentLayout title="Section Details">
+    <ContentLayout title="Entry Point Details">
       <section className="flex flex-col items-center gap-y-5 mt-12">
-        <SectionsForm
+        <EntryPointsForm
           onSuccess={onSuccess}
           id={sectionId?.toString() ?? 'new'}
         />

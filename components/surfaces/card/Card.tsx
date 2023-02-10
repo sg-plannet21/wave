@@ -26,7 +26,7 @@ const Card: React.FC<CardProps> = ({ title, description, children }) => {
             {description}
           </p>
         )}
-        <div className="mt-2 flex flex-col space-y-2">{children}</div>
+        <div className="mt-2 flex flex-col space-y-1">{children}</div>
       </div>
     </div>
   );
