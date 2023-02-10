@@ -31,7 +31,8 @@ const UnassignedEntryPointsTable: React.FC = () => {
     AxiosError<WaveError>
   >(
     ['/entrypoints/?unassigned=true', activeBusinessUnit],
-    entityFetcher('entry_point_id', 'entry_point')
+    entityFetcher('entry_point_id', 'entry_point'),
+    { revalidateOnFocus: false }
   );
 
   const { addNotification } = useContext(NotificationContext);
