@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import classNames from 'classnames';
 import { Queue, UnassignedEntity } from 'components/icons';
 import ContentLayout from 'components/layouts/content/Content';
@@ -5,18 +6,25 @@ import PrimaryLayout from 'components/layouts/primary/PrimaryLayout';
 import NavLink from 'components/navigation/NavLink/NavLink';
 import UnassignedEntryPointsTable from 'features/pages/entry-points/components/UnassignedEntryPointsTable';
 import { EntryPoint } from 'features/pages/entry-points/types';
+import { entityFetcher } from 'lib/client/api-helper';
+import { WaveError } from 'lib/client/types';
+import { Dictionary } from 'lodash';
 import { useRouter } from 'next/router';
 import { NextPageWithLayout } from 'pages/page';
 import { useContext } from 'react';
 import BusinessUnitContext from 'state/business-units/BusinessUnitContext';
-import useCollectionRequest from 'state/hooks/useCollectionRequest';
+import useSWR from 'swr';
 
 const UnassignedEntitiesHome: NextPageWithLayout = () => {
   const { query } = useRouter();
   const { activeBusinessUnit } = useContext(BusinessUnitContext);
 
-  const { data: entryPoints } = useCollectionRequest<EntryPoint>(
-    'entrypoints_unassigned'
+  const { data: entryPoints } = useSWR<
+    Dictionary<EntryPoint>,
+    AxiosError<WaveError>
+  >(
+    ['/entrypoints/?unassigned=true', activeBusinessUnit],
+    entityFetcher('entry_point_id', 'entry_point')
   );
 
   const links = [

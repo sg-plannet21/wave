@@ -22,11 +22,6 @@ const entities: EntityMap = {
     path: '/entrypoints/',
     orderBy: 'entry_point',
   },
-  entrypoints_unassigned: {
-    id: 'entry_point_id',
-    path: '/entrypoints/?unassigned=true',
-    orderBy: 'entry_point',
-  },
   users: { id: 'id', path: '/users/', orderBy: 'last_name' },
   regions: { id: 'id', path: '/regions/', orderBy: 'language_name' },
   menus: { id: 'menu_id', path: '/menus/', orderBy: 'menu_name' },
