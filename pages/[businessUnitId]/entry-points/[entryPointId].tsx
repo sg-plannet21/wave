@@ -6,20 +6,17 @@ import { NextPageWithLayout } from 'pages/page';
 
 const SectionsDetails: NextPageWithLayout = () => {
   const router = useRouter();
-  const { businessUnitId, sectionId } = router.query;
+  const { businessUnitId, entryPointId } = router.query;
 
   function onSuccess() {
     console.log('SUCCESS');
-    router.push(`/${businessUnitId}/sections`);
+    router.push(`/${businessUnitId}/entry-points`);
   }
 
   return (
     <ContentLayout title="Entry Point Details">
       <section className="flex flex-col items-center gap-y-5 mt-12">
-        <EntryPointsForm
-          onSuccess={onSuccess}
-          id={sectionId?.toString() ?? 'new'}
-        />
+        <EntryPointsForm onSuccess={onSuccess} id={String(entryPointId)} />
       </section>
     </ContentLayout>
   );
