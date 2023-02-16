@@ -16,6 +16,11 @@ const entities: EntityMap = {
     path: '/businessunits/',
     orderBy: 'business_unit',
   },
+  businessUnitRoles: {
+    id: 'id',
+    path: '/businessunitroles/',
+    orderBy: 'id',
+  },
   routes: { id: 'route_id', path: '/routes/', orderBy: 'route_name' },
   entrypoints: {
     id: 'entry_point_id',

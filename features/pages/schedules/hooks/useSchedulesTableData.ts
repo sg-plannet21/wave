@@ -27,6 +27,7 @@ export function useSchedulesTableData(sectionId?: string) {
 
   const { data: schedules, error: schedulesError } =
     useCollectionRequest<Schedule>('schedules');
+
   const { data: routes, error: routesError } =
     useCollectionRequest<Route>('routes');
 
@@ -52,7 +53,10 @@ export function useSchedulesTableData(sectionId?: string) {
   const dataWithActiveSchedule: ScheduleTableRecord[] = useMemo(() => {
     if (!data) return [];
     const now = moment();
-    const filtered = data.filter((schedule) => schedule.weekDay === now.day());
+    const filtered = data.filter(
+      (schedule) =>
+        schedule.sectionId === sectionId && schedule.weekDay === now.day()
+    );
     const activeSchedule = filtered.find(
       ({ startTime, endTime, isDefault }) => {
         if (isDefault) return false;
@@ -62,6 +66,7 @@ export function useSchedulesTableData(sectionId?: string) {
         );
       }
     );
+
     const activeScheduleId = activeSchedule
       ? activeSchedule.id
       : filtered.find((schedule) => schedule.isDefault)?.id;
@@ -70,7 +75,7 @@ export function useSchedulesTableData(sectionId?: string) {
       ...schedule,
       isActive: schedule.id === activeScheduleId,
     }));
-  }, [data]);
+  }, [data, sectionId]);
 
   const filterBySection: ScheduleTableRecord[] = useMemo(() => {
     if (!sectionId) return dataWithActiveSchedule;

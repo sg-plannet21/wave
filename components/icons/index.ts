@@ -1,3 +1,4 @@
+export { default as AdminRole } from './AdminRole';
 export { default as Archive } from './Archive';
 export { default as ArrowLeft } from './ArrowLeft';
 export { default as ArrowRight } from './ArrowRight';
@@ -38,6 +39,7 @@ export { default as Schedule } from './Schedule';
 export { default as Section } from './Section';
 export { default as Star } from './Star';
 export { default as Sun } from './Sun';
+export { default as SuperAdminRole } from './SuperAdminRole';
 export { default as Trash } from './Trash';
 export { default as UnassignedEntity } from './UnassignedEntity';
 export { default as User } from './User';

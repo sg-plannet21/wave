@@ -16,3 +16,11 @@ export interface BusinessUnit {
   business_unit: string;
   default_region: number;
 }
+
+export interface BusinessUnitRole {
+  url: string;
+  id: number;
+  versions: Version[];
+  business_unit: string;
+  roles: number[];
+}
