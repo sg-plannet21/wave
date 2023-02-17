@@ -10,7 +10,10 @@ import {
   Schedule,
   SuperAdminRole,
 } from 'components/icons';
+import Switch from 'components/inputs/switch';
+import { mapNumberToColour } from 'components/inputs/switch/Switch';
 import WaveTableSkeleton from 'components/skeletons/wave-table/WaveTableSkeleton';
+import Card from 'components/surfaces/card';
 import _ from 'lodash';
 import { useContext } from 'react';
 import { EntityRoles } from 'state/auth/types';
@@ -26,10 +29,10 @@ const clickableClasses =
 const iconActiveClasses = 'text-green-500 dark:text-green-400';
 
 const UsersTable: React.FC = () => {
-  const { data, roles, error, isLoading } = useUsersTableData();
-  const { addNotification } = useContext(NotificationContext);
-
+  const { data, roles, filters, error, isLoading } = useUsersTableData();
   const { mutate } = useCollectionRequest<User>('users');
+
+  const { addNotification } = useContext(NotificationContext);
 
   const columns: TableColumn<UserTableRecord>[] = [
     { field: 'username', label: 'Username' },
@@ -111,7 +114,7 @@ const UsersTable: React.FC = () => {
       );
     }
 
-    // xor the complete BU list vs the new option
+    // xor the complete BU list vs the new role only
     return _.xor(
       user.currentBuRoles.map((role) => roles[role]),
       [roles[role]]
@@ -190,7 +193,42 @@ const UsersTable: React.FC = () => {
     }
   }
 
-  return <Table columns={columns} data={data} />;
+  function handleRoleFilterChange(role: EntityRoles | string) {
+    filters.setRoleExceptionList((roles) => _.xor(roles, [role]));
+  }
+
+  return (
+    <div className="w-full flex flex-col lg:flex-row">
+      <div className="hidden lg:flex lg:flex-col lg:w-56 p-2 space-x-3 lg:space-y-3 lg:space-x-0">
+        <div className="hidden lg:block">
+          <Card title="Wave Superusers">
+            <Switch
+              label="Show Superusers"
+              isChecked={filters.hideSuperUsers}
+              onChange={filters.setHideSuperUsers}
+            />
+          </Card>
+        </div>
+
+        <div className="hidden lg:block">
+          <Card title="Roles" description="Filter by User Role">
+            {filters.roleList.map((role, index) => (
+              <Switch
+                key={role}
+                isChecked={!filters.roleExceptionList.includes(role)}
+                label={role}
+                onChange={() => handleRoleFilterChange(role)}
+                colour={mapNumberToColour(index)}
+              />
+            ))}
+          </Card>
+        </div>
+      </div>
+      <div className="flex-1 overflow-x-auto">
+        <Table columns={columns} data={data} />
+      </div>
+    </div>
+  );
 };
 
 export default UsersTable;

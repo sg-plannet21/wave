@@ -1,5 +1,5 @@
 import { BusinessUnitRole } from 'features/pages/business-units/types';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { EntityRoles } from 'state/auth/types';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { User } from '../types';
@@ -14,7 +14,20 @@ export type UserTableRecord = {
   isSuperUser: boolean;
 };
 
+const roleList = [
+  EntityRoles.EntryPoints,
+  EntityRoles.Menus,
+  EntityRoles.Queues,
+  EntityRoles.Prompts,
+  EntityRoles.Schedules,
+  EntityRoles.Administrator,
+  'No Roles',
+];
+
 export function useUsersTableData() {
+  const [showSuperusers, setShowSuperusers] = useState(false);
+  const [roleExceptionList, setRoleExceptionList] = useState<string[]>([]);
+
   const { data: users, error: usersError } =
     useCollectionRequest<User>('users');
 
@@ -73,9 +86,48 @@ export function useUsersTableData() {
       }));
   }, [users, roles]);
 
+  const filteredBySuperuser: UserTableRecord[] = useMemo(() => {
+    if (!showSuperusers)
+      return data.filter((userRecord) => !userRecord.isSuperUser);
+
+    return data;
+  }, [data, showSuperusers]);
+
+  const filteredByRole: UserTableRecord[] = useMemo(
+    () =>
+      filteredBySuperuser.filter((userRecord) => {
+        if (
+          userRecord.isSuperUser ||
+          !roleExceptionList.includes('No Roles') ||
+          userRecord.currentBuRoles.includes(EntityRoles.Administrator)
+        )
+          return true;
+
+        console.log(
+          'userRecord.currentBuRoles :>> ',
+          userRecord.currentBuRoles
+        );
+        console.log('roleExceptionList :>> ', roleExceptionList);
+
+        return (
+          userRecord.currentBuRoles.filter(
+            (role) => !roleExceptionList.includes(role)
+          ).length > 0
+        );
+      }),
+    [filteredBySuperuser, roleExceptionList]
+  );
+
   return {
-    data,
+    data: filteredByRole,
     roles,
+    filters: {
+      roleList,
+      hideSuperUsers: showSuperusers,
+      setHideSuperUsers: setShowSuperusers,
+      roleExceptionList,
+      setRoleExceptionList,
+    },
     error: usersError || businessUnitRolesError,
     isLoading: !data && !usersError && !businessUnitRoles,
   };
