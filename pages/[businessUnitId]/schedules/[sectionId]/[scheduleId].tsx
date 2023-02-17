@@ -11,7 +11,6 @@ const ScheduleDetails: NextPageWithLayout = () => {
   const { businessUnitId, sectionId, scheduleId } = router.query;
 
   function handleSuccess() {
-    console.log('SUCCESS');
     router.push(`/${businessUnitId}/schedules/${sectionId}`);
   }
 

@@ -216,7 +216,7 @@ const SchedulesTable: React.FC = () => {
       <div className="flex-1 overflow-x-auto">
         <div className="py-2 px-4 flex justify-end">
           <div className="w-72">
-            <SectionsSelect />
+            <SectionsSelect path="schedules" />
           </div>
         </div>
         <Table<ScheduleTableRecord> columns={columns} data={data} />

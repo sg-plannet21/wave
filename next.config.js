@@ -8,7 +8,8 @@ const nextConfig = {
   publicRuntimeConfig: {
     // Will be available on both server and client
     yourKey: 'your-value',
-    changeDateFormat: 'MMM Do YYYY, h:mm:ss a',
+    tableDateFormat: 'ddd Do MMM YYYY, h:mm a',
+    versionTableFormat: 'MMM Do YYYY, h:mm:ss a',
     dateFormat: 'DD-MM-YYYY HH:mm',
     timeFormat: 'HH:mm',
     serverTimeFormat: 'HH:mm:ss',

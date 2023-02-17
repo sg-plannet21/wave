@@ -85,7 +85,7 @@ const Switch: React.FC<SwitchProps> = ({
               <span
                 className={`${
                   checked ? 'translate-x-5' : 'translate-x-0'
-                } inline-block w-5 h-5 transition duration-200 ease-in-out transform bg-white rounded-full bg-`}
+                } inline-block w-5 h-5 transition-colors duration-200 ease-in-out transform bg-white rounded-full bg-`}
               />
             )}
           </UISwitch>

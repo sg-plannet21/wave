@@ -1,16 +1,4 @@
-// type SystemSchedule = {
-//   is_default: true;
-//   start_time: null;
-//   end_time: null;
-// };
-
 import { Version } from 'lib/client/types';
-
-// type CustomSchedule = {
-//   is_default: false;
-//   start_time: string;
-//   end_time: string;
-// };
 
 export type Schedule = {
   url: string;

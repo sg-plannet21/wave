@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 
 type SectionsSelectProps = {
-  // sections: Section[];
+  path: 'schedules' | 'schedule-exceptions';
 };
 
 export type SelectOption = {
@@ -15,7 +15,7 @@ export type SelectOption = {
   value: string | number | string[];
 };
 
-const SectionsSelect: React.FC<SectionsSelectProps> = () => {
+const SectionsSelect: React.FC<SectionsSelectProps> = ({ path }) => {
   const router = useRouter();
   const [selectedSection, setSelectedSection] = useState<
     SelectOption | undefined
@@ -28,9 +28,9 @@ const SectionsSelect: React.FC<SectionsSelectProps> = () => {
 
       setSelectedSection(section);
 
-      router.push(`/${router.query.businessUnitId}/schedules/${section.value}`);
+      router.push(`/${router.query.businessUnitId}/${path}/${section.value}`);
     },
-    [router, sections]
+    [router, sections, path]
   );
 
   const options: SelectOption[] = useMemo(() => {

@@ -30,6 +30,7 @@ function PlayAudio<T extends FieldValues>({
   });
 
   if (!promptId || !prompts) return null;
+
   return (
     <div className="pl-2">
       <AudioPlayerDialog

@@ -13,7 +13,11 @@ const {
 type TimeRangePickerProps = AntDTimeRangePickerProps &
   FieldWrapperPassThroughProps;
 
-const TimeRangePicker = ({ label, error, ...props }: TimeRangePickerProps) => {
+const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
+  label,
+  error,
+  ...props
+}) => {
   return (
     <FieldWrapper label={label} error={error}>
       <TimePicker.RangePicker

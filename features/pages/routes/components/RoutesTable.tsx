@@ -124,7 +124,7 @@ const RoutesTable: React.FC = () => {
         )}
       </div>
       <div className="flex-1 overflow-x-auto">
-        <WaveTable columns={columns} data={data} />
+        <WaveTable<RouteTableRecord> columns={columns} data={data} />
       </div>
     </div>
   );

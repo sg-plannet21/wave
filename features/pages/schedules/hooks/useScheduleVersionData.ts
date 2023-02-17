@@ -15,7 +15,7 @@ import { Schedule, Weekdays } from '../types';
 import { useSchedule } from './useSchedule';
 
 const {
-  publicRuntimeConfig: { timeFormat, changeDateFormat },
+  publicRuntimeConfig: { timeFormat, versionTableFormat },
 } = getConfig();
 
 export default function useScheduleVersionData(scheduleId: string) {
@@ -40,7 +40,7 @@ export default function useScheduleVersionData(scheduleId: string) {
       return deserialisedSchedule.map((schedule) => {
         return {
           ...schedule,
-          changeDate: moment(schedule.changeDate).format(changeDateFormat),
+          changeDate: moment(schedule.changeDate).format(versionTableFormat),
           start_time: schedule.start_time
             ? moment.utc(schedule.start_time, timeFormat).format(timeFormat)
             : '',
