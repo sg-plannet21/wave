@@ -10,6 +10,7 @@ export type UserTableRecord = {
   firstName: string;
   lastName: string;
   currentBuRoles: EntityRoles[];
+  businessUnitRoles: number[];
   isSuperUser: boolean;
 };
 
@@ -37,7 +38,7 @@ export function useUsersTableData() {
 
     enum Roles {
       Prompts = promptsRole,
-      EntryPoint = promptsRole + 1,
+      EntryPoints = promptsRole + 1,
       Menus = promptsRole + 2,
       Queues = promptsRole + 3,
       Schedules = promptsRole + 4,
@@ -67,11 +68,10 @@ export function useUsersTableData() {
         currentBuRoles: user.current_business_unit_roles.map(
           (buRoleId) => roles[buRoleId]
         ) as EntityRoles[],
+        businessUnitRoles: user.current_business_unit_roles,
         isSuperUser: user.is_wave_superuser,
       }));
   }, [users, roles]);
-
-  console.log('data :>> ', data);
 
   return {
     data,
