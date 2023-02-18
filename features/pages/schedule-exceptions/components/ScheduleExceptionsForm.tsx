@@ -12,14 +12,20 @@ import {
 import { MessageField } from 'features/pages/schedules/types';
 import { TimeRangeWithLabel, validateRange } from 'lib/client/date-utilities';
 import moment, { Moment } from 'moment';
+import getConfig from 'next/config';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Controller, FieldError, useForm } from 'react-hook-form';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
+import NotificationContext from 'state/notifications/NotificationContext';
 import { z } from 'zod';
 import { saveScheduleException } from '../api/saveScheduleException';
 import { useScheduleException } from '../hooks/useScheduleException';
 import { ScheduleException } from '../types';
+
+const {
+  publicRuntimeConfig: { tableDateFormat },
+} = getConfig();
 
 const localStartDate = moment().add(1, 'days').startOf('day').hours(9);
 const localEndDate = moment(localStartDate).hours(18);
@@ -73,6 +79,8 @@ const ScheduleExceptionsForm: React.FC<ScheduleExceptionsFormProps> = ({
         timeRange: [localStartDate.toISOString(), localEndDate.toISOString()],
       },
     });
+
+  const { addNotification } = useContext(NotificationContext);
 
   useEffect(() => {
     if (!scheduleException || !id?.length) return;
@@ -138,6 +146,16 @@ const ScheduleExceptionsForm: React.FC<ScheduleExceptionsFormProps> = ({
         try {
           const { data } = await saveScheduleException(payload);
           const exception = { [data['schedule_exception_id']]: data };
+          addNotification({
+            title: `${data.description} Exception ${
+              newRecord ? 'Created' : 'Updated'
+            }.`,
+            message: `${moment(data.start_time).format(
+              tableDateFormat
+            )} to ${moment(data.end_time).format(tableDateFormat)}`,
+            type: 'success',
+            duration: 10000,
+          });
           onSuccess();
           return { ...existingExceptions, ...exception };
         } catch (error) {
