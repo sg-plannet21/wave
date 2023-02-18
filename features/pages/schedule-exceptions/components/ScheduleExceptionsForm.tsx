@@ -13,7 +13,7 @@ import { MessageField } from 'features/pages/schedules/types';
 import { TimeRangeWithLabel, validateRange } from 'lib/client/date-utilities';
 import moment, { Moment } from 'moment';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, FieldError, useForm } from 'react-hook-form';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { z } from 'zod';
@@ -47,48 +47,64 @@ const ScheduleExceptionsForm: React.FC<ScheduleExceptionsFormProps> = ({
   const {
     query: { sectionId },
   } = useRouter();
+
   const {
-    data: scheudleException,
+    data: scheduleException,
     error: scheduleExceptionsError,
     isValidating,
   } = useScheduleException(newRecord ? undefined : id, {
     revalidateOnFocus: false,
   });
 
-  const { register, control, handleSubmit, formState, setError } =
+  const { data: scheduleExceptions, mutate } =
+    useCollectionRequest<ScheduleException>('scheduleExceptions');
+
+  const { register, control, handleSubmit, formState, reset, setError } =
     useForm<ScheduleExceptionsFormValues>({
       resolver: zodResolver(schema),
       defaultValues: {
-        description: scheudleException?.description,
-        route: scheudleException?.route,
-        message1: scheudleException?.message_1?.toString() ?? '',
-        message2: scheudleException?.message_2?.toString() ?? '',
-        message3: scheudleException?.message_3?.toString() ?? '',
-        message4: scheudleException?.message_4?.toString() ?? '',
-        message5: scheudleException?.message_5?.toString() ?? '',
-        timeRange: [
-          scheudleException?.start_time ?? localStartDate.toISOString(),
-          scheudleException?.end_time ?? localEndDate.toISOString(),
-        ],
+        description: '',
+        route: '',
+        message1: '',
+        message2: '',
+        message3: '',
+        message4: '',
+        message5: '',
+        timeRange: [localStartDate.toISOString(), localEndDate.toISOString()],
       },
     });
 
-  const { data: scheduleExceptions, mutate } =
-    useCollectionRequest<ScheduleException>('scheduleExceptions');
+  useEffect(() => {
+    if (!scheduleException || !id?.length) return;
+    reset({
+      description: scheduleException?.description,
+      route: scheduleException?.route,
+      message1: scheduleException?.message_1?.toString() ?? '',
+      message2: scheduleException?.message_2?.toString() ?? '',
+      message3: scheduleException?.message_3?.toString() ?? '',
+      message4: scheduleException?.message_4?.toString() ?? '',
+      message5: scheduleException?.message_5?.toString() ?? '',
+      timeRange: [scheduleException?.start_time, scheduleException?.end_time],
+    });
+  }, [scheduleException, id, reset]);
 
   if (isValidating) return <div>Loading..</div>;
 
   if (scheduleExceptionsError) return <div>An error has occurred</div>;
 
-  if (!newRecord && !scheudleException) return <div>Not found..</div>;
+  if (!newRecord && !scheduleException) return <div>Not found..</div>;
 
   async function onSubmit(values: ScheduleExceptionsFormValues) {
     if (scheduleExceptions) {
-      console.log('looking for clash :>> ');
       const existingExceptions: TimeRangeWithLabel[] = Object.values(
         scheduleExceptions
       )
-        .filter((scheduleException) => scheduleException.section === sectionId)
+        .filter(
+          (schExp) =>
+            schExp.section === sectionId &&
+            schExp.schedule_exception_id !==
+              scheduleException?.schedule_exception_id
+        )
         .map(({ start_time, end_time, description }) => ({
           startTime: moment(start_time),
           endTime: moment(end_time),
@@ -102,7 +118,6 @@ const ScheduleExceptionsForm: React.FC<ScheduleExceptionsFormProps> = ({
         existingExceptions,
         { type: 'date' }
       );
-      console.log('outcome :>> ', outcome);
       if (!outcome.result) {
         setError('timeRange', { message: outcome.message });
         return;
@@ -116,7 +131,7 @@ const ScheduleExceptionsForm: React.FC<ScheduleExceptionsFormProps> = ({
       startTime: values.timeRange[0],
       endTime: values.timeRange[1],
       ...values,
-      ...(!newRecord && { id: scheudleException?.schedule_exception_id }),
+      ...(!newRecord && { id: scheduleException?.schedule_exception_id }),
     };
     mutate(
       async (existingExceptions) => {
@@ -135,8 +150,6 @@ const ScheduleExceptionsForm: React.FC<ScheduleExceptionsFormProps> = ({
       { revalidate: false }
     );
   }
-
-  console.log('formState.dirtyFields :>> ', formState.dirtyFields);
 
   return (
     <form

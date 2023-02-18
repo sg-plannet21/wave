@@ -2,16 +2,18 @@ import Search from 'components/inputs/search';
 import Pagination from 'components/navigation/Pagination';
 import { paginate } from 'lib/client/paginate';
 import _ from 'lodash';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Table, { SortColumn, TableProps } from '../table/Table';
 
 export type WaveTableProps<Entry> = TableProps<Entry> & {
   pageSize?: number;
+  children?: React.ReactNode;
 };
 
 const WaveTable = <Entry extends { [P in keyof Entry]: Entry[P] }>({
   columns,
   data,
+  children,
   sortColumn = { field: columns[0]?.field, order: 'asc' },
   pageSize = 5,
 }: WaveTableProps<Entry>) => {
@@ -54,7 +56,7 @@ const WaveTable = <Entry extends { [P in keyof Entry]: Entry[P] }>({
 
   return (
     <>
-      <div className="py-2 px-4 flex justify-end sm:px-6 lg:px-8">
+      <div className="py-2 px-4 flex justify-between items-end flex-row-reverse sm:px-6 lg:px-8">
         <div className="w-72">
           {pagedData.length > 0 && (
             <Search
@@ -63,6 +65,7 @@ const WaveTable = <Entry extends { [P in keyof Entry]: Entry[P] }>({
             />
           )}
         </div>
+        {children}
       </div>
       <Table<Entry>
         columns={columns}

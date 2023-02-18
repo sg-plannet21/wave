@@ -17,7 +17,7 @@ const ScheduleExceptionDetails: NextPageWithLayout = () => {
       <section className="flex flex-col items-center gap-y-5 mt-12">
         <ScheduleExceptionsForm
           onSuccess={onSuccess}
-          id={String(scheduleExceptionId) ?? 'new'}
+          id={scheduleExceptionId?.toString() ?? 'new'}
         />
       </section>
     </ContentLayout>

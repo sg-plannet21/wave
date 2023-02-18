@@ -2,7 +2,7 @@ import { Route } from 'features/pages/routes/types';
 import _ from 'lodash';
 import moment from 'moment';
 import getConfig from 'next/config';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { ScheduleException } from '../types';
 
@@ -16,30 +16,39 @@ export type ScheduleExceptionTableRecord = {
   startTimeLabel: string;
   endTimeLabel: string;
   routeLabel: string;
-  status: string;
+  status: { value: 'Expired' | 'Active' | 'Upcoming'; label: string };
 };
 
-function getExceptionStatus(startTime: string, endTime: string) {
+function getExceptionStatus(
+  startTime: string,
+  endTime: string
+): ScheduleExceptionTableRecord['status'] {
   const now = moment();
   const exceptionStart = moment(startTime);
   const exceptionEnd = moment(endTime);
 
-  if (now.isAfter(exceptionEnd)) return 'Inactive';
-  // currently active
+  if (now.isAfter(exceptionEnd))
+    return { value: 'Expired', label: exceptionStart.fromNow() };
+
   if (now.isBetween(exceptionStart, exceptionEnd))
-    return exceptionEnd.fromNow();
-  // upcoming
-  return exceptionStart.fromNow();
+    return {
+      value: 'Active',
+      label: exceptionEnd.fromNow().replace('in', 'for'),
+    };
+
+  return { value: 'Upcoming', label: exceptionStart.fromNow() };
 }
 
 export function useScheduleExceptionsTableData(sectionId?: string) {
+  const [stateExceptionList, setStateExceptionList] = useState<
+    ScheduleExceptionTableRecord['status']['value'][]
+  >([]);
+
   const { data: scheduleExceptions, error: scheduleExceptionsError } =
     useCollectionRequest<ScheduleException>('scheduleExceptions');
 
   const { data: routes, error: routesError } =
     useCollectionRequest<Route>('routes');
-
-  console.log('scheduleExceptions :>> ', scheduleExceptions);
 
   const data: ScheduleExceptionTableRecord[] = useMemo(() => {
     if (!scheduleExceptions || !routes) return [];
@@ -63,6 +72,24 @@ export function useScheduleExceptionsTableData(sectionId?: string) {
       }));
   }, [scheduleExceptions, sectionId, routes]);
 
+  const filteredData: ScheduleExceptionTableRecord[] = useMemo(
+    () =>
+      data.filter(
+        (exception) => !stateExceptionList.includes(exception.status.value)
+      ),
+    [data, stateExceptionList]
+  );
+
+  const stateList: ScheduleExceptionTableRecord['status']['value'][] = useMemo(
+    () =>
+      _.chain(data)
+        .map((exception) => exception.status.value)
+        .uniq()
+        .sortBy((exception) => exception.toLowerCase())
+        .value(),
+    [data]
+  );
+
   return {
     isLoading:
       !scheduleExceptions &&
@@ -70,6 +97,11 @@ export function useScheduleExceptionsTableData(sectionId?: string) {
       !scheduleExceptionsError &&
       !routesError,
     error: scheduleExceptionsError || routesError,
-    data,
+    data: filteredData,
+    filters: {
+      stateList,
+      stateExceptionList,
+      setStateExceptionList,
+    },
   };
 }

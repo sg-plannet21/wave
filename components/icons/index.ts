@@ -10,6 +10,7 @@ export { default as ChevronDown } from './ChevronDown';
 export { default as ChevronLeft } from './ChevronLeft';
 export { default as ChevronRight } from './ChevronRight';
 export { default as ChevronUp } from './ChevronUp';
+export { default as Clock } from './Clock';
 export { default as CreditCard } from './CreditCard';
 export { default as Cross } from './Cross';
 export { default as Dialpad } from './Dialpad';

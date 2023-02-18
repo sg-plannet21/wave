@@ -8,7 +8,7 @@ const SectionsSelectExample: React.FC = () => {
         Sections Select Example
       </h1>
       <div className="w-60">
-        <SectionsSelect />
+        <SectionsSelect path="schedules" />
       </div>
     </div>
   );

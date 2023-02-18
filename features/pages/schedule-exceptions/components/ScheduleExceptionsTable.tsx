@@ -1,8 +1,13 @@
+import Badge from 'components/data-display/badge/Badge';
 import { TableColumn } from 'components/data-display/table';
-import Table from 'components/data-display/table/Table';
-import { Plus } from 'components/icons';
+import WaveTable from 'components/data-display/wave-table/WaveTable';
+import { Clock, Plus } from 'components/icons';
+import Switch from 'components/inputs/switch';
+import { mapNumberToColour } from 'components/inputs/switch/Switch';
 import SectionsSelect from 'components/navigation/SectionsSelect';
 import WaveTablePage from 'components/skeletons/wave-table-page';
+import Card from 'components/surfaces/card';
+import _ from 'lodash';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useIsAuthorised } from 'state/hooks/useAuthorisation';
@@ -11,12 +16,13 @@ import {
   useScheduleExceptionsTableData,
 } from '../hooks/useScheduleExceptionsTableData';
 import DeleteScheduleException from './DeleteScheduleException';
+import ScheduleExceptionVersions from './ScheduleExceptionVersions';
 
 const ScheduleExceptionsTables: React.FC = () => {
   const {
     query: { businessUnitId, sectionId },
   } = useRouter();
-  const { data, isLoading, error } = useScheduleExceptionsTableData(
+  const { data, filters, isLoading, error } = useScheduleExceptionsTableData(
     sectionId?.toString()
   );
   const { isSuperUser } = useIsAuthorised();
@@ -29,8 +35,13 @@ const ScheduleExceptionsTables: React.FC = () => {
         return (
           <Link
             href={{
-              pathname: 'schedule-exceptions/[scheduleExceptionId]',
-              query: { businessUnitId, scheduleExceptionId: entry.id },
+              pathname:
+                '/[businessUnitId]/schedule-exceptions/[sectionId]/[scheduleExceptionId]',
+              query: {
+                businessUnitId,
+                sectionId,
+                scheduleExceptionId: entry.id,
+              },
             }}
           >
             <a className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
@@ -42,8 +53,37 @@ const ScheduleExceptionsTables: React.FC = () => {
     },
     { field: 'startTimeLabel', label: 'Start' },
     { field: 'endTimeLabel', label: 'End' },
-    { field: 'status', label: 'Status' },
+    {
+      field: 'id',
+      label: 'Status',
+      ignoreFiltering: true,
+      Cell({ entry }) {
+        const value = entry.status.value;
+        const variant =
+          value === 'Active'
+            ? 'success'
+            : value === 'Expired'
+            ? 'secondary'
+            : 'primary';
+        return (
+          <Badge
+            label={entry.status.label}
+            size="sm"
+            variant={variant}
+            startIcon={<Clock className="h-3 w-3 mr-1" />}
+          />
+        );
+      },
+    },
     { field: 'routeLabel', label: 'Destination' },
+    {
+      field: 'id',
+      label: '',
+      ignoreFiltering: true,
+      Cell({ entry }) {
+        return <ScheduleExceptionVersions scheduleExceptionId={entry.id} />;
+      },
+    },
   ];
 
   if (isSuperUser) {
@@ -61,6 +101,12 @@ const ScheduleExceptionsTables: React.FC = () => {
     });
   }
 
+  function handleExceptionStateFilterChange(
+    state: ScheduleExceptionTableRecord['status']['value']
+  ) {
+    filters.setStateExceptionList((currentList) => _.xor(currentList, [state]));
+  }
+
   if (isLoading) return <WaveTablePage numberOfColumns={columns.length} />;
   if (error) return <div>We have encountered an error..</div>;
 
@@ -73,14 +119,33 @@ const ScheduleExceptionsTables: React.FC = () => {
             <span>New Exception</span>
           </a>
         </Link>
+
+        {filters.stateList.length > 1 && (
+          <div className="hidden md:block">
+            <Card title="Exception States" description="Filter by State">
+              {filters.stateList.map((scheduleException, index) => (
+                <Switch
+                  key={scheduleException}
+                  isChecked={
+                    !filters.stateExceptionList.includes(scheduleException)
+                  }
+                  label={scheduleException}
+                  onChange={() =>
+                    handleExceptionStateFilterChange(scheduleException)
+                  }
+                  colour={mapNumberToColour(index + 3)}
+                />
+              ))}
+            </Card>
+          </div>
+        )}
       </div>
       <div className="flex-1 overflow-x-auto">
-        <div className="py-2 px-4 flex justify-end">
+        <WaveTable<ScheduleExceptionTableRecord> columns={columns} data={data}>
           <div className="w-72">
             <SectionsSelect path="schedule-exceptions" />
           </div>
-        </div>
-        <Table<ScheduleExceptionTableRecord> columns={columns} data={data} />
+        </WaveTable>
       </div>
     </div>
   );
