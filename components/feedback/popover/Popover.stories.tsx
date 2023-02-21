@@ -3,7 +3,7 @@ import Popover, { PopoverProps } from './Popover';
 import { mockPopoverProps } from './Popover.mocks';
 
 const meta: Meta = {
-  title: 'utility/Popover',
+  title: 'data-display/Popover',
   component: Popover,
   // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
   argTypes: {},

@@ -4,20 +4,21 @@ import Button from 'components/inputs/button';
 import React, { useContext } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import NotificationContext from 'state/notifications/NotificationContext';
-import deleteSection from '../api/deleteSection';
-import { Section } from '../types';
 
-type DeleteSectionProps = {
-  id: Section['section_id'];
+import deleteMenu from '../api/deleteMenu';
+import { Menu } from '../types';
+
+type DeleteMenuProps = {
+  id: Menu['menu_id'];
   name: string;
 };
 
 // idle - loading - complete
-const DeleteSection: React.FC<DeleteSectionProps> = ({ id, name }) => {
+const DeleteMenu: React.FC<DeleteMenuProps> = ({ id, name }) => {
   const [status, setStatus] = React.useState<'idle' | 'loading' | 'complete'>(
     'idle'
   );
-  const { mutate } = useCollectionRequest<Section>('sections', {
+  const { mutate } = useCollectionRequest<Menu>('menus', {
     revalidateOnFocus: false,
   });
   const { addNotification } = useContext(NotificationContext);
@@ -25,25 +26,24 @@ const DeleteSection: React.FC<DeleteSectionProps> = ({ id, name }) => {
   async function handleDelete() {
     setStatus('loading');
     mutate(
-      async (existingSections) => {
+      async (existingMenus) => {
         try {
-          await deleteSection(id);
+          await deleteMenu(id);
 
           addNotification({
             type: 'success',
             title: `${
-              existingSections ? `${existingSections[id].section} ` : ''
-            }Section Deleted`,
+              existingMenus ? `${existingMenus[id].menu_name} ` : ''
+            }Menu Deleted`,
             duration: 3000,
           });
 
-          if (existingSections && existingSections[id])
-            delete existingSections[id];
+          if (existingMenus && existingMenus[id]) delete existingMenus[id];
 
-          return { ...existingSections };
+          return { ...existingMenus };
         } catch (error) {
           console.log('error', error);
-          return existingSections;
+          return existingMenus;
         }
       },
       { revalidate: false }
@@ -52,7 +52,7 @@ const DeleteSection: React.FC<DeleteSectionProps> = ({ id, name }) => {
 
   return (
     <ConfirmationDialog
-      title="Delete Section"
+      title="Delete Menu"
       body={`Delete ${name}?`}
       isDone={status === 'complete'}
       triggerButton={
@@ -74,4 +74,4 @@ const DeleteSection: React.FC<DeleteSectionProps> = ({ id, name }) => {
   );
 };
 
-export default DeleteSection;
+export default DeleteMenu;

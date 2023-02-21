@@ -1,5 +1,6 @@
 import PrimaryLayout from 'components/layouts/primary/PrimaryLayout';
-import Popover from 'components/utility/popover';
+
+import Popover from 'components/feedback/popover';
 import { NextPageWithLayout } from './page';
 
 const Test: NextPageWithLayout = () => {
