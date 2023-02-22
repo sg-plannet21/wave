@@ -4,33 +4,43 @@ import { useMemo } from 'react';
 import useCollectionRequest from 'state/hooks/useCollectionRequest';
 import { Menu } from '../types';
 
-export type MenusTableRecord = {
+type ActiveOptionType = { label: string; route: string | null };
+
+export type MenuOptions = {
+  noInput: ActiveOptionType;
+  noMatch: ActiveOptionType;
+  option0: ActiveOptionType;
+  option1: ActiveOptionType;
+  option2: ActiveOptionType;
+  option3: ActiveOptionType;
+  option4: ActiveOptionType;
+  option5: ActiveOptionType;
+  option6: ActiveOptionType;
+  option7: ActiveOptionType;
+  option8: ActiveOptionType;
+  option9: ActiveOptionType;
+  asterisk: ActiveOptionType;
+  hash: ActiveOptionType;
+};
+
+export type MenusTableRecord = MenuOptions & {
   id: string;
   name: string;
   retries: number;
-  noInputRoute: string | null;
-  noMatchRoute: string | null;
-  option0Route: string | null;
-  option1Route: string | null;
-  option2Route: string | null;
-  option3Route: string | null;
-  option4Route: string | null;
-  option5Route: string | null;
-  option6Route: string | null;
-  option7Route: string | null;
-  option8Route: string | null;
-  option9Route: string | null;
-  asteriskRoute: string | null;
-  hashRoute: string | null;
 };
 
 function mapRouteToOption(
   routes: _.Dictionary<Route>,
-  route: keyof _.Dictionary<Route> | null
-): string | null {
-  if (!route) return null;
+  route: keyof _.Dictionary<Route> | null,
+  label: string
+): ActiveOptionType {
+  if (!route)
+    return {
+      route: null,
+      label,
+    };
 
-  return _.get(routes[route], 'route_name');
+  return { route: _.get(routes[route], 'route_name'), label };
 }
 
 export function useMenusTableData() {
@@ -47,20 +57,20 @@ export function useMenusTableData() {
       id: menu.menu_id,
       name: menu.menu_name,
       retries: menu.max_retries,
-      noInputRoute: mapRouteToOption(routes, menu.no_input_route),
-      noMatchRoute: mapRouteToOption(routes, menu.no_match_route),
-      option0Route: mapRouteToOption(routes, menu.opt0_route),
-      option1Route: mapRouteToOption(routes, menu.opt1_route),
-      option2Route: mapRouteToOption(routes, menu.opt2_route),
-      option3Route: mapRouteToOption(routes, menu.opt3_route),
-      option4Route: mapRouteToOption(routes, menu.opt4_route),
-      option5Route: mapRouteToOption(routes, menu.opt5_route),
-      option6Route: mapRouteToOption(routes, menu.opt6_route),
-      option7Route: mapRouteToOption(routes, menu.opt7_route),
-      option8Route: mapRouteToOption(routes, menu.opt8_route),
-      option9Route: mapRouteToOption(routes, menu.opt9_route),
-      asteriskRoute: mapRouteToOption(routes, menu.asterisk_route),
-      hashRoute: mapRouteToOption(routes, menu.hash_route),
+      noInput: mapRouteToOption(routes, menu.no_input_route, 'NI'),
+      noMatch: mapRouteToOption(routes, menu.no_match_route, 'NM'),
+      option0: mapRouteToOption(routes, menu.opt0_route, '1'),
+      option1: mapRouteToOption(routes, menu.opt1_route, '2'),
+      option2: mapRouteToOption(routes, menu.opt2_route, '3'),
+      option3: mapRouteToOption(routes, menu.opt3_route, '4'),
+      option4: mapRouteToOption(routes, menu.opt4_route, '5'),
+      option5: mapRouteToOption(routes, menu.opt5_route, '6'),
+      option6: mapRouteToOption(routes, menu.opt6_route, '7'),
+      option7: mapRouteToOption(routes, menu.opt7_route, '8'),
+      option8: mapRouteToOption(routes, menu.opt8_route, '9'),
+      option9: mapRouteToOption(routes, menu.opt9_route, '0'),
+      asterisk: mapRouteToOption(routes, menu.asterisk_route, '*'),
+      hash: mapRouteToOption(routes, menu.hash_route, '#'),
     }));
   }, [menus, routes]);
 

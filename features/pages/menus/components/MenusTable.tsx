@@ -8,7 +8,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { EntityRoles } from 'state/auth/types';
 import { useIsAuthorised } from 'state/hooks/useAuthorisation';
+import { menuOptionFields } from '../helpers/form-helpers';
 import {
+  MenuOptions,
   MenusTableRecord,
   useMenusTableData,
 } from '../hooks/useMenusTableData';
@@ -20,6 +22,34 @@ const MenusTable: React.FC = () => {
   } = useRouter();
   const { data, isLoading, error } = useMenusTableData();
   const { isSuperUser, hasWriteAccess } = useIsAuthorised([EntityRoles.Menus]);
+
+  const options: TableColumn<MenusTableRecord>[] = menuOptionFields.map(
+    (option) => ({
+      field: option as keyof MenuOptions,
+      label: '',
+      ignoreFiltering: true,
+      Cell({ entry }: { entry: MenusTableRecord }) {
+        if (!entry[option as keyof MenuOptions].route)
+          return (
+            <Badge
+              label={entry[option as keyof MenuOptions].label}
+              size="sm"
+              variant="secondary"
+            />
+          );
+
+        return (
+          <Popover message={entry[option as keyof MenuOptions].route as string}>
+            <Badge
+              variant="primary"
+              size="sm"
+              label={entry[option as keyof MenuOptions].label}
+            />
+          </Popover>
+        );
+      },
+    })
+  );
 
   const columns: TableColumn<MenusTableRecord>[] = [
     {
@@ -40,22 +70,8 @@ const MenusTable: React.FC = () => {
         );
       },
     },
+    ...options,
     { field: 'retries', label: 'Retries' },
-    {
-      field: 'noInputRoute',
-      label: '',
-      ignoreFiltering: true,
-      Cell({ entry }) {
-        if (!entry.noInputRoute)
-          return <Badge label="NI" size="sm" variant="secondary" />;
-
-        return (
-          <Popover message={entry.noInputRoute}>
-            <Badge variant="primary" size="sm" label="NI" />
-          </Popover>
-        );
-      },
-    },
   ];
 
   if (isSuperUser || hasWriteAccess) {
@@ -81,7 +97,7 @@ const MenusTable: React.FC = () => {
   return (
     <div className="w-full flex flex-col md:flex-row">
       <div className="sm:w-56 flex md:flex-col p-2 space-x-3 md:space-y-3 md:space-x-0">
-        <Link href={`/${businessUnitId}/menu/new`}>
+        <Link href={`/${businessUnitId}/menus/new`}>
           <a className="flex justify-center items-center space-x-1 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
             <Plus />
             <span>New Menu</span>
