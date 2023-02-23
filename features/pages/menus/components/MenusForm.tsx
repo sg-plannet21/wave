@@ -3,12 +3,16 @@ import { InputField } from 'components/form/InputField';
 import MessageSelectField from 'components/form/MessageSelectField';
 import RouteSelectInfoField from 'components/form/RouteSelectInfoField';
 import Button from 'components/inputs/button';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { EntityRoles } from 'state/auth/types';
 import { useIsAuthorised } from 'state/hooks/useAuthorisation';
+import useCollectionRequest from 'state/hooks/useCollectionRequest';
+import NotificationContext from 'state/notifications/NotificationContext';
 import { z } from 'zod';
+import { saveMenu } from '../api/saveMenu';
 import { useMenu } from '../hooks/useMenu';
 import { fieldList } from '../hooks/useMenusTableData';
+import { Menu } from '../types';
 
 type MenusFormProps = {
   onSuccess: () => void;
@@ -25,39 +29,39 @@ const schema = z
       .min(0, 'Max Retries must be 0 or more')
       .max(10, 'Max Retries must be 10 or less'),
     menuMessage: z.string().min(1, 'Menu Message is required'),
-    noInput_message: z.string().nullable(),
-    noInput_route: z.string().min(1, 'No Input Route is a required field'),
-    noMatch_message: z.string().nullable(),
-    noMatch_route: z.string().min(1, 'No Match Route is a required field'),
-    option0_message: z.string().nullable(),
-    option0_route: z.string().nullable(),
-    option1_message: z.string().nullable(),
-    option1_route: z.string().nullable(),
-    option2_message: z.string().nullable(),
-    option2_route: z.string().nullable(),
-    option3_message: z.string().nullable(),
-    option3_route: z.string().nullable(),
-    option4_message: z.string().nullable(),
-    option4_route: z.string().nullable(),
-    option5_message: z.string().nullable(),
-    option5_route: z.string().nullable(),
-    option6_message: z.string().nullable(),
-    option6_route: z.string().nullable(),
-    option7_message: z.string().nullable(),
-    option7_route: z.string().nullable(),
-    option8_message: z.string().nullable(),
-    option8_route: z.string().nullable(),
-    option9_message: z.string().nullable(),
-    option9_route: z.string().nullable(),
-    asterisk_message: z.string().nullable(),
-    asterisk_route: z.string().nullable(),
-    hash_message: z.string().nullable(),
-    hash_route: z.string().nullable(),
+    noInputMessage: z.string() ?? '',
+    noInputRoute: z.string().min(1, 'No Input Route is a required field'),
+    noMatchMessage: z.string() ?? '',
+    noMatchRoute: z.string().min(1, 'No Match Route is a required field'),
+    option0Message: z.string() ?? '',
+    option0Route: z.string().nullable(),
+    option1Message: z.string() ?? '',
+    option1Route: z.string().nullable(),
+    option2Message: z.string() ?? '',
+    option2Route: z.string().nullable(),
+    option3Message: z.string() ?? '',
+    option3Route: z.string().nullable(),
+    option4Message: z.string() ?? '',
+    option4Route: z.string().nullable(),
+    option5Message: z.string() ?? '',
+    option5Route: z.string().nullable(),
+    option6Message: z.string() ?? '',
+    option6Route: z.string().nullable(),
+    option7Message: z.string() ?? '',
+    option7Route: z.string().nullable(),
+    option8Message: z.string() ?? '',
+    option8Route: z.string().nullable(),
+    option9Message: z.string() ?? '',
+    option9Route: z.string().nullable(),
+    asteriskMessage: z.string() ?? '',
+    asteriskRoute: z.string().nullable(),
+    hashMessage: z.string() ?? '',
+    hashRoute: z.string().nullable(),
   })
   .superRefine((val, ctx) => {
     for (const field of fieldList) {
-      const messageField = `${field.value}_message`;
-      const routeField = `${field.value}_route`;
+      const messageField = `${field.value}Message`;
+      const routeField = `${field.value}Route`;
 
       if (
         val[messageField as keyof typeof val] &&
@@ -72,18 +76,18 @@ const schema = z
     }
 
     if (
-      !val.option0_route &&
-      !val.option1_route &&
-      !val.option2_route &&
-      !val.option3_route &&
-      !val.option4_route &&
-      !val.option5_route &&
-      !val.option6_route &&
-      !val.option7_route &&
-      !val.option8_route &&
-      !val.option9_route &&
-      !val.asterisk_route &&
-      !val.hash_route
+      !val.option0Route &&
+      !val.option1Route &&
+      !val.option2Route &&
+      !val.option3Route &&
+      !val.option4Route &&
+      !val.option5Route &&
+      !val.option6Route &&
+      !val.option7Route &&
+      !val.option8Route &&
+      !val.option9Route &&
+      !val.asteriskRoute &&
+      !val.hashRoute
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -103,9 +107,9 @@ const MenusForm: React.FC<MenusFormProps> = ({ id, onSuccess }) => {
     error: menusError,
     isValidating,
   } = useMenu(newRecord ? undefined : id, { revalidateOnFocus: false });
-  // const { addNotification } = useContext(NotificationContext);
+  const { addNotification } = useContext(NotificationContext);
 
-  // const { mutate } = useCollectionRequest<Menu>('menus');
+  const { mutate } = useCollectionRequest<Menu>('menus');
   const { isSuperUser, hasWriteAccess } = useIsAuthorised([EntityRoles.Menus]);
 
   const hasWritePermissions = isSuperUser || hasWriteAccess;
@@ -119,7 +123,26 @@ const MenusForm: React.FC<MenusFormProps> = ({ id, onSuccess }) => {
       schema={schema}
       onSubmit={async (values) => {
         setIsLoading(true);
-        console.log('values :>> ', values);
+        mutate(async (existingMenus) => {
+          try {
+            const { data } = await saveMenu({
+              ...values,
+              ...(!!menu && { id: menu.menu_id }),
+            });
+            const updatedMenu = { [data['menu_id']]: data };
+
+            addNotification({
+              title: `${data.menu_name} Menu ${
+                newRecord ? 'Created' : 'Updated'
+              }.`,
+              type: 'success',
+              duration: 10000,
+            });
+            return { ...existingMenus, ...updatedMenu };
+          } catch (error) {
+            return existingMenus;
+          }
+        });
         setIsLoading(false);
         onSuccess();
         return;
@@ -128,6 +151,35 @@ const MenusForm: React.FC<MenusFormProps> = ({ id, onSuccess }) => {
         defaultValues: {
           name: menu?.menu_name,
           maxRetries: menu?.max_retries ?? 3,
+          menuMessage: menu?.menu_message.toString(),
+          noInputMessage: menu?.no_input_message?.toString(),
+          noInputRoute: menu?.no_input_route,
+          noMatchMessage: menu?.no_match_message?.toString(),
+          noMatchRoute: menu?.no_match_route,
+          option0Message: menu?.opt0_message?.toString(),
+          option0Route: menu?.opt0_route,
+          option1Message: menu?.opt1_message?.toString(),
+          option1Route: menu?.opt1_route,
+          option2Message: menu?.opt2_message?.toString(),
+          option2Route: menu?.opt2_route,
+          option3Message: menu?.opt3_message?.toString(),
+          option3Route: menu?.opt3_route,
+          option4Message: menu?.opt4_message?.toString(),
+          option4Route: menu?.opt4_route,
+          option5Message: menu?.opt5_message?.toString(),
+          option5Route: menu?.opt5_route,
+          option6Message: menu?.opt6_message?.toString(),
+          option6Route: menu?.opt6_route,
+          option7Message: menu?.opt7_message?.toString(),
+          option7Route: menu?.opt7_route,
+          option8Message: menu?.opt8_message?.toString(),
+          option8Route: menu?.opt8_route,
+          option9Message: menu?.opt9_message?.toString(),
+          option9Route: menu?.opt9_route,
+          asteriskMessage: menu?.asterisk_message?.toString(),
+          asteriskRoute: menu?.asterisk_route,
+          hashMessage: menu?.hash_message?.toString(),
+          hashRoute: menu?.hash_route,
         },
       }}
       className="w-full sm:max-w-md lg:max-w-3xl space-y-3"
@@ -170,11 +222,11 @@ const MenusForm: React.FC<MenusFormProps> = ({ id, onSuccess }) => {
                 <MessageSelectField
                   control={control}
                   registration={register(
-                    `${field.value}_message` as keyof MenusFormValues
+                    `${field.value}Message` as keyof MenusFormValues
                   )}
                   error={
                     formState.errors[
-                      `${field.value}_message` as keyof MenusFormValues
+                      `${field.value}Message` as keyof MenusFormValues
                     ]
                   }
                   label={`${field.label} Message`}
@@ -184,11 +236,11 @@ const MenusForm: React.FC<MenusFormProps> = ({ id, onSuccess }) => {
                 <RouteSelectInfoField
                   control={control}
                   registration={register(
-                    `${field.value}_route` as keyof MenusFormValues
+                    `${field.value}Route` as keyof MenusFormValues
                   )}
                   error={
                     formState.errors[
-                      `${field.value}_route` as keyof MenusFormValues
+                      `${field.value}Route` as keyof MenusFormValues
                     ]
                   }
                   label={`${field.label} Route`}

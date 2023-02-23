@@ -30,9 +30,9 @@ export interface Menu {
   opt9_message: number | null;
   opt9_route: string | null;
   no_input_message: number | null;
-  no_input_route: string | null;
+  no_input_route: string;
   no_match_message: number | null;
-  no_match_route: string | null;
+  no_match_route: string;
   asterisk_message: number | null;
   asterisk_route: string | null;
   hash_message: number | null;

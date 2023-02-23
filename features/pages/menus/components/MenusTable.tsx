@@ -104,10 +104,6 @@ const MenusTable: React.FC = () => {
 
   if (error) return <div>We have encountered an error..</div>;
 
-  console.log('data.length :>> ', data.length);
-  console.log('filters.option :>> ', filters.optionExceptionList);
-  console.log('filters.option.length :>> ', filters.optionExceptionList.length);
-
   return (
     <div className="w-full flex flex-col md:flex-row">
       <div className="sm:w-56 flex md:flex-col p-2 space-x-3 md:space-y-3 md:space-x-0">
@@ -125,7 +121,7 @@ const MenusTable: React.FC = () => {
               title="Destination Types"
               description="Filter by Destination Type"
             >
-              {filters.optionList.map((menuOption, index) => (
+              {filters.optionsList.map((menuOption, index) => (
                 <Switch
                   key={menuOption.value}
                   isChecked={

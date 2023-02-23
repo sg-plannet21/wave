@@ -22,6 +22,7 @@ export const fieldList: FieldList = [
   { value: 'asterisk', label: 'Option *' },
   { value: 'hash', label: 'Option #' },
 ];
+const optionsList = fieldList.slice(2);
 
 type ActiveOptionType = { label: string; route: string | null };
 
@@ -111,9 +112,7 @@ export function useMenusTableData() {
     error: menusError || routesError,
     data: filtered,
     filters: {
-      optionList: fieldList.filter(
-        (field) => field.value !== 'noInput' && field.value !== 'noMatch'
-      ),
+      optionsList,
       optionExceptionList,
       setOptionExceptionList,
     },
