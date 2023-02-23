@@ -3,15 +3,19 @@ import { TableColumn } from 'components/data-display/table';
 import WaveTable from 'components/data-display/wave-table';
 import Popover from 'components/feedback/popover/Popover';
 import { Plus } from 'components/icons';
+import Switch from 'components/inputs/switch';
+import { mapNumberToColour } from 'components/inputs/switch/Switch';
 import WaveTablePage from 'components/skeletons/wave-table-page/WaveTablePage';
+import Card from 'components/surfaces/card';
+import _ from 'lodash';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { EntityRoles } from 'state/auth/types';
 import { useIsAuthorised } from 'state/hooks/useAuthorisation';
-import { menuOptionFields } from '../helpers/form-helpers';
 import {
   MenuOptions,
   MenusTableRecord,
+  fieldList,
   useMenusTableData,
 } from '../hooks/useMenusTableData';
 import DeleteMenu from './DeleteMenu';
@@ -20,11 +24,11 @@ const MenusTable: React.FC = () => {
   const {
     query: { businessUnitId },
   } = useRouter();
-  const { data, isLoading, error } = useMenusTableData();
+  const { data, filters, isLoading, error } = useMenusTableData();
   const { isSuperUser, hasWriteAccess } = useIsAuthorised([EntityRoles.Menus]);
 
-  const options: TableColumn<MenusTableRecord>[] = menuOptionFields.map(
-    (option) => ({
+  const options: TableColumn<MenusTableRecord>[] = fieldList.map(
+    ({ value: option }) => ({
       field: option as keyof MenuOptions,
       label: '',
       ignoreFiltering: true,
@@ -89,10 +93,20 @@ const MenusTable: React.FC = () => {
     });
   }
 
+  function handleOptionFilterChange(option: string) {
+    filters.setOptionExceptionList((exceptionList) =>
+      _.xor(exceptionList, [option])
+    );
+  }
+
   if (isLoading)
     return <WaveTablePage filters={[]} numberOfColumns={columns.length} />;
 
   if (error) return <div>We have encountered an error..</div>;
+
+  console.log('data.length :>> ', data.length);
+  console.log('filters.option :>> ', filters.optionExceptionList);
+  console.log('filters.option.length :>> ', filters.optionExceptionList.length);
 
   return (
     <div className="w-full flex flex-col md:flex-row">
@@ -103,6 +117,28 @@ const MenusTable: React.FC = () => {
             <span>New Menu</span>
           </a>
         </Link>
+
+        {(data.length > 0 ||
+          (data.length === 0 && filters.optionExceptionList.length !== 0)) && (
+          <div className="hidden md:block">
+            <Card
+              title="Destination Types"
+              description="Filter by Destination Type"
+            >
+              {filters.optionList.map((menuOption, index) => (
+                <Switch
+                  key={menuOption.value}
+                  isChecked={
+                    !filters.optionExceptionList.includes(menuOption.value)
+                  }
+                  label={menuOption.label}
+                  onChange={() => handleOptionFilterChange(menuOption.value)}
+                  colour={mapNumberToColour(index)}
+                />
+              ))}
+            </Card>
+          </div>
+        )}
       </div>
       <div className="flex-1 overflow-x-auto">
         <WaveTable columns={columns} data={data} />

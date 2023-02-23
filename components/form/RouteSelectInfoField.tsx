@@ -17,7 +17,6 @@ function getEntityLink(
   route: Route,
   destinationType: string
 ): JSX.Element | undefined {
-  console.log('destinationType :>> ', destinationType);
   switch (destinationType.toLowerCase()) {
     case 'section':
       return (
