@@ -19,6 +19,7 @@ import {
   useMenusTableData,
 } from '../hooks/useMenusTableData';
 import DeleteMenu from './DeleteMenu';
+import MenuVersions from './MenuVersions';
 
 const MenusTable: React.FC = () => {
   const {
@@ -76,6 +77,14 @@ const MenusTable: React.FC = () => {
     },
     ...options,
     { field: 'retries', label: 'Retries' },
+    {
+      field: 'id',
+      label: '',
+      ignoreFiltering: true,
+      Cell({ entry }) {
+        return <MenuVersions menuId={entry.id} />;
+      },
+    },
   ];
 
   if (isSuperUser || hasWriteAccess) {

@@ -15,7 +15,7 @@ import { ScheduleException } from '../types';
 import { useScheduleException } from './useScheduleException';
 
 const {
-  publicRuntimeConfig: { versionTableFormat },
+  publicRuntimeConfig: { versionTableDateFormat },
 } = getConfig();
 
 export default function useScheduleExceptionsVersionData(
@@ -50,10 +50,10 @@ export default function useScheduleExceptionsVersionData(
             'route_name'
           ),
           start_time: moment(scheduleException.start_time).format(
-            versionTableFormat
+            versionTableDateFormat
           ),
           end_time: moment(scheduleException.start_time).format(
-            versionTableFormat
+            versionTableDateFormat
           ),
           ...[
             'message_1',

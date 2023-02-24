@@ -25,4 +25,4 @@ export type EntityMapping<Entity> = {
 };
 
 export type FormattedToVersionTable<Entity> = CommonVersionFields &
-  VersionMappings<Omit<Entity, 'versions'>>;
+  VersionMappings<Omit<Entity, 'versions' | 'dependencies'>>;
