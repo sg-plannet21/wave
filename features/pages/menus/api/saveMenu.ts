@@ -5,7 +5,7 @@ import { Menu } from '../types';
 
 type NewMenuDto = {
   name: Menu['menu_name'];
-  maxRetries: Menu['max_retries'];
+  maxRetries: string;
   menuMessage: string;
   option0Message: string;
   option0Route: Menu['opt0_route'];
@@ -59,7 +59,7 @@ function mapMenuToDto(data: NewMenuDto | ExistingMenuDto): Partial<Menu> {
   return {
     ...(isExistingMenu(data) && { menu_id: data.id }),
     menu_name: data.name,
-    max_retries: data.maxRetries,
+    max_retries: parseInt(data.maxRetries),
     menu_message: parseInt(data.menuMessage),
     opt0_message: mapMessageToDto(data.option0Message),
     opt0_route: data.option0Route,

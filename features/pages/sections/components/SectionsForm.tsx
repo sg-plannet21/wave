@@ -30,7 +30,7 @@ const SectionsForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
     data: section,
     error: sectionError,
     isValidating,
-  } = useSection(newRecord ? undefined : id);
+  } = useSection(newRecord ? undefined : id, { revalidateOnFocus: false });
   const { addNotification } = useContext(NotificationContext);
 
   const { mutate } = useCollectionRequest<Section>('sections');
@@ -51,7 +51,7 @@ const SectionsForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
       onSubmit={async (values) => {
         setIsLoading(true);
         mutate(
-          async (sections) => {
+          async (existingSections) => {
             try {
               const { data } = newRecord
                 ? await createSection(values)
@@ -68,10 +68,10 @@ const SectionsForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
               });
 
               onSuccess();
-              return { ...sections, ...section };
+              return { ...existingSections, ...section };
             } catch (error) {
               console.log('error', error);
-              return sections;
+              return existingSections;
             } finally {
               setIsLoading(false);
             }

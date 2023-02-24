@@ -8,7 +8,6 @@ export interface Queue {
   cc_queue_id: string;
   queue_name: string;
   queue_priority: number;
-  closed_toggle: boolean;
   no_agents_toggle: boolean;
   max_queue_calls_toggle: boolean;
   max_queue_calls_threshold: number | null;
@@ -25,14 +24,15 @@ export interface Queue {
   queue_message_4: number | null;
   queue_message_5: number | null;
   queue_music: number;
+  closed_toggle: boolean;
   closed_message: number | null;
-  closed_route: number | null;
+  closed_route: string | null;
   no_agents_message: number | null;
-  no_agents_route: number | null;
+  no_agents_route: string | null;
   max_queue_calls_message: number | null;
-  max_queue_calls_route: number | null;
+  max_queue_calls_route: string | null;
   max_queue_time_message: number | null;
-  max_queue_time_route: number | null;
-  callback_route: number | null;
+  max_queue_time_route: string | null;
+  callback_route: string | null;
   whisper_message: number | null;
 }

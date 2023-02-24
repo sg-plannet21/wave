@@ -2,6 +2,7 @@ import { Form } from 'components/form/Form';
 import { InputField } from 'components/form/InputField';
 import MessageSelectField from 'components/form/MessageSelectField';
 import RouteSelectInfoField from 'components/form/RouteSelectInfoField';
+import { Option, SelectField } from 'components/form/SelectField';
 import Button from 'components/inputs/button';
 import { useContext, useState } from 'react';
 import { EntityRoles } from 'state/auth/types';
@@ -19,15 +20,15 @@ type MenusFormProps = {
   id: string;
 };
 
+const retryRange: Option[] = Array.from(Array(10).keys()).map((key) => ({
+  value: key,
+  label: key,
+}));
+
 const schema = z
   .object({
     name: z.string().min(1, ' Menu name is required'),
-    maxRetries: z
-      .number({
-        invalid_type_error: 'Max Retries must be a number in the range 0-10',
-      })
-      .min(0, 'Max Retries must be 0 or more')
-      .max(10, 'Max Retries must be 10 or less'),
+    maxRetries: z.string().min(1, 'Max Retries is required'),
     menuMessage: z.string().min(1, 'Menu Message is required'),
     noInputMessage: z.string() ?? '',
     noInputRoute: z.string().min(1, 'No Input Route is a required field'),
@@ -150,7 +151,7 @@ const MenusForm: React.FC<MenusFormProps> = ({ id, onSuccess }) => {
       options={{
         defaultValues: {
           name: menu?.menu_name,
-          maxRetries: menu?.max_retries ?? 3,
+          maxRetries: String(menu?.max_retries ?? 3),
           menuMessage: menu?.menu_message.toString(),
           noInputMessage: menu?.no_input_message?.toString(),
           noInputRoute: menu?.no_input_route,
@@ -201,14 +202,16 @@ const MenusForm: React.FC<MenusFormProps> = ({ id, onSuccess }) => {
                 registration={register('menuMessage')}
                 error={formState.errors['menuMessage']}
                 label="Menu Message"
+                disabled={!hasWritePermissions}
               />
             </div>
             <div>
-              <InputField
-                type="number"
-                registration={register('maxRetries', { valueAsNumber: true })}
+              <SelectField
+                registration={register('maxRetries')}
                 error={formState.errors['maxRetries']}
                 label="Max Retries"
+                options={retryRange}
+                disabled={!hasWritePermissions}
               />
             </div>
           </div>
@@ -230,6 +233,7 @@ const MenusForm: React.FC<MenusFormProps> = ({ id, onSuccess }) => {
                     ]
                   }
                   label={`${field.label} Message`}
+                  disabled={!hasWritePermissions}
                 />
               </div>
               <div className="flex-1">
@@ -244,6 +248,7 @@ const MenusForm: React.FC<MenusFormProps> = ({ id, onSuccess }) => {
                     ]
                   }
                   label={`${field.label} Route`}
+                  disabled={!hasWritePermissions}
                 />
               </div>
             </div>
