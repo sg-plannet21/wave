@@ -1,4 +1,5 @@
 import { Switch as UISwitch } from '@headlessui/react';
+import classNames from 'classnames';
 import { Dispatch, SetStateAction } from 'react';
 
 const colourList = {
@@ -56,42 +57,43 @@ export type SwitchProps = {
   isChecked: boolean;
   onChange: Dispatch<SetStateAction<boolean>>;
   colour?: keyof typeof colourList;
+  className?: string;
+  disabled?: boolean;
 };
 
 const Switch: React.FC<SwitchProps> = ({
   label,
   isChecked,
   onChange,
+  className = 'flex items-center justify-between py-1',
   colour = 'indigo',
+  disabled = false,
 }) => {
   return (
-    <div className="flex items-center justify-center py-4 px-2">
-      <div className="w-full max-w-xs mx-auto">
-        <UISwitch.Group as="div" className="flex items-center justify-between">
-          <UISwitch.Label className="flex-1">{label}</UISwitch.Label>
-          <UISwitch
-            as="button"
-            checked={isChecked}
-            onChange={onChange}
+    <UISwitch.Group as="div" className={classNames(className)}>
+      <UISwitch.Label className="flex-1">{label}</UISwitch.Label>
+      <UISwitch
+        as="button"
+        disabled={disabled}
+        checked={isChecked}
+        onChange={onChange}
+        className={`${
+          isChecked
+            ? `${colourList[colour].background}`
+            : 'bg-gray-200 dark:bg-gray-700'
+        } relative inline-flex flex-shrink-0 h-6 transition-colors duration-200 ease-in-out border-2 border-transparent rounded-full cursor-pointer w-11 focus:outline-none focus:shadow-outline focus:ring-4 ${
+          colourList[colour].ring
+        }`}
+      >
+        {({ checked }) => (
+          <span
             className={`${
-              isChecked
-                ? `${colourList[colour].background}`
-                : 'bg-gray-200 dark:bg-gray-700'
-            } relative inline-flex flex-shrink-0 h-6 transition-colors duration-200 ease-in-out border-2 border-transparent rounded-full cursor-pointer w-11 focus:outline-none focus:shadow-outline focus:ring-4 ${
-              colourList[colour].ring
-            }`}
-          >
-            {({ checked }) => (
-              <span
-                className={`${
-                  checked ? 'translate-x-5' : 'translate-x-0'
-                } inline-block w-5 h-5 transition-colors duration-200 ease-in-out transform bg-white rounded-full bg-`}
-              />
-            )}
-          </UISwitch>
-        </UISwitch.Group>
-      </div>
-    </div>
+              checked ? 'translate-x-5' : 'translate-x-0'
+            } inline-block w-5 h-5 transition-colors duration-200 ease-in-out transform bg-white rounded-full bg-`}
+          />
+        )}
+      </UISwitch>
+    </UISwitch.Group>
   );
 };
 

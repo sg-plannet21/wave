@@ -17,18 +17,21 @@ type EditQueue = {
   closedToggle: boolean;
   closedMessage?: string;
   closedRoute?: string;
-  noAgentToggle: boolean;
-  noAgentMessage?: string;
-  noAgentRoute?: string;
+  noAgentsToggle: boolean;
+  noAgentsMessage?: string;
+  noAgentsRoute?: string;
   maxQueueCallsToggle: boolean;
+  maxQueueCallsThreshold?: string;
   maxQueueCallsMessage?: string;
   maxQueueCallsRoute?: string;
   maxQueueTimeToggle: boolean;
+  maxQueueTimeThreshold?: string;
   maxQueueTimeMessage?: string;
   maxQueueTimeRoute?: string;
-  callbackToggle: boolean;
-  callbackCallsThreshold?: number;
-  callbackTimeThreshold?: number;
+  callbacksToggle: boolean;
+  callbackCallsThreshold?: string;
+  callbackTimeThreshold?: string;
+  callbackRoute?: string;
 };
 
 function mapMessageToDto(message?: string): number | null {
@@ -56,13 +59,14 @@ function mapToDto(data: EditQueue): Partial<Queue> {
       ? mapMessageToDto(data.closedMessage)
       : null,
     closed_route: data.closedToggle ? mapRouteToDto(data.closedRoute) : null,
-    no_agents_toggle: data.noAgentToggle,
-    no_agents_message: data.noAgentToggle
-      ? mapMessageToDto(data.noAgentMessage)
+    no_agents_toggle: data.noAgentsToggle,
+    no_agents_message: data.noAgentsToggle
+      ? mapMessageToDto(data.noAgentsMessage)
       : null,
-    no_agents_route: data.noAgentToggle
-      ? mapRouteToDto(data.noAgentRoute)
+    no_agents_route: data.noAgentsToggle
+      ? mapRouteToDto(data.noAgentsRoute)
       : null,
+
     max_queue_calls_toggle: data.maxQueueCallsToggle,
     max_queue_calls_message: data.maxQueueCallsToggle
       ? mapMessageToDto(data.maxQueueCallsMessage)
@@ -70,19 +74,40 @@ function mapToDto(data: EditQueue): Partial<Queue> {
     max_queue_calls_route: data.maxQueueCallsToggle
       ? mapRouteToDto(data.maxQueueCallsRoute)
       : null,
+
+    max_queue_calls_threshold:
+      data.maxQueueCallsToggle &&
+      typeof data.maxQueueCallsThreshold === 'number'
+        ? data.maxQueueCallsThreshold
+        : null,
+
     max_queue_time_toggle: data.maxQueueTimeToggle,
+
+    max_queue_time_threshold:
+      data.maxQueueCallsToggle && typeof data.maxQueueTimeThreshold === 'number'
+        ? data.maxQueueTimeThreshold
+        : null,
+
     max_queue_time_message: data.maxQueueTimeToggle
       ? mapMessageToDto(data.maxQueueTimeMessage)
       : null,
     max_queue_time_route: data.maxQueueTimeToggle
       ? mapRouteToDto(data.maxQueueTimeRoute)
       : null,
-    callback_toggle: data.callbackToggle,
-    callback_calls_threshold: data.callbackToggle
-      ? data.callbackCallsThreshold
-      : null,
-    callback_time_threshold: data.callbackToggle
-      ? data.callbackTimeThreshold
+
+    callback_toggle: data.callbacksToggle,
+    callback_calls_threshold:
+      data.callbacksToggle && typeof data.callbackCallsThreshold === 'number'
+        ? data.callbackCallsThreshold
+        : null,
+
+    callback_time_threshold:
+      data.callbacksToggle && typeof data.callbackTimeThreshold === 'number'
+        ? data.callbackTimeThreshold
+        : null,
+
+    callback_route: data.callbacksToggle
+      ? mapRouteToDto(data.callbackRoute)
       : null,
   };
 }
@@ -91,5 +116,6 @@ export function saveQueue(
   data: EditQueue
 ): Promise<AxiosResponse<Queue, WaveError>> {
   const payload = mapToDto(data);
-  return axios.patch(`/menus/${data.id}/`, payload);
+  console.log('payload :>> ', payload);
+  return axios.patch(`/queues/${data.id}/`, payload);
 }
