@@ -27,7 +27,9 @@ const MessagesForm: React.FC<MessagesFormProps> = ({ id, onSuccess }) => {
   const { data: prompt, error: promptsError, isValidating } = useMessage(id);
   const { addNotification } = useContext(NotificationContext);
 
-  const { mutate } = useCollectionRequest<Prompt>('prompts');
+  const { mutate } = useCollectionRequest<Prompt>('prompts', {
+    revalidateOnFocus: false,
+  });
 
   const { isSuperUser, hasWriteAccess } = useIsAuthorised([
     EntityRoles.Prompts,

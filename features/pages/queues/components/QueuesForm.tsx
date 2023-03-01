@@ -6,6 +6,7 @@ import RouteSelectInfoField from 'components/form/RouteSelectInfoField';
 import { SelectField } from 'components/form/SelectField';
 import Button from 'components/inputs/button';
 import Switch from 'components/inputs/switch';
+import { isValidNumber } from 'lib/client/utilities';
 import { useContext, useState } from 'react';
 import { Controller } from 'react-hook-form';
 import { EntityRoles } from 'state/auth/types';
@@ -36,7 +37,7 @@ const priorityRange: Option[] = Array.from(Array(10).keys()).map((key) => ({
 
 const schema = z
   .object({
-    priority: z.number(),
+    priority: z.string(),
     whisperMessage: z.string().optional(),
     queueWelcome: z.string().optional(),
     queueMusic: z.string().min(1, 'Queue Music is required'),
@@ -59,18 +60,106 @@ const schema = z
     maxQueueTimeMessage: z.string().optional(),
     maxQueueTimeThreshold: z.string().optional(),
     maxQueueTimeRoute: z.string().optional(),
-    callbacksToggle: z.boolean(),
-    callbacksCallsThreshold: z.string().optional(),
-    callbacksTimeThreshold: z.string().optional(),
-    callbacksRoute: z.string().optional(),
+    callbackToggle: z.boolean(),
+    callbackCallsThreshold: z.string().optional(),
+    callbackTimeThreshold: z.string().optional(),
+    callbackRoute: z.string().optional(),
   })
   .superRefine((formValues, ctx) => {
+    // closed toggle
     if (formValues.closedToggle && !formValues.closedRoute) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Route is required when Closed Toggle is enabled',
+        message: 'Required when toggle is enabled',
         path: ['closedRoute'],
       });
+    }
+
+    // no agents toggle
+    if (formValues.noAgentsToggle && !formValues.noAgentsRoute) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Required when toggle is enabled',
+        path: ['noAgentsRoute'],
+      });
+    }
+
+    // max queue calls toggle
+    if (formValues.maxQueueCallsToggle) {
+      // max queue calls threshold (number)
+      if (
+        !formValues.maxQueueCallsThreshold ||
+        !isValidNumber(formValues.maxQueueCallsThreshold)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Number of calls required',
+          path: ['maxQueueCallsThreshold'],
+        });
+      }
+
+      // max queue calls route
+      if (!formValues.maxQueueCallsRoute) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Required when toggle is enabled',
+          path: ['maxQueueCallsRoute'],
+        });
+      }
+    }
+
+    // max queue time toggle
+    if (formValues.maxQueueTimeToggle) {
+      // max queue time (number)
+      if (
+        !formValues.maxQueueTimeThreshold ||
+        !isValidNumber(formValues.maxQueueTimeThreshold)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Max Queue seconds required',
+          path: ['maxQueueTimeThreshold'],
+        });
+      }
+
+      // max queue time Route
+      if (!formValues.maxQueueTimeRoute) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Required when toggle is enabled',
+          path: ['maxQueueTimeRoute'],
+        });
+      }
+    }
+
+    if (formValues.callbackToggle) {
+      // callback calls threshold or callback time threshold must be populated
+      if (
+        (!formValues.callbackCallsThreshold ||
+          !isValidNumber(formValues.callbackCallsThreshold)) &&
+        (!formValues.callbackTimeThreshold ||
+          !isValidNumber(formValues.callbackTimeThreshold))
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'At least one threshold field is required',
+          path: ['callbackCallsThreshold'],
+        });
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'At least one threshold field is required',
+          path: ['callbackTimeThreshold'],
+        });
+      }
+
+      // callback Route
+      if (!formValues.callbackRoute) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Required when toggle is enabled',
+          path: ['callbackRoute'],
+        });
+      }
     }
   });
 
@@ -86,7 +175,9 @@ const QueuesForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
   } = useQueue(newRecord ? undefined : id, { revalidateOnFocus: false });
   const { addNotification } = useContext(NotificationContext);
 
-  const { mutate } = useCollectionRequest<Queue>('queues');
+  const { mutate } = useCollectionRequest<Queue>('queues', {
+    revalidateOnFocus: false,
+  });
   const { isSuperUser, hasWriteAccess } = useIsAuthorised([EntityRoles.Queues]);
 
   const hasWritePermissions = isSuperUser || hasWriteAccess;
@@ -95,6 +186,8 @@ const QueuesForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
   if (isValidating) return <div>Loading..</div>;
 
   if (queueError) return <div>An error has occurred</div>;
+
+  console.log('queue :>> ', queue);
 
   return (
     <Form<QueuesFormValues, typeof schema>
@@ -105,9 +198,13 @@ const QueuesForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
         mutate(
           async (existingQueues) => {
             try {
-              const { data } = await saveQueue({ ...values, id });
+              const { data } = await saveQueue({
+                ...values,
+                id,
+                queueName: queue?.queue_name as string,
+              });
 
-              const updated = { [data['queue_name']]: data };
+              const updated = { [data['queue_id']]: data };
 
               addNotification({
                 title: `${data.queue_name} Queue Updated}`,
@@ -129,7 +226,7 @@ const QueuesForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
       }}
       options={{
         defaultValues: {
-          priority: queue?.queue_priority ?? 3,
+          priority: String(queue?.queue_priority ?? 3),
           queueMessage1: queue?.queue_message_1?.toString(),
           queueMessage2: queue?.queue_message_2?.toString(),
           queueMessage3: queue?.queue_message_3?.toString(),
@@ -145,51 +242,54 @@ const QueuesForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
           noAgentsMessage: queue?.no_agents_message?.toString(),
           noAgentsRoute: queue?.no_agents_route?.toString(),
           maxQueueCallsToggle: queue?.max_queue_calls_toggle,
-          maxQueueCallsThreshold: queue?.max_queue_calls_message?.toString(),
+          maxQueueCallsThreshold: queue?.max_queue_calls_threshold?.toString(),
           maxQueueCallsMessage: queue?.max_queue_calls_message?.toString(),
           maxQueueCallsRoute: queue?.max_queue_calls_route?.toString(),
           maxQueueTimeToggle: queue?.max_queue_time_toggle,
-          maxQueueTimeThreshold: queue?.max_queue_time_message?.toString(),
+          maxQueueTimeThreshold: queue?.max_queue_time_threshold?.toString(),
           maxQueueTimeMessage: queue?.max_queue_time_message?.toString(),
           maxQueueTimeRoute: queue?.max_queue_time_route?.toString(),
-          callbacksToggle: queue?.callback_toggle,
-          callbacksCallsThreshold: queue?.callback_calls_threshold?.toString(),
-          callbacksTimeThreshold: queue?.callback_time_threshold?.toString(),
-          callbacksRoute: queue?.callback_route?.toString(),
+          callbackToggle: queue?.callback_toggle,
+          callbackCallsThreshold: queue?.callback_calls_threshold?.toString(),
+          callbackTimeThreshold: queue?.callback_time_threshold?.toString(),
+          callbackRoute: queue?.callback_route?.toString(),
         },
       }}
       className="w-full sm:max-w-md lg:max-w-4xl space-y-3"
     >
       {({ register, formState, control }) => (
         <>
+          <h1 className="text-2xl font-semibold text-center sm:text-left leading-none tracking-tight text-gray-700 dark:text-gray-200">
+            {queue?.queue_name}
+          </h1>
           <div className="flex flex-col space-y-3 lg:flex-row lg:items-start lg:space-x-6 lg:space-y-0">
             <div className="flex flex-col space-y-3 flex-1">
               <SelectField
+                label="Queue Priority"
                 registration={register('priority')}
                 error={formState.errors['priority']}
-                label="Queue Priority"
                 options={priorityRange}
                 disabled={!hasWritePermissions}
               />
               <MessageSelectField
+                label="Queue Welcome"
                 control={control}
                 registration={register('queueWelcome')}
                 error={formState.errors['queueWelcome']}
-                label="Whisper Announcement"
                 disabled={!hasWritePermissions}
               />
               <MessageSelectField
+                label="Queue Music"
                 control={control}
                 registration={register('queueMusic')}
                 error={formState.errors['queueMusic']}
-                label="Whisper Announcement"
                 disabled={!hasWritePermissions}
               />
               <MessageSelectField
+                label="Whisper Announcement"
                 control={control}
                 registration={register('whisperMessage')}
                 error={formState.errors['whisperMessage']}
-                label="Whisper Announcement"
                 disabled={!hasWritePermissions}
               />
             </div>
@@ -197,7 +297,7 @@ const QueuesForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
               {Array.from(Array(5).keys()).map((ele) => (
                 <MessageSelectField
                   key={ele}
-                  disabled={!hasWritePermissions}
+                  label={`Message ${ele + 1}`}
                   control={control}
                   registration={register(
                     `queueMessage${ele + 1}` as queueMessages
@@ -205,7 +305,7 @@ const QueuesForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
                   error={
                     formState.errors[`queueMessage${ele + 1}` as queueMessages]
                   }
-                  label={`Message ${ele + 1}`}
+                  disabled={!hasWritePermissions}
                 />
               ))}
             </div>
@@ -220,27 +320,27 @@ const QueuesForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
                 name="closedToggle"
                 render={({ field }) => (
                   <Switch
-                    disabled={!hasWritePermissions}
                     label="Status"
                     isChecked={field.value}
                     onChange={field.onChange}
                     className="flex w-24 text-sm flex-row-reverse items-end lg:items-start justify-between text-right lg:w-auto lg:flex-col lg:space-y-3 lg:pb-2"
+                    disabled={!hasWritePermissions}
                   />
                 )}
               />
               <MessageSelectField
-                disabled={!hasWritePermissions}
+                label="Closed Message"
                 control={control}
                 registration={register('closedMessage')}
                 error={formState.errors['closedMessage']}
-                label="Closed Message"
+                disabled={!hasWritePermissions}
               />
               <RouteSelectInfoField
-                disabled={!hasWritePermissions}
+                label="Closed Route"
                 control={control}
                 registration={register('closedRoute')}
                 error={formState.errors['closedRoute']}
-                label="Closed Route"
+                disabled={!hasWritePermissions}
               />
             </div>
           </fieldset>
@@ -255,27 +355,27 @@ const QueuesForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
                 name="noAgentsToggle"
                 render={({ field }) => (
                   <Switch
-                    disabled={!hasWritePermissions}
                     label="Status"
                     isChecked={field.value}
                     onChange={field.onChange}
                     className="flex w-24 text-sm flex-row-reverse items-end lg:items-start justify-between text-right lg:w-auto lg:flex-col lg:space-y-3 lg:pb-2"
+                    disabled={!hasWritePermissions}
                   />
                 )}
               />
               <MessageSelectField
-                disabled={!hasWritePermissions}
+                label="No Agents Message"
                 control={control}
                 registration={register('noAgentsMessage')}
                 error={formState.errors['noAgentsMessage']}
-                label="No Agents Message"
+                disabled={!hasWritePermissions}
               />
               <RouteSelectInfoField
-                disabled={!hasWritePermissions}
+                label="No Agent Route"
                 control={control}
                 registration={register('noAgentsRoute')}
                 error={formState.errors['noAgentsRoute']}
-                label="No Agent Route"
+                disabled={!hasWritePermissions}
               />
             </div>
           </fieldset>
@@ -290,18 +390,19 @@ const QueuesForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
                 name="maxQueueCallsToggle"
                 render={({ field }) => (
                   <Switch
-                    disabled={!hasWritePermissions}
                     label="Status"
                     isChecked={field.value}
                     onChange={field.onChange}
                     className="flex w-24 text-sm flex-row-reverse items-end lg:items-start justify-between text-right lg:w-auto lg:flex-col lg:space-y-3 lg:pb-2"
+                    disabled={!hasWritePermissions}
                   />
                 )}
               />
 
-              <div className="lg:w-128">
+              <div className="lg:w-56">
                 <InputField
                   label="Max Calls Threshold"
+                  placeholder="Max Queue Calls"
                   registration={register('maxQueueCallsThreshold')}
                   error={formState.errors['maxQueueCallsThreshold']}
                   type="number"
@@ -309,20 +410,24 @@ const QueuesForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
                 />
               </div>
 
-              <MessageSelectField
-                label="Max Queue Calls Message"
-                control={control}
-                registration={register('maxQueueCallsMessage')}
-                error={formState.errors['maxQueueCallsMessage']}
-                disabled={!hasWritePermissions}
-              />
-              <RouteSelectInfoField
-                disabled={!hasWritePermissions}
-                control={control}
-                registration={register('maxQueueCallsRoute')}
-                error={formState.errors['maxQueueCallsRoute']}
-                label="Max Queue Calls Route"
-              />
+              <div className="flex-1">
+                <MessageSelectField
+                  label="Max Queue Calls Message"
+                  control={control}
+                  registration={register('maxQueueCallsMessage')}
+                  error={formState.errors['maxQueueCallsMessage']}
+                  disabled={!hasWritePermissions}
+                />
+              </div>
+              <div className="flex-1">
+                <RouteSelectInfoField
+                  label="Max Queue Calls Route"
+                  control={control}
+                  registration={register('maxQueueCallsRoute')}
+                  error={formState.errors['maxQueueCallsRoute']}
+                  disabled={!hasWritePermissions}
+                />
+              </div>
             </div>
           </fieldset>
 
@@ -336,39 +441,43 @@ const QueuesForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
                 name="maxQueueTimeToggle"
                 render={({ field }) => (
                   <Switch
-                    disabled={!hasWritePermissions}
                     label="Status"
                     isChecked={field.value}
                     onChange={field.onChange}
                     className="flex w-24 text-sm flex-row-reverse items-end lg:items-start justify-between text-right lg:w-auto lg:flex-col lg:space-y-3 lg:pb-2"
+                    disabled={!hasWritePermissions}
                   />
                 )}
               />
 
-              <div className="lg:w-128">
+              <div className="lg:w-56">
                 <InputField
                   label="Max Seconds Threshold"
+                  placeholder="Max Queue Time seconds"
                   registration={register('maxQueueTimeThreshold')}
                   error={formState.errors['maxQueueTimeThreshold']}
                   type="number"
                   disabled={!hasWritePermissions}
                 />
               </div>
-
-              <MessageSelectField
-                label="Max Queue Time Message"
-                control={control}
-                registration={register('maxQueueTimeMessage')}
-                error={formState.errors['maxQueueTimeMessage']}
-                disabled={!hasWritePermissions}
-              />
-              <RouteSelectInfoField
-                disabled={!hasWritePermissions}
-                control={control}
-                registration={register('maxQueueTimeRoute')}
-                error={formState.errors['maxQueueTimeRoute']}
-                label="Max Queue Time Route"
-              />
+              <div className="flex-1">
+                <MessageSelectField
+                  label="Max Queue Time Message"
+                  control={control}
+                  registration={register('maxQueueTimeMessage')}
+                  error={formState.errors['maxQueueTimeMessage']}
+                  disabled={!hasWritePermissions}
+                />
+              </div>
+              <div className="flex-1">
+                <RouteSelectInfoField
+                  label="Max Queue Time Route"
+                  control={control}
+                  registration={register('maxQueueTimeRoute')}
+                  error={formState.errors['maxQueueTimeRoute']}
+                  disabled={!hasWritePermissions}
+                />
+              </div>
             </div>
           </fieldset>
 
@@ -379,45 +488,49 @@ const QueuesForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
             <div className="flex flex-col space-y-3 lg:flex-row lg:items-center lg:space-x-3 lg:space-y-0">
               <Controller
                 control={control}
-                name="callbacksToggle"
+                name="callbackToggle"
                 render={({ field }) => (
                   <Switch
-                    disabled={!hasWritePermissions}
                     label="Status"
                     isChecked={field.value}
                     onChange={field.onChange}
                     className="flex w-24 text-sm flex-row-reverse items-end lg:items-start justify-between text-right lg:w-auto lg:flex-col lg:space-y-3 lg:pb-2"
+                    disabled={!hasWritePermissions}
                   />
                 )}
               />
 
-              <div className="lg:w-80">
+              <div className="lg:w-56">
                 <InputField
                   label="Number Threshold"
-                  registration={register('callbacksCallsThreshold')}
-                  error={formState.errors['callbacksCallsThreshold']}
+                  placeholder="Number of Queue Calls"
+                  registration={register('callbackCallsThreshold')}
+                  error={formState.errors['callbackCallsThreshold']}
                   type="number"
                   disabled={!hasWritePermissions}
                 />
               </div>
 
-              <div className="lg:w-80">
+              <div className="lg:w-56">
                 <InputField
                   label="Seconds Threshold"
-                  registration={register('callbacksTimeThreshold')}
-                  error={formState.errors['callbacksTimeThreshold']}
+                  placeholder="Longest Queue Call seconds"
+                  registration={register('callbackTimeThreshold')}
+                  error={formState.errors['callbackTimeThreshold']}
                   type="number"
                   disabled={!hasWritePermissions}
                 />
               </div>
 
-              <RouteSelectInfoField
-                disabled={!hasWritePermissions}
-                control={control}
-                registration={register('callbacksRoute')}
-                error={formState.errors['callbacksRoute']}
-                label="Callback Route"
-              />
+              <div className="flex-1">
+                <RouteSelectInfoField
+                  label="Callback Route"
+                  control={control}
+                  registration={register('callbackRoute')}
+                  error={formState.errors['callbackRoute']}
+                  disabled={!hasWritePermissions}
+                />
+              </div>
             </div>
           </fieldset>
 

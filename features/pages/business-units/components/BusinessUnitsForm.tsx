@@ -40,7 +40,9 @@ const BusinessUnitsForm: React.FC<BusinessUnitFormProps> = ({
   } = useBusinessUnit(newRecord ? undefined : id);
   const { addNotification } = useContext(NotificationContext);
 
-  const { mutate } = useCollectionRequest<BusinessUnit>('businessUnits');
+  const { mutate } = useCollectionRequest<BusinessUnit>('businessUnits', {
+    revalidateOnFocus: false,
+  });
 
   if (isValidating) return <div>Loading..</div>;
 

@@ -110,7 +110,9 @@ const MenusForm: React.FC<MenusFormProps> = ({ id, onSuccess }) => {
   } = useMenu(newRecord ? undefined : id, { revalidateOnFocus: false });
   const { addNotification } = useContext(NotificationContext);
 
-  const { mutate } = useCollectionRequest<Menu>('menus');
+  const { mutate } = useCollectionRequest<Menu>('menus', {
+    revalidateOnFocus: false,
+  });
   const { isSuperUser, hasWriteAccess } = useIsAuthorised([EntityRoles.Menus]);
 
   const hasWritePermissions = isSuperUser || hasWriteAccess;

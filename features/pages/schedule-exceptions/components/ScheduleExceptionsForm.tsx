@@ -63,7 +63,9 @@ const ScheduleExceptionsForm: React.FC<ScheduleExceptionsFormProps> = ({
   });
 
   const { data: scheduleExceptions, mutate } =
-    useCollectionRequest<ScheduleException>('scheduleExceptions');
+    useCollectionRequest<ScheduleException>('scheduleExceptions', {
+      revalidateOnFocus: false,
+    });
 
   const { register, control, handleSubmit, formState, reset, setError } =
     useForm<ScheduleExceptionsFormValues>({

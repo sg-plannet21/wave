@@ -5,7 +5,8 @@ import { Queue } from '../types';
 
 type EditQueue = {
   id: string;
-  priority: number;
+  queueName: string;
+  priority: string;
   whisperMessage?: string;
   queueWelcome?: string;
   queueMusic: string;
@@ -28,7 +29,7 @@ type EditQueue = {
   maxQueueTimeThreshold?: string;
   maxQueueTimeMessage?: string;
   maxQueueTimeRoute?: string;
-  callbacksToggle: boolean;
+  callbackToggle: boolean;
   callbackCallsThreshold?: string;
   callbackTimeThreshold?: string;
   callbackRoute?: string;
@@ -45,7 +46,8 @@ function mapRouteToDto(route?: string): string | null {
 function mapToDto(data: EditQueue): Partial<Queue> {
   return {
     queue_id: data.id,
-    queue_priority: data.priority,
+    queue_name: data.queueName,
+    queue_priority: parseInt(data.priority),
     whisper_message: mapMessageToDto(data.whisperMessage),
     queue_welcome: mapMessageToDto(data.queueWelcome),
     queue_music: parseInt(data.queueMusic),
@@ -76,18 +78,15 @@ function mapToDto(data: EditQueue): Partial<Queue> {
       : null,
 
     max_queue_calls_threshold:
-      data.maxQueueCallsToggle &&
-      typeof data.maxQueueCallsThreshold === 'number'
-        ? data.maxQueueCallsThreshold
+      data.maxQueueCallsToggle && data.maxQueueCallsThreshold
+        ? parseInt(data.maxQueueCallsThreshold)
         : null,
 
     max_queue_time_toggle: data.maxQueueTimeToggle,
-
     max_queue_time_threshold:
-      data.maxQueueCallsToggle && typeof data.maxQueueTimeThreshold === 'number'
-        ? data.maxQueueTimeThreshold
+      data.maxQueueTimeToggle && data.maxQueueTimeThreshold
+        ? parseInt(data.maxQueueTimeThreshold)
         : null,
-
     max_queue_time_message: data.maxQueueTimeToggle
       ? mapMessageToDto(data.maxQueueTimeMessage)
       : null,
@@ -95,18 +94,16 @@ function mapToDto(data: EditQueue): Partial<Queue> {
       ? mapRouteToDto(data.maxQueueTimeRoute)
       : null,
 
-    callback_toggle: data.callbacksToggle,
+    callback_toggle: data.callbackToggle,
     callback_calls_threshold:
-      data.callbacksToggle && typeof data.callbackCallsThreshold === 'number'
-        ? data.callbackCallsThreshold
+      data.callbackToggle && data.callbackCallsThreshold
+        ? parseInt(data.callbackCallsThreshold)
         : null,
-
     callback_time_threshold:
-      data.callbacksToggle && typeof data.callbackTimeThreshold === 'number'
-        ? data.callbackTimeThreshold
+      data.callbackToggle && data.callbackTimeThreshold
+        ? parseInt(data.callbackTimeThreshold)
         : null,
-
-    callback_route: data.callbacksToggle
+    callback_route: data.callbackToggle
       ? mapRouteToDto(data.callbackRoute)
       : null,
   };

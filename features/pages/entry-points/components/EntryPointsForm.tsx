@@ -46,7 +46,9 @@ const EntryPointsForm: React.FC<EntryPointsFormProps> = ({ id, onSuccess }) => {
     isValidating,
   } = useEntryPoint(id, { revalidateOnFocus: false });
 
-  const { mutate } = useCollectionRequest<EntryPoint>('entrypoints');
+  const { mutate } = useCollectionRequest<EntryPoint>('entrypoints', {
+    revalidateOnFocus: false,
+  });
   const { addNotification } = useContext(NotificationContext);
 
   if (isValidating) return <div>Loading..</div>;

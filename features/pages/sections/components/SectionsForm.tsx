@@ -33,7 +33,9 @@ const SectionsForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
   } = useSection(newRecord ? undefined : id, { revalidateOnFocus: false });
   const { addNotification } = useContext(NotificationContext);
 
-  const { mutate } = useCollectionRequest<Section>('sections');
+  const { mutate } = useCollectionRequest<Section>('sections', {
+    revalidateOnFocus: false,
+  });
   const { isSuperUser, hasWriteAccess } = useIsAuthorised([
     EntityRoles.Schedules,
   ]);
