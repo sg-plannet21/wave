@@ -16,6 +16,7 @@ import {
   useQueuesTableData,
 } from '../hooks/useQueuesTableData';
 import DeleteQueue from './DeleteQueue';
+import QueueVersions from './QueueVersions';
 
 const inactiveLabel = 'Disabled';
 
@@ -124,6 +125,14 @@ const QueuesTable: React.FC = () => {
         );
       },
     },
+    {
+      field: 'id',
+      label: '',
+      ignoreFiltering: true,
+      Cell({ entry }) {
+        return <QueueVersions queueId={entry.id} />;
+      },
+    },
   ];
 
   if (isSuperUser || hasWriteAccess) {
@@ -146,7 +155,12 @@ const QueuesTable: React.FC = () => {
   }
 
   if (isLoading)
-    return <WaveTablePage filters={[]} numberOfColumns={columns.length} />;
+    return (
+      <WaveTablePage
+        filters={[{ showTitle: true, showDescription: true, rowCount: 5 }]}
+        numberOfColumns={columns.length}
+      />
+    );
 
   if (error) return <div>We have encountered an error..</div>;
 
