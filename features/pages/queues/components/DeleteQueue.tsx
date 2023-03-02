@@ -13,7 +13,7 @@ type DeleteQueueProps = {
 };
 
 // idle - loading - complete
-const DeleteSection: React.FC<DeleteQueueProps> = ({ id, name }) => {
+const DeleteQueue: React.FC<DeleteQueueProps> = ({ id, name }) => {
   const [status, setStatus] = React.useState<'idle' | 'loading' | 'complete'>(
     'idle'
   );
@@ -73,4 +73,4 @@ const DeleteSection: React.FC<DeleteQueueProps> = ({ id, name }) => {
   );
 };
 
-export default DeleteSection;
+export default DeleteQueue;

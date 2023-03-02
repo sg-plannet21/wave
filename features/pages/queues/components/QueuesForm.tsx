@@ -182,12 +182,9 @@ const QueuesForm: React.FC<SectionsFormProps> = ({ id, onSuccess }) => {
 
   const hasWritePermissions = isSuperUser || hasWriteAccess;
 
-  // if (!newRecord && !section) return <div>Loading..</div>;
   if (isValidating) return <div>Loading..</div>;
 
   if (queueError) return <div>An error has occurred</div>;
-
-  console.log('queue :>> ', queue);
 
   return (
     <Form<QueuesFormValues, typeof schema>

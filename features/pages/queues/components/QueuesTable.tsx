@@ -1,7 +1,12 @@
+import Badge from 'components/data-display/badge/Badge';
 import { TableColumn } from 'components/data-display/table';
 import WaveTable from 'components/data-display/wave-table';
 import { Plus } from 'components/icons';
+import Switch from 'components/inputs/switch';
+import { mapNumberToColour } from 'components/inputs/switch/Switch';
 import WaveTablePage from 'components/skeletons/wave-table-page/WaveTablePage';
+import Card from 'components/surfaces/card';
+import _ from 'lodash';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { EntityRoles } from 'state/auth/types';
@@ -10,13 +15,15 @@ import {
   QueuesTableRecord,
   useQueuesTableData,
 } from '../hooks/useQueuesTableData';
-import DeleteSection from './DeleteQueue';
+import DeleteQueue from './DeleteQueue';
+
+const inactiveLabel = 'Disabled';
 
 const QueuesTable: React.FC = () => {
   const {
     query: { businessUnitId },
   } = useRouter();
-  const { data, isLoading, error } = useQueuesTableData();
+  const { data, filters, isLoading, error } = useQueuesTableData();
   const { isSuperUser, hasWriteAccess } = useIsAuthorised([
     EntityRoles.Schedules,
   ]);
@@ -40,6 +47,83 @@ const QueuesTable: React.FC = () => {
         );
       },
     },
+    { field: 'priority', label: 'Priority' },
+    {
+      field: 'closedRoute',
+      label: 'Closed',
+      ignoreFiltering: true,
+      Cell({ entry }) {
+        return (
+          <Badge
+            size="sm"
+            label={entry.closedRoute ? entry.closedRoute : inactiveLabel}
+            variant={entry.closedRoute ? 'primary' : 'secondary'}
+          />
+        );
+      },
+    },
+    {
+      field: 'noAgentsRoute',
+      label: 'No Agents',
+      ignoreFiltering: true,
+      Cell({ entry }) {
+        return (
+          <Badge
+            size="sm"
+            label={entry.noAgentsRoute ? entry.noAgentsRoute : inactiveLabel}
+            variant={entry.noAgentsRoute ? 'primary' : 'secondary'}
+          />
+        );
+      },
+    },
+    {
+      field: 'maxQueueCallsRoute',
+      label: 'Max Calls',
+      ignoreFiltering: true,
+      Cell({ entry }) {
+        return (
+          <Badge
+            size="sm"
+            label={
+              entry.maxQueueCallsRoute
+                ? entry.maxQueueCallsRoute
+                : inactiveLabel
+            }
+            variant={entry.maxQueueCallsRoute ? 'primary' : 'secondary'}
+          />
+        );
+      },
+    },
+    {
+      field: 'maxQueueTimeRoute',
+      label: 'Max Time',
+      ignoreFiltering: true,
+      Cell({ entry }) {
+        return (
+          <Badge
+            size="sm"
+            label={
+              entry.maxQueueTimeRoute ? entry.maxQueueTimeRoute : inactiveLabel
+            }
+            variant={entry.maxQueueTimeRoute ? 'primary' : 'secondary'}
+          />
+        );
+      },
+    },
+    {
+      field: 'callbackRoute',
+      label: 'Calback',
+      ignoreFiltering: true,
+      Cell({ entry }) {
+        return (
+          <Badge
+            size="sm"
+            label={entry.callbackRoute ? entry.callbackRoute : inactiveLabel}
+            variant={entry.callbackRoute ? 'primary' : 'secondary'}
+          />
+        );
+      },
+    },
   ];
 
   if (isSuperUser || hasWriteAccess) {
@@ -50,11 +134,15 @@ const QueuesTable: React.FC = () => {
       Cell({ entry }) {
         return (
           <div className="text-right">
-            <DeleteSection id={entry.id} name={entry.name} />
+            <DeleteQueue id={entry.id} name={entry.name} />
           </div>
         );
       },
     });
+  }
+
+  function handleRouteFilterChange(filter: string) {
+    filters.setRouteDisplayList((currentList) => _.xor(currentList, [filter]));
   }
 
   if (isLoading)
@@ -71,6 +159,24 @@ const QueuesTable: React.FC = () => {
             <span>New Queues</span>
           </a>
         </Link>
+        {((data.length === 0 && filters.routeDisplayList.length < 5) ||
+          data.length > 0) && (
+          <div className="hidden md:block">
+            <Card title="Queue Config" description="Filter by feature status">
+              {filters.routeFilterList.map((routeFilter, index) => (
+                <Switch
+                  key={routeFilter.value}
+                  isChecked={filters.routeDisplayList.includes(
+                    routeFilter.value
+                  )}
+                  label={routeFilter.label}
+                  onChange={() => handleRouteFilterChange(routeFilter.value)}
+                  colour={mapNumberToColour(index)}
+                />
+              ))}
+            </Card>
+          </div>
+        )}
       </div>
       <div className="flex-1 overflow-x-auto">
         <WaveTable columns={columns} data={data} />
