@@ -13,7 +13,9 @@ import {
   EntryPointTableRecord,
   useEntryPointsTableData,
 } from '../hooks/useEntryPointsData';
+import CurrentCallflow from './CurrentCallflow';
 import DeleteEntryPoint from './DeleteEntryPoint';
+import HistoricalCallflow from './HistoricalCallflow';
 
 const EntryPointsTable: React.FC = () => {
   const {
@@ -45,6 +47,33 @@ const EntryPointsTable: React.FC = () => {
     },
     { field: 'section', label: 'Section' },
     { field: 'region', label: 'Region' },
+    {
+      field: 'id',
+      label: 'Historical Callflow',
+      ignoreFiltering: true,
+      Cell({ entry }) {
+        return (
+          <HistoricalCallflow
+            businessUnit={businessUnitId?.toString() as string}
+            name={entry.name}
+          />
+        );
+      },
+    },
+    {
+      field: 'id',
+      label: 'Current Callflow',
+      ignoreFiltering: true,
+      Cell({ entry }) {
+        return (
+          <CurrentCallflow
+            entryPointId={entry.id}
+            businessUnit={businessUnitId?.toString() as string}
+            name={entry.name}
+          />
+        );
+      },
+    },
   ];
 
   if (isSuperUser || hasWriteAccess) {
