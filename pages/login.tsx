@@ -5,9 +5,12 @@ import { NextPageWithLayout } from './page';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
-  console.log(router.query);
 
-  return <LoginForm onSuccess={() => router.push('/')} />;
+  return (
+    <LoginForm
+      onSuccess={() => router.push(router.query.callbackUrl?.toString() ?? '/')}
+    />
+  );
 };
 
 export default Login;

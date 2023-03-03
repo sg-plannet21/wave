@@ -83,6 +83,8 @@ const AuthRoute: React.FC<AuthRouteProps> = ({ children }) => {
           id: businessUnit.business_unit,
           name: businessUnit.business_unit_name,
         });
+      } else {
+        router.replace('/');
       }
       // setCalledPush(true);
       // router.replace('/404');

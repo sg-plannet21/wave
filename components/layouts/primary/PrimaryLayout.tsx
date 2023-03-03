@@ -19,7 +19,7 @@ import {
 } from 'components/icons';
 import BusinessUnitSelect from 'components/navigation/BusinessUnitSelect/BusinessUnitSelect';
 import NavLink from 'components/navigation/NavLink/NavLink';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -238,13 +238,12 @@ type IUserNavigationItem = {
 };
 
 function logout() {
-  console.log('logout()');
+  signOut();
 }
 
 const UserNavigation: React.FC = () => {
   const userNavigation = [
-    { name: 'Profile', href: '/about' },
-    { name: 'Logout', href: '', onClick: logout },
+    { name: 'Logout', href: '/login', onClick: logout },
   ].filter(Boolean) as IUserNavigationItem[];
   return (
     <Menu as="div" className="ml-3 relative">
