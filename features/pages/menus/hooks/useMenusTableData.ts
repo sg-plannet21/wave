@@ -108,7 +108,7 @@ export function useMenusTableData() {
   );
 
   return {
-    isLoading: !menus && !routes && !menusError && !routesError,
+    isLoading: (!menus || !routes) && !menusError && !routesError,
     error: menusError || routesError,
     data: filtered,
     filters: {

@@ -163,9 +163,7 @@ export default function useQueuesVersionData(queueId: string) {
   return {
     error: queueError || routesError || messagesError,
     isLoading:
-      !queue &&
-      !routes &&
-      !messages &&
+      (!queue || !routes || !messages) &&
       !queueError &&
       !routesError &&
       !messagesError,

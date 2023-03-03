@@ -1,7 +1,7 @@
 import { DatePicker } from 'antd';
 import Drawer from 'components/feedback/drawer';
 import { FieldWrapper } from 'components/form/FieldWrapper';
-import { Insights } from 'components/icons';
+import { Callflow } from 'components/icons';
 import Button from 'components/inputs/button';
 import moment from 'moment';
 import getConfig from 'next/config';
@@ -51,8 +51,6 @@ const CurrentCallflow: React.FC<CurrentCallflowProps> = ({
       values.date
     ).format()}&height=${height}`;
 
-    console.log('url :>> ', url);
-
     setIframeUrl(encodeURI(url));
   }
   return (
@@ -62,7 +60,7 @@ const CurrentCallflow: React.FC<CurrentCallflowProps> = ({
           className="text-indigo-600 dark:text-indigo-400 transition-transform hover:scale-110"
           onClick={open}
         >
-          <Insights className="w-5 h-5" />
+          <Callflow className="w-5 h-5" />
         </button>
       </div>
       <Drawer
@@ -92,9 +90,6 @@ const CurrentCallflow: React.FC<CurrentCallflowProps> = ({
                   minuteStep={15}
                   placement="bottomLeft"
                   showTime={true}
-                  disabledDate={(current) =>
-                    current?.isBefore(moment().startOf('day'))
-                  }
                   value={moment(props.field.value)}
                   onChange={(value) =>
                     props.field.onChange(value?.toISOString())

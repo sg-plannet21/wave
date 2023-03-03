@@ -98,9 +98,7 @@ export default function useScheduleVersionData(scheduleId: string) {
   return {
     error: scheduleError || routesError || messagesError,
     isLoading:
-      !schedule &&
-      !routes &&
-      !messages &&
+      (!schedule || !routes || !messages) &&
       !scheduleError &&
       !routesError &&
       !messagesError,

@@ -78,7 +78,7 @@ export function useQueuesTableData() {
   }, [data, routeDisplayList]);
 
   return {
-    isLoading: !queues && !routes && !queuesError && !routesError,
+    isLoading: (!queues || !routes) && !queuesError && !routesError,
     error: queuesError || routesError,
     data: filtered,
     filters: {

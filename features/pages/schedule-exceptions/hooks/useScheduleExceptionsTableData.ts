@@ -92,8 +92,7 @@ export function useScheduleExceptionsTableData(sectionId?: string) {
 
   return {
     isLoading:
-      !scheduleExceptions &&
-      !routes &&
+      (!scheduleExceptions || !routes) &&
       !scheduleExceptionsError &&
       !routesError,
     error: scheduleExceptionsError || routesError,

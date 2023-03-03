@@ -1,6 +1,6 @@
 import Drawer from 'components/feedback/drawer';
 import DateRangePicker from 'components/form/DateRangeField';
-import { Callflow } from 'components/icons';
+import { Insights } from 'components/icons';
 import Button from 'components/inputs/button';
 import moment, { Moment } from 'moment';
 import { useState } from 'react';
@@ -43,8 +43,6 @@ const HistoricalCallflow: React.FC<HistoricalCallflowProps> = ({
       values.dateRange[0]
     ).format()}&end=${moment(values.dateRange[1]).format()}&height=${height}`;
 
-    console.log('url :>> ', url);
-
     setIframeUrl(encodeURI(url));
   }
   return (
@@ -54,7 +52,7 @@ const HistoricalCallflow: React.FC<HistoricalCallflowProps> = ({
           className="text-emerald-600 dark:text-emerald-400 transition-transform hover:scale-110"
           onClick={open}
         >
-          <Callflow className="w-5 h-5" />
+          <Insights className="w-5 h-5" />
         </button>
       </div>
       <Drawer

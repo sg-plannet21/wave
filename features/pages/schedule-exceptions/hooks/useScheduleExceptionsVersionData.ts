@@ -100,9 +100,7 @@ export default function useScheduleExceptionsVersionData(
   return {
     error: scheduleExceptionError || routesError || messagesError,
     isLoading:
-      !scheduleException &&
-      !routes &&
-      !messages &&
+      (!scheduleException || !routes || !messages) &&
       !scheduleExceptionError &&
       !routesError &&
       !messagesError,

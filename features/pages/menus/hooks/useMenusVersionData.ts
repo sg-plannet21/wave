@@ -120,9 +120,7 @@ export default function useMenusVersionData(menuId: string) {
   return {
     error: menuError || routesError || messagesError,
     isLoading:
-      !menu &&
-      !routes &&
-      !messages &&
+      (!menu || !routes || !messages) &&
       !menuError &&
       !routesError &&
       !messagesError,
